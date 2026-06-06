@@ -165,14 +165,14 @@ export default function Hero() {
                 >
                     <Link
                         href="/enroll"
-                        className="px-8 py-3 w-full sm:w-auto rounded-full bg-gradient-to-r from-[#E6C687] via-[#D4AF37] to-[#AA7C11] text-sm font-bold text-black tracking-wide shadow-[0_4px_14px_rgba(212,175,55,0.25)] hover:shadow-[0_4px_22px_rgba(212,175,55,0.45)] hover:brightness-110 transition-all duration-300 text-center"
+                        className="px-8 py-3 w-full sm:w-auto rounded-full bg-linear-to-r from-[#E6C687] via-[#D4AF37] to-[#AA7C11] text-sm font-bold text-black tracking-wide shadow-[0_4px_14px_rgba(212,175,55,0.25)] hover:shadow-[0_4px_22px_rgba(212,175,55,0.45)] hover:brightness-110 transition-all duration-300 text-center"
                     >
                         {session === null ? "Enroll Now" : "Login / Enroll Now"}
                     </Link>
 
                     <Link
                         href="/demo"
-                        className="inline-flex w-full sm:w-auto items-center justify-center gap-2 px-8 py-3 rounded-full border border-white/[0.04] hover:border-[#DFB15B]/30 text-sm font-semibold text-white tracking-wide bg-[#15131C] hover:bg-[#1E1A29] transition-all duration-300 text-center"
+                        className="inline-flex w-full sm:w-auto items-center justify-center gap-2 px-8 py-3 rounded-full border border-white/4 hover:border-[#DFB15B]/30 text-sm font-semibold text-white tracking-wide bg-[#15131C] hover:bg-[#1E1A29] transition-all duration-300 text-center"
                     >
                         <Play className="w-3.5 h-3.5 text-[#DFB15B] fill-[#DFB15B]" />
                         Watch Demo
@@ -181,7 +181,7 @@ export default function Hero() {
 
                 {/* Stats Analytics Dashboard Footprint */}
                 <motion.div
-                    className="grid grid-cols-1 sm:grid-cols-3 gap-8 w-full max-w-4xl border-t border-white/[0.04] pt-12"
+                    className="grid grid-cols-1 sm:grid-cols-3 gap-8 w-full max-w-4xl border-t border-white/4 pt-12"
                     variants={itemVariants}
                 >
                     {statItems.map((stat) => (
