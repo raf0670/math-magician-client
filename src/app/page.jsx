@@ -7,6 +7,7 @@ import ReadyToCrack from "@/components/home/ReadyToCrack";
 import Testimonials from "@/components/home/Testimonials";
 import ThreeSteps from "@/components/home/ThreeSteps";
 import WhatYouGet from "@/components/home/WhatYouGet";
+import Footer from "@/components/shared/Footer";
 
 export default function LandingPage() {
   return (
@@ -22,6 +23,7 @@ export default function LandingPage() {
       <Community></Community>
       <FAQ></FAQ>
       <ReadyToCrack></ReadyToCrack>
+      <Footer></Footer>
     </div>
   );
 }
