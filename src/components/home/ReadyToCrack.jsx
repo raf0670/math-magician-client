@@ -12,7 +12,6 @@ export default function ReadyToCrack() {
         setHasMounted(true);
     }, []);
 
-    // 🌀 Generate localized deep-space star orbits swirling continuously around the core elements
     const orbitSparks = useMemo(() => {
         const symbols = ["✦", "★", "✧", "•"];
         return Array.from({ length: 18 }).map((_, idx) => {
@@ -25,149 +24,114 @@ export default function ReadyToCrack() {
                 radiusY,
                 size: Math.random() * 8 + 10,
                 opacity: Math.random() * 0.4 + 0.2,
-                speed: Math.random() * 4 + 3, // Orbit cycle durations
-                delay: Math.random() * -10, // Randomized offset start points
+                speed: Math.random() * 4 + 3,
+                delay: Math.random() * -10,
             };
         });
     }, []);
 
-    // 🚀 Native smooth scroll layout handler targeting your programs component anchor
-    const handleScrollToPrograms = () => {
-        const targetElement = document.getElementById("programs-section");
-        if (targetElement) {
-            targetElement.scrollIntoView({ behavior: "smooth", block: "start" });
-        }
-    };
-
-    // 🌌 Unfamiliar 3D Vortex Entry Transition Profile (triggers every time it hits viewport)
-    const vortexContainerVariants = {
-        hidden: {
-            opacity: 0,
-            scale: 1.15,
-            rotateY: -25,
-            rotateX: 12,
-            z: -100
-        },
+    const containerVariants = {
+        hidden: { opacity: 0 },
         visible: {
             opacity: 1,
-            scale: 1,
-            rotateY: 0,
-            rotateX: 0,
-            z: 0,
-            transition: {
-                duration: 1.2,
-                ease: [0.16, 1, 0.3, 1], // Custom cinematic cubic bezier curve
-                staggerChildren: 0.15
-            }
+            transition: { staggerChildren: 0.15 }
         }
     };
 
     const textNodeVariants = {
-        hidden: { opacity: 0, filter: "blur(8px)", y: 20 },
+        hidden: { opacity: 0, y: 30 },
         visible: {
             opacity: 1,
-            filter: "blur(0px)",
             y: 0,
-            transition: { duration: 0.8, ease: "easeOut" }
+            transition: { duration: 0.8, ease: [0.25, 1, 0.5, 1] }
+        }
+    };
+
+    const handleScrollToPrograms = () => {
+        const programAnchor = document.getElementById("programs-section");
+        if (programAnchor) {
+            programAnchor.scrollIntoView({ behavior: "smooth" });
         }
     };
 
     return (
-        <section className="w-full bg-[#0D0B14] py-28 px-6 md:px-12 lg:px-24 relative overflow-hidden select-none perspective-distant">
+        // 🪄 Strict matching base background color applied here to keep everything uniform
+        <section className="w-full bg-[#0D0B14] py-28 px-6 md:px-12 lg:px-24 relative overflow-hidden select-none flex items-center justify-center">
 
-            {/* 🔮 MASTER BACKGROUND NEBULA MASKS */}
-            <div className="absolute top-[50%] left-[50%] -translate-x-1/2 -translate-y-1/2 w-[65vw] h-[65vw] bg-indigo-950/20 rounded-full blur-[140px] pointer-events-none" />
-            <div className="absolute top-[50%] left-[50%] -translate-x-1/2 -translate-y-1/2 w-[40vw] h-[40vw] bg-[#7C3AED]/10 rounded-full blur-[120px] pointer-events-none animate-pulse" />
+            {/* 🌌 CENTRALIZED BLENDED AMBIENT GLOW BACKDROP */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[55vw] h-[55vw] bg-indigo-950/15 rounded-full blur-[130px] pointer-events-none" />
 
-            {/* 🛸 REVOLVING ORBIT CONSTELLATION FIELDS */}
-            <div className="absolute inset-0 pointer-events-none overflow-hidden z-0 hidden sm:block">
-                {hasMounted && orbitSparks.map((spark) => (
-                    <motion.div
-                        key={spark.id}
-                        className="absolute left-[50%] top-[45%] font-serif text-[#DFB15B]"
-                        style={{
-                            fontSize: spark.size,
-                            filter: "drop-shadow(0 0 8px rgba(223,177,91,0.6))",
-                        }}
-                        animate={{
-                            // Math equation based ellipse tracking models for unconventional cosmic loops
-                            x: orbitSparks.map((_, i) => Math.cos((i / 5) * 2 * Math.PI) * spark.radiusX),
-                            y: orbitSparks.map((_, i) => Math.sin((i / 5) * 2 * Math.PI) * spark.radiusY),
-                            opacity: [spark.opacity, spark.opacity + 0.3, 0.1, spark.opacity],
-                            scale: [1, 1.25, 0.75, 1]
-                        }}
-                        transition={{
-                            duration: spark.speed,
-                            repeat: Infinity,
-                            ease: "linear",
-                            delay: spark.delay
-                        }}
-                    >
-                        {spark.char}
-                    </motion.div>
-                ))}
-            </div>
+            {/* Particle Orbits */}
+            {hasMounted && (
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-40">
+                    {orbitSparks.map((spark) => (
+                        <motion.span
+                            key={spark.id}
+                            className="absolute font-sans text-white/40 selection:bg-transparent"
+                            style={{ fontSize: spark.size }}
+                            animate={{
+                                x: [0, spark.radiusX, 0, -spark.radiusX, 0],
+                                y: [-spark.radiusY, 0, spark.radiusY, 0, -spark.radiusY],
+                                opacity: [spark.opacity, spark.opacity * 2, spark.opacity, spark.opacity * 0.5, spark.opacity],
+                                scale: [1, 1.2, 0.9, 0.8, 1],
+                            }}
+                            transition={{
+                                duration: spark.speed,
+                                repeat: Infinity,
+                                ease: "linear",
+                                delay: spark.delay,
+                            }}
+                        >
+                            {spark.char}
+                        </motion.span>
+                    ))}
+                </div>
+            )}
 
-            {/* 🏰 CORE CONTAINER BLOCK */}
             <motion.div
-                className="container mx-auto max-w-3xl flex flex-col items-center text-center relative z-10"
-                variants={vortexContainerVariants}
+                className="max-w-3xl w-full flex flex-col items-center text-center relative z-10"
+                variants={containerVariants}
                 initial="hidden"
                 whileInView="visible"
-                viewport={{ once: false, amount: 0.25 }} // Re-triggers continuously upon re-scrolling
+                viewport={{ once: false, amount: 0.2 }}
             >
-
-                {/* Magic Floating Top Emblem */}
                 <motion.div
                     variants={textNodeVariants}
-                    animate={{ y: [0, -8, 0] }}
-                    transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                    className="mb-8"
+                    className="w-11 h-11 rounded-2xl bg-[#DFB15B]/10 border border-[#DFB15B]/20 flex items-center justify-center mb-6 shadow-[0_0_15px_rgba(223,177,91,0.1)]"
                 >
-                    <div className="w-16 h-16 rounded-2xl bg-linear-to-br from-[#1A1625] to-[#121017] border border-[#DFB15B]/20 flex items-center justify-center shadow-[0_8px_25px_rgba(212,175,55,0.1)] relative group">
-                        <div className="absolute inset-0 bg-[#DFB15B]/5 rounded-2xl blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                        <Sparkles className="w-7 h-7 text-[#DFB15B] filter drop-shadow-[0_0_6px_rgba(223,177,91,0.5)]" />
-                    </div>
+                    <Sparkles className="w-5 h-5 text-[#DFB15B]" />
                 </motion.div>
 
-                {/* Serif Headline Header */}
                 <motion.h2
                     variants={textNodeVariants}
-                    className="font-serif text-4xl sm:text-6xl font-medium tracking-tight text-white leading-tight mb-6"
+                    className="font-serif text-3xl md:text-5xl lg:text-6xl font-medium tracking-wide text-white mb-6 leading-tight"
                 >
-                    Are You Ready <br />
-                    to <span className="text-[#DFB15B]">Crack IBA?</span>
+                    Ready to Crack <span className="text-[#DFB15B]">IBA?</span>
                 </motion.h2>
 
-                {/* Supporting Pitch Bio Description */}
                 <motion.p
                     variants={textNodeVariants}
-                    className="text-[#8E8A9F] text-xs md:text-sm font-medium leading-relaxed max-w-xl mb-12 px-2"
+                    className="text-[#8E8A9F] text-xs md:text-sm font-medium leading-relaxed max-w-xl mb-10"
                 >
-                    Every IBA topper started exactly where you are right now. The only difference is — they started. Your seat at Dhaka University’s most prestigious institute is waiting.
+                    Stop waiting for the perfect moment. The best resources, structured lessons, and guidance are right here. Dhaka University’s most prestigious institute is waiting.
                 </motion.p>
 
-                {/* Interactive Smooth Scroll Launch Call to Action button */}
                 <motion.button
                     variants={textNodeVariants}
                     onClick={handleScrollToPrograms}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.98 }}
-                    className="px-10 py-4 rounded-2xl bg-linear-to-r from-[#E6C687] via-[#D4AF37] to-[#AA7C11] text-xs font-bold text-black uppercase tracking-wider shadow-[0_10px_30px_rgba(212,175,55,0.25)] hover:shadow-[0_15px_40px_rgba(212,175,55,0.45)] transition-all duration-300 relative group overflow-hidden"
+                    className="px-10 py-4 rounded-2xl bg-gradient-to-r from-[#E6C687] via-[#D4AF37] to-[#AA7C11] text-xs font-bold text-black uppercase tracking-wider shadow-[0_10px_30px_rgba(212,175,55,0.25)] hover:shadow-[0_15px_40px_rgba(212,175,55,0.45)] transition-all duration-300 relative group overflow-hidden"
                 >
-                    {/* Subtle horizontal laser flash swipe across button background */}
-                    <div className="absolute inset-0 w-1/2 h-full bg-white/20 skew-x-[-30deg] -translate-x-full group-hover:animate-shine transition-transform duration-1000" />
                     Start Your Journey
                 </motion.button>
 
-                {/* Small Baseline Footnote Notification */}
                 <motion.span
                     variants={textNodeVariants}
                     className="text-[10px] md:text-xs font-semibold text-[#6B667B] tracking-wide mt-6"
                 >
-                    Next batch starts soon — limited seats available
+                    Instant access available immediately upon registration confirmation • Join today
                 </motion.span>
-
             </motion.div>
         </section>
     );

@@ -18,10 +18,10 @@ export default function LandingPage() {
       <div id="programs-section">
         <Programs></Programs>
       </div>
-      <Testimonials></Testimonials>
+      {/* <Testimonials></Testimonials> */}
       <Community></Community>
-      <ReadyToCrack></ReadyToCrack>
       <FAQ></FAQ>
+      <ReadyToCrack></ReadyToCrack>
     </div>
   );
 }

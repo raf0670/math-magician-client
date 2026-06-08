@@ -2,9 +2,10 @@
 "use client";
 import { useEffect, useState, useMemo } from "react";
 import { motion } from "framer-motion";
-import { School, Building2, Laptop, Plus } from "lucide-react";
+import { School, Building2, Laptop, Plus, Star } from "lucide-react";
+import Image from "next/image";
 
-export default function Programs() {
+export default function ProgramsAndTestimonials() {
     const [hasMounted, setHasMounted] = useState(false);
 
     useEffect(() => {
@@ -12,82 +13,105 @@ export default function Programs() {
         setHasMounted(true);
     }, []);
 
-    // 🪄 Generate continuous localized magical floating sparks for the center card
+    // 🪄 Localized floating background magic sparks for the highlight card
     const popularSparks = useMemo(() => {
         const magicGlyphs = ["★", "✦", "✧", "•"];
         return Array.from({ length: 14 }).map((_, idx) => ({
             id: idx,
             char: magicGlyphs[idx % magicGlyphs.length],
             left: `${Math.random() * 90 + 5}%`,
-            bottom: `${Math.random() * 20}%`, // Sparks initiate from base area
+            bottom: `${Math.random() * 20}%`,
             size: Math.random() * 8 + 10,
             opacity: Math.random() * 0.4 + 0.2,
             driftX: [0, Math.random() * 30 - 15, Math.random() * -30 + 15, 0],
-            driftY: [0, -120, -260, -400], // Smooth continuous upward float sequence
-            duration: Math.random() * 3 + 3, // Fast, snappy ember float
+            driftY: [0, -120, -260, -400],
+            speed: Math.random() * 5 + 4,
+            delay: Math.random() * -8,
         }));
     }, []);
 
-    const programCards = [
+    // --- Programs Data ---
+    const cardsData = [
         {
-            title: "Offline",
-            location: "Farmgate",
-            description: "In-person classes at our Farmgate center. Best for students who thrive face-to-face with structured daily sessions.",
-            price: "৳ 8,000",
-            period: "/ 3 month batch",
-            badge: "Most Popular",
-            badgeStyle: "bg-gradient-to-r from-[#E6C687] to-[#D4AF37] text-black font-bold border border-[#DFB15B]/30 shadow-[0_0_15px_rgba(212,175,55,0.4)]",
-            isPopular: true,
-            glowHoverClass: "hover:shadow-[0_0_50px_rgba(212,175,55,0.25)] hover:border-[#DFB15B]/50",
-            buttonStyle: "bg-gradient-to-r from-[#E6C687] via-[#D4AF37] to-[#AA7C11] text-black font-bold shadow-[0_4px_14px_rgba(212,175,55,0.3)] hover:shadow-[0_4px_22px_rgba(212,175,55,0.5)]",
+            badge: "Offline Intensive",
+            title: "IBA Offline Batch",
+            desc: "Full comprehensive offline preparation at our physical center with face-to-face mentorship and real-time exam simulations.",
             icon: School,
-            iconColor: "text-[#DFB15B]",
             features: [
-                "Daily 2-hr live classes",
-                "Printed study materials",
-                "On-site mock exams",
-                "Small batch (30 max)"
-            ]
+                "48+ Interactive Physical Lectures",
+                "Printed Strategy Lecture Sheets",
+                "Weekly Specialized Topic Tests",
+                "15+ Realistic Full Mock Exams",
+                "Direct 1-on-1 Doubt Solving"
+            ],
+            price: "৳15,000",
+            period: "/ full program",
+            borderClass: "border-white/3 hover:border-white/10",
+            bgClass: "bg-[#121017]",
+            badgeStyle: "bg-white/5 border-white/10 text-white/80",
+            iconStyle: "bg-white/5 text-white/80 border-white/10",
+            buttonStyle: "bg-white/5 hover:bg-white/10 text-white border border-white/10"
         },
         {
-            title: "Offline",
-            location: "Bailey Road",
-            description: "Our Bailey Road branch — closer to Dhaka University. Evening batches available for school/college students.",
-            price: "৳ 8,000",
-            period: "/ 3 month batch",
-            badge: null,
-            isPopular: false,
-            glowHoverClass: "hover:shadow-[0_0_45px_rgba(124,58,237,0.2)] hover:border-[#7C3AED]/40",
-            buttonStyle: "bg-[#1E1A29] text-white border border-white/[0.04] hover:bg-[#252033] font-semibold",
+            badge: "Most Popular Option",
+            title: "IBA Premium Combo",
+            desc: "Get the best of both worlds. Complete physical class access combined with our entire digital suite, video vaults, and remote mock portals.",
             icon: Building2,
-            iconColor: "text-[#8E8A9F]",
             features: [
-                "Evening & weekend batches",
-                "Printed study materials",
-                "On-site mock exams",
-                "Small batch (30 max)"
-            ]
+                "Everything in Offline Batch",
+                "Full Online Portal Access 24/7",
+                "120+ Recorded Core Concept Videos",
+                "Exclusive GK & Analytical Vaults",
+                "Premium WhatsApp Group Support"
+            ],
+            price: "৳18,000",
+            period: "/ full program",
+            borderClass: "border-[#DFB15B]/25 shadow-[0_4px_30px_rgba(213,175,55,0.03)]",
+            bgClass: "bg-[#121017]",
+            badgeStyle: "bg-[#DFB15B]/10 border-[#DFB15B]/20 text-[#DFB15B]",
+            iconStyle: "bg-[#DFB15B]/10 text-[#DFB15B] border-[#DFB15B]/20",
+            buttonStyle: "bg-gradient-to-r from-[#E6C687] via-[#D4AF37] to-[#AA7C11] text-black font-bold shadow-[0_4px_20px_rgba(212,175,55,0.15)]",
+            isPopular: true
         },
         {
-            title: "Online",
-            location: "Anywhere in Bangladesh",
-            description: "Full access from anywhere in Bangladesh or abroad. Live classes, recordings, digital materials, and online mock tests.",
-            price: "৳ 5,500",
-            period: "/ 3 month batch",
-            badge: "Study Anywhere",
-            badgeStyle: "bg-[#7C3AED] text-white font-semibold border border-[#A78BFA]/20",
-            isPopular: false,
-            glowHoverClass: "hover:shadow-[0_0_45px_rgba(99,102,241,0.25)] hover:border-[#6366F1]/50",
-            buttonStyle: "bg-[#1E1A29] text-white border border-white/[0.04] hover:bg-[#252033] font-semibold",
+            badge: "Flexible Remote",
+            title: "IBA Online Live",
+            desc: "Prepare from anywhere in Bangladesh. Interactive live streaming broadcasts with complete access to saved records and digital resources.",
             icon: Laptop,
-            iconColor: "text-[#A78BFA]",
             features: [
-                "Live + recorded sessions",
-                "Digital study materials",
-                "Online mock tests",
-                "WhatsApp doubt support"
-            ]
+                "48+ Interactive HD Live Streams",
+                "Digital Strategy PDFs & Notes",
+                "Web-Based Sectional Timed Quizzes",
+                "15+ Automated Digital Mocks",
+                "Dedicated Group Doubt Chatrooms"
+            ],
+            price: "৳12,000",
+            period: "/ full program",
+            borderClass: "border-white/3 hover:border-white/10",
+            bgClass: "bg-[#121017]",
+            badgeStyle: "bg-white/5 border-white/10 text-white/80",
+            iconStyle: "bg-white/5 text-white/80 border-white/10",
+            buttonStyle: "bg-white/5 hover:bg-white/10 text-white border border-white/10"
         }
+    ];
+
+    // --- Testimonials Data ---
+    const reviews = [
+        {
+            name: "Sakib Al Hasan",
+            meta: "IBA 48th Batch — Selected ✓",
+            text: '"MathMagician’s mock tests are identical in feel to the real IBA paper. The personal counselling sessions helped me fix my timing issues. I literally couldn’t have made it without this."',
+        },
+        {
+            name: "Nusrat Jahan",
+            meta: "IBA 47th Batch — Selected ✓",
+            text: '"I was weak in Math but the structured approach here changed everything. Short-cut techniques, pattern recognition drills — I scored 90%+ in quantitative. Absolutely worth every taka."',
+        },
+        {
+            name: "Rafiul Islam",
+            meta: "IBA 49th Batch — Selected ✓",
+            text: '"The community alone is worth enrolling for. Everyone is super serious and motivated. The live classes are engaging, and the instructor genuinely cares about each student\'s progress."',
+        },
     ];
 
     const containerVariants = {
@@ -98,8 +122,8 @@ export default function Programs() {
         }
     };
 
-    const cardVariants = {
-        hidden: { opacity: 0, y: 40 },
+    const itemVariants = {
+        hidden: { opacity: 0, y: 35 },
         visible: {
             opacity: 1,
             y: 0,
@@ -108,118 +132,107 @@ export default function Programs() {
     };
 
     return (
+        // 🪄 This unified root section binds both layers into one solid continuous background sheet
         <section className="w-full bg-[#0D0B14] py-24 px-6 md:px-12 lg:px-24 relative overflow-hidden select-none">
 
-            {/* 🌌 AMBIENT CANVAS BACKGROUND GLOWS */}
-            <div className="absolute top-[20%] right-[-10%] w-[50vw] h-[50vw] bg-[#7C3AED]/5 rounded-full blur-[140px] pointer-events-none" />
-            <div className="absolute bottom-[-10%] left-[-10%] w-[45vw] h-[45vw] bg-indigo-950/20 rounded-full blur-[130px] pointer-events-none" />
+            {/* 🌌 BALANCED LAYER LIGHT FIELDS */}
+            <div className="absolute top-[15%] left-[50%] -translate-x-1/2 w-[65vw] h-[65vw] bg-[#7C3AED]/5 rounded-full blur-[140px] pointer-events-none" />
+            <div className="absolute bottom-[20%] left-[50%] -translate-x-1/2 w-[60vw] h-[60vw] bg-indigo-950/10 rounded-full blur-[150px] pointer-events-none" />
 
-            <div className="container mx-auto max-w-6xl relative z-10">
+            {/* =========================================================================
+                                     SECTION 1: PROGRAMS DECK
+               ========================================================================= */}
+            <div className="container mx-auto max-w-6xl relative z-10 mb-32">
 
-                {/* 🏷️ SECTION HEADLINE BLOCK */}
-                <div className="w-full flex flex-col items-center text-center mb-20">
+                {/* Programs Header Block */}
+                <div className="w-full flex flex-col items-center text-center mb-16">
                     <div className="inline-block px-3 py-1 rounded-full bg-[#DFB15B]/5 border border-[#DFB15B]/15 text-[10px] tracking-widest text-[#DFB15B] uppercase font-bold mb-4">
                         Programs
                     </div>
                     <h2 className="font-serif text-3xl md:text-5xl font-medium tracking-wide text-white mb-4">
-                        Pick Your Program
+                        Choose Your Battlefield
                     </h2>
                     <p className="text-[#6B667B] text-xs md:text-sm font-medium">
-                        Offline or online — same world-class content, same results.
+                        Tailored program tracks engineered explicitly to convert preparation into admission results.
                     </p>
                 </div>
 
-                {/* 🗃️ PRICING STRUCUTURAL CARDS GRID */}
+                {/* Programs Matrix Grid */}
                 <motion.div
-                    className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch pt-6"
+                    className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch"
                     variants={containerVariants}
                     initial="hidden"
                     whileInView="visible"
-                    viewport={{ once: false, amount: 0.15 }}
+                    viewport={{ once: false, amount: 0.1 }}
                 >
-                    {programCards.map((card, index) => {
-                        const IconComponent = card.icon;
-
+                    {cardsData.map((card, index) => {
                         return (
                             <motion.div
                                 key={index}
-                                variants={cardVariants}
-                                whileHover={{ y: -10 }}
-                                className={`bg-[#121017] border rounded-3xl p-8 flex flex-col justify-between transition-all duration-500 relative shadow-[0_10px_30px_rgba(0,0,0,0.5)] group overflow-visible
-                  ${card.isPopular ? "border-[#DFB15B]/25 shadow-[0_0_30px_rgba(212,175,55,0.08)]" : "border-white/3"}
-                  ${card.glowHoverClass}`}
+                                variants={itemVariants}
+                                whileHover={{ y: -6 }}
+                                className={`${card.bgClass} ${card.borderClass} rounded-3xl p-8 flex flex-col justify-between transition-all duration-300 relative group overflow-hidden hover:shadow-[0_12px_40px_rgba(0,0,0,0.5)]`}
                             >
-
-                                {/* 🌟 PERSISTENT FLOATING SPARK LAYER FOR THE MOST POPULAR CARD */}
+                                {/* Active Floating Sparks System for Highlighted Card */}
                                 {card.isPopular && hasMounted && (
-                                    <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-3xl z-0">
+                                    <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-3xl z-0 opacity-40">
                                         {popularSparks.map((spark) => (
-                                            <motion.div
+                                            <motion.span
                                                 key={spark.id}
-                                                className="absolute font-serif text-[#DFB15B] pointer-events-none font-bold"
-                                                style={{
-                                                    left: spark.left,
-                                                    bottom: spark.bottom,
-                                                    fontSize: spark.size,
-                                                    opacity: spark.opacity,
-                                                    filter: "drop-shadow(0 0 6px rgba(223,177,91,0.6))",
-                                                }}
+                                                className="absolute font-sans text-[#DFB15B]/40"
+                                                style={{ left: spark.left, bottom: spark.bottom, fontSize: spark.size }}
                                                 animate={{
                                                     x: spark.driftX,
                                                     y: spark.driftY,
-                                                    opacity: [spark.opacity, spark.opacity + 0.3, 0, 0],
+                                                    opacity: [spark.opacity, spark.opacity * 2, spark.opacity, 0],
                                                 }}
                                                 transition={{
-                                                    duration: spark.duration,
+                                                    duration: spark.speed,
                                                     repeat: Infinity,
                                                     ease: "linear",
+                                                    delay: spark.delay,
                                                 }}
                                             >
                                                 {spark.char}
-                                            </motion.div>
+                                            </motion.span>
                                         ))}
                                     </div>
                                 )}
 
-                                {/* Card Top Structural content */}
                                 <div className="relative z-10">
-                                    {/* Absolute Card Header Pill Badges */}
-                                    {card.badge && (
-                                        <div className={`absolute -top-11 -left-2 px-4 py-1.5 rounded-full text-[10px] uppercase tracking-widest ${card.badgeStyle}`}>
+                                    {/* Top Metadata Headers */}
+                                    <div className="w-full flex items-center justify-between gap-4 mb-6">
+                                        <div className={`px-2.5 py-1 rounded-md border text-[9px] font-bold tracking-wider uppercase ${card.badgeStyle}`}>
                                             {card.badge}
                                         </div>
-                                    )}
-
-                                    {/* Program Header */}
-                                    <div className="flex items-center justify-between mb-6">
-                                        <div className="flex flex-col">
-                                            <h3 className="font-serif text-2xl font-semibold text-white tracking-wide transition-colors duration-300 group-hover:text-white">
-                                                {card.title}
-                                            </h3>
-                                            <span className={`text-xs font-semibold mt-0.5 ${card.isPopular ? "text-[#DFB15B]" : "text-[#8E8A9F]"}`}>
-                                                {card.location}
-                                            </span>
-                                        </div>
-                                        <IconComponent className={`w-6 h-6 ${card.iconColor} opacity-90`} />
                                     </div>
 
-                                    {/* Card Main Body Pitch Text */}
-                                    <p className="text-[#6B667B] text-xs leading-relaxed font-medium mb-8 group-hover:text-[#8E8A9F] transition-colors duration-300">
-                                        {card.description}
+                                    {/* Title Header Structure */}
+                                    <div className="flex items-center gap-4 mb-4">
+                                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center border ${card.iconStyle}`}>
+                                            <card.icon className="w-4 h-4 stroke-[1.8]" />
+                                        </div>
+                                        <h3 className="font-serif text-xl font-semibold text-white tracking-wide">
+                                            {card.title}
+                                        </h3>
+                                    </div>
+
+                                    <p className="text-[#6B667B] text-xs leading-relaxed font-medium mb-6">
+                                        {card.desc}
                                     </p>
 
-                                    {/* Bullet Feature Set Matrix */}
-                                    <ul className="flex flex-col gap-3.5 border-t border-white/3 pt-6 mb-8">
-                                        {card.features.map((feat, idx) => (
-                                            <li key={idx} className="flex items-center gap-3 text-xs font-medium text-[#8E8A9F] group-hover:text-white transition-colors duration-300">
-                                                <Plus className="w-3.5 h-3.5 text-[#DFB15B]/80 shrink-0" />
+                                    {/* Core Features Checklists */}
+                                    <ul className="flex flex-col gap-3 border-t border-white/3 pt-6 mb-8">
+                                        {card.features.map((feat, fIdx) => (
+                                            <li key={fIdx} className="flex items-start gap-2.5 text-xs font-semibold text-[#8E8A9F]">
+                                                <Plus className="w-3.5 h-3.5 text-[#DFB15B] shrink-0 mt-0.5 opacity-70" />
                                                 <span>{feat}</span>
                                             </li>
                                         ))}
                                     </ul>
                                 </div>
 
-                                {/* Card Bottom Pricing Anchor Framework */}
+                                {/* Pricing Framework Footers */}
                                 <div className="mt-auto pt-4 relative z-10">
                                     <div className="flex items-baseline gap-1.5 mb-6">
                                         <span className="font-serif text-3xl font-bold text-white tracking-tight">
@@ -239,8 +252,82 @@ export default function Programs() {
                         );
                     })}
                 </motion.div>
-
             </div>
+
+            {/* =========================================================================
+                                   SECTION 2: TESTIMONIALS LAYER
+               ========================================================================= */}
+            <div className="container mx-auto max-w-6xl relative z-10">
+
+                {/* Testimonials Header Block */}
+                <div className="w-full flex flex-col items-center text-center mb-16">
+                    <div className="inline-block px-3 py-1 rounded-full bg-[#7C3AED]/10 border border-[#7C3AED]/20 text-[10px] tracking-widest text-[#A78BFA] uppercase font-bold mb-4">
+                        Testimonials
+                    </div>
+                    <h2 className="font-serif text-3xl md:text-5xl font-medium tracking-wide text-white mb-4">
+                        Stories from the Magic Guild
+                    </h2>
+                    <p className="text-[#6B667B] text-xs md:text-sm font-medium">
+                        Real reports from successful applicants who navigated the system.
+                    </p>
+                </div>
+
+                {/* Review Cards Grid Deck */}
+                <motion.div
+                    className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch"
+                    variants={containerVariants}
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: false, amount: 0.15 }}
+                >
+                    {reviews.map((item, index) => (
+                        <motion.div
+                            key={index}
+                            variants={itemVariants}
+                            whileHover={{ y: -6 }}
+                            className="bg-[#121017] border border-white/3 hover:border-white/10 rounded-3xl p-8 flex flex-col justify-between transition-all duration-300 relative group hover:shadow-[0_12px_40px_rgba(0,0,0,0.4)]"
+                        >
+                            <div className="flex flex-col gap-4">
+                                {/* Stars Row Block */}
+                                <div className="flex items-center gap-1">
+                                    {[...Array(5)].map((_, starIdx) => (
+                                        <Star key={starIdx} className="w-3.5 h-3.5 fill-[#DFB15B] text-[#DFB15B]" />
+                                    ))}
+                                </div>
+
+                                {/* Text Quotes Area */}
+                                <p className="text-[#8E8A9F] text-xs leading-relaxed font-medium italic">
+                                    {item.text}
+                                </p>
+                            </div>
+
+                            {/* User Profile Footer row */}
+                            <div className="mt-8 pt-5 border-t border-white/3 flex items-center gap-3.5">
+                                <div className="w-11 h-11 rounded-full overflow-hidden bg-[#16131C] border border-white/8 relative shrink-0">
+                                    <Image
+                                        src="https://plus.unsplash.com/premium_photo-1661942126259-fb08e7cce1e2"
+                                        alt={item.name}
+                                        width={80}
+                                        height={80}
+                                        className="w-full h-full object-cover grayscale brightness-[0.9] contrast-[1.05] group-hover:grayscale-0 group-hover:scale-105 transition-all duration-500"
+                                    />
+                                </div>
+
+                                <div className="flex flex-col min-w-0">
+                                    <span className="text-white text-xs font-semibold tracking-wide truncate">
+                                        {item.name}
+                                    </span>
+                                    <span className="text-[#DFB15B] text-[10px] font-bold tracking-wide mt-0.5 truncate">
+                                        {item.meta}
+                                    </span>
+                                </div>
+                            </div>
+
+                        </motion.div>
+                    ))}
+                </motion.div>
+            </div>
+
         </section>
     );
 }
