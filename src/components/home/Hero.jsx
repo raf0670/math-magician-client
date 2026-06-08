@@ -38,10 +38,10 @@ export default function UnifiedHeroDeck() {
             char: symbols[idx % symbols.length],
             left: `${Math.random() * 90 + 5}%`,
             top: `${Math.random() * 90 + 5}%`,
-            size: Math.random() * 12 + 11,
-            opacity: Math.random() * 0.18 + 0.04,
+            size: Math.random() * 12 + 30,
+            opacity: Math.random() * 0.3 + 1,
             delay: Math.random() * -20,
-            duration: Math.random() * 15 + 20,
+            duration: Math.random() * 15 + 30,
         }));
     }, []);
 
@@ -93,15 +93,15 @@ export default function UnifiedHeroDeck() {
         const magicGlyphs = ["★", "✦", "✧", "•"];
         return Array.from({ length: 14 }).map((_, idx) => {
             const angle = (idx / 14) * 2 * Math.PI;
-            const radius = 150 + Math.random() * 50;
+            const radius = 150 + Math.random() * 40;
             return {
                 id: idx,
                 char: magicGlyphs[idx % magicGlyphs.length],
-                x: Math.cos(angle) * radius + 170,
-                y: Math.sin(angle) * radius + 170,
-                size: Math.random() * 6 + 9,
-                opacity: Math.random() * 0.35 + 0.15,
-                delay: Math.random() * -6,
+                x: Math.cos(angle) * radius + 200,
+                y: Math.sin(angle) * radius + 200,
+                size: Math.random() * 6 + 20,
+                opacity: Math.random() * 0.35 + 1,
+                delay: Math.random() * -1,
             };
         });
     }, []);
