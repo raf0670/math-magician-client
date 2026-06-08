@@ -13,7 +13,7 @@ export default function DashboardSidebar() {
         { href: "/dashboard/classes", label: "Live Classes", icon: Video },
         { href: "/dashboard/mock-tests", label: "Mock Tests", icon: ClipboardCheck },
         { href: "/dashboard/analytics", label: "Analytics", icon: BarChart3 },
-        { href: "/dashboard/profile", label: "My Profile", icon: User },
+        { href: "/dashboard/profile", label: "Profile", icon: User },
     ];
 
     return (
@@ -101,7 +101,7 @@ export default function DashboardSidebar() {
                                 <item.icon className={`w-4 h-4 transition-transform duration-200 ${isActive ? "text-[#DFB15B] scale-110" : "text-[#6B667B]"
                                     }`} />
 
-                                <span className={`text-[9px] font-bold mt-1 tracking-wide transition-colors duration-200 ${isActive ? "text-white" : "text-[#6B667B]"
+                                <span className={`text-center text-[9px] font-bold mt-1 tracking-wide transition-colors duration-200 ${isActive ? "text-white" : "text-[#6B667B]"
                                     }`}>
                                     {item.label}
                                 </span>
