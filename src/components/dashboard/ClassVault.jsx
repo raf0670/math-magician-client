@@ -23,7 +23,6 @@ export default function ClassVault() {
             date: "June 04, 2026",
             duration: "1h 42m",
             driveLink: "https://drive.google.com/drive/folders/mock-quant-link-1",
-            status: "watched" // watched, in-progress, unwatched
         },
         {
             id: "v2",
@@ -32,7 +31,6 @@ export default function ClassVault() {
             date: "June 01, 2026",
             duration: "1h 25m",
             driveLink: "https://drive.google.com/drive/folders/mock-english-link-1",
-            status: "in-progress"
         },
         {
             id: "v3",
@@ -41,7 +39,6 @@ export default function ClassVault() {
             date: "May 28, 2026",
             duration: "1h 55m",
             driveLink: "https://drive.google.com/drive/folders/mock-analytical-link-1",
-            status: "unwatched"
         },
         {
             id: "v4",
@@ -50,7 +47,6 @@ export default function ClassVault() {
             date: "May 25, 2026",
             duration: "2h 02m",
             driveLink: "https://drive.google.com/drive/folders/mock-quant-link-2",
-            status: "watched"
         }
     ];
 
