@@ -1,13 +1,26 @@
 /* eslint-disable react-hooks/purity */
 "use client";
-import { useEffect, useState, useMemo } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useEffect, useState, useMemo, useRef } from "react";
+// 🪄 1. Added useScroll and useTransform for Parallax Magic
+import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
 import { Sparkles, Play, Target, Star, FileText, Video, ClipboardCheck, UserCheck, Users, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 
 export default function UnifiedHeroDeck() {
     const [hasMounted, setHasMounted] = useState(false);
+
+    // 🪄 2. Create a reference anchor to monitor the scroll container position
+    const containerRef = useRef(null);
+    const { scrollYProgress } = useScroll({
+        target: containerRef,
+        offset: ["start start", "end end"]
+    });
+
+    // 🪄 3. Map scroll position to different movement values (Parallax Weights)
+    // Background glows and back-layer elements move much slower
+    const yGlowBg = useTransform(scrollYProgress, [0, 1], [0, 250]);
+    const yGlyphsBg = useTransform(scrollYProgress, [0, 1], [0, -150]);
 
     useEffect(() => {
         // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -25,10 +38,10 @@ export default function UnifiedHeroDeck() {
             char: symbols[idx % symbols.length],
             left: `${Math.random() * 90 + 5}%`,
             top: `${Math.random() * 90 + 5}%`,
-            size: Math.random() * 12 + 20,
-            opacity: Math.random() * 0.5 + 1,
-            delay: Math.random() * -10,
-            duration: Math.random() * 15 + 30,
+            size: Math.random() * 12 + 11,
+            opacity: Math.random() * 0.18 + 0.04,
+            delay: Math.random() * -20,
+            duration: Math.random() * 15 + 20,
         }));
     }, []);
 
@@ -93,7 +106,7 @@ export default function UnifiedHeroDeck() {
         });
     }, []);
 
-    // --- ANIMATION MASTER SPECIFICATIONS (RE-ESTABLISHED) ---
+    // --- Animation Variants ---
     const heroContainerVariants = {
         hidden: { opacity: 0 },
         visible: {
@@ -138,16 +151,17 @@ export default function UnifiedHeroDeck() {
     };
 
     return (
-        <div className="w-full bg-[#0D0B14] relative overflow-hidden select-none">
+        // Added container ref to register scroll track boundaries
+        <div ref={containerRef} className="w-full bg-[#0D0B14] relative overflow-hidden select-none">
 
-            {/* 🌌 SYSTEM RADIANCE GRADIENTS (Continuous Backdrop Sheet) */}
-            <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[85vw] h-[85vw] bg-indigo-950/15 rounded-full blur-[150px] pointer-events-none" />
-            <div className="absolute top-[35%] right-[-15%] w-[55vw] h-[55vw] bg-[#7C3AED]/4 rounded-full blur-[140px] pointer-events-none" />
-            <div className="absolute bottom-[10%] left-[-10%] w-[50vw] h-[50vw] bg-indigo-950/15 rounded-full blur-[140px] pointer-events-none" />
+            {/* 🌌 PARALLAX RADIANCE FIELDS: Attached style={{ y: yGlowBg }} so they glide smoothly at an offset pace */}
+            <motion.div style={{ y: yGlowBg }} className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[85vw] h-[85vw] bg-indigo-950/15 rounded-full blur-[150px] pointer-events-none" />
+            <motion.div style={{ y: yGlowBg }} className="absolute top-[35%] right-[-15%] w-[55vw] h-[55vw] bg-[#7C3AED]/4 rounded-full blur-[140px] pointer-events-none" />
+            <motion.div style={{ y: yGlowBg }} className="absolute bottom-[10%] left-[-10%] w-[50vw] h-[50vw] bg-indigo-950/15 rounded-full blur-[140px] pointer-events-none" />
 
-            {/* Persistent Atmospheric Cosmic Spark Fields */}
+            {/* 🌌 PARALLAX GLYPH FIELD: Controlled by yGlyphsBg to float independently of layout panels */}
             {hasMounted && (
-                <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
+                <motion.div style={{ y: yGlyphsBg }} className="absolute inset-0 pointer-events-none overflow-hidden z-0">
                     <AnimatePresence>
                         {floatingGlyphs.map((glyph) => (
                             <motion.span
@@ -175,7 +189,7 @@ export default function UnifiedHeroDeck() {
                             </motion.span>
                         ))}
                     </AnimatePresence>
-                </div>
+                </motion.div>
             )}
 
             {/* =========================================================================
@@ -197,7 +211,7 @@ export default function UnifiedHeroDeck() {
 
                     <motion.h1 variants={heroItemVariants} className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-medium tracking-wide text-white leading-[1.12] mb-6">
                         Crack the Code of <br />
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#E6C687] via-[#D4AF37] to-[#AA7C11]">
+                        <span className="text-transparent bg-clip-text bg-linear-to-r from-[#E6C687] via-[#D4AF37] to-[#AA7C11]">
                             IBA Admission
                         </span>
                     </motion.h1>
@@ -207,7 +221,7 @@ export default function UnifiedHeroDeck() {
                     </motion.p>
 
                     <motion.div variants={heroItemVariants} className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full mb-20">
-                        <Link href="#programs-section" className="inline-flex w-full sm:w-auto items-center justify-center px-8 py-3.5 rounded-full bg-gradient-to-r from-[#E6C687] via-[#D4AF37] to-[#AA7C11] text-xs font-bold text-black uppercase tracking-wider shadow-[0_4px_25px_rgba(212,175,55,0.2)] hover:shadow-[0_10px_35px_rgba(212,175,55,0.35)] transition-all duration-300 hover:scale-[1.02]">
+                        <Link href="#programs-section" className="inline-flex w-full sm:w-auto items-center justify-center px-8 py-3.5 rounded-full bg-linear-to-r from-[#E6C687] via-[#D4AF37] to-[#AA7C11] text-xs font-bold text-black uppercase tracking-wider shadow-[0_4px_25px_rgba(212,175,55,0.2)] hover:shadow-[0_10px_35px_rgba(212,175,55,0.35)] transition-all duration-300 hover:scale-[1.02]">
                             Explore Programs
                         </Link>
                         <Link href="#" className="inline-flex w-full sm:w-auto items-center justify-center gap-2 px-8 py-3.5 rounded-full border border-white/4 hover:border-[#DFB15B]/30 text-xs font-bold text-white uppercase tracking-wider bg-[#121017] hover:bg-[#1A1722] transition-all duration-300">
@@ -233,8 +247,6 @@ export default function UnifiedHeroDeck() {
                ========================================================================= */}
             <section className="w-full py-24 px-6 md:px-12 lg:px-24 relative z-10">
                 <div className="container mx-auto max-w-6xl">
-
-                    {/* Independent Viewport-Triggered Header Block */}
                     <motion.div
                         className="w-full flex flex-col items-center text-center mb-16"
                         variants={blockHeaderVariants}
@@ -253,7 +265,6 @@ export default function UnifiedHeroDeck() {
                         </p>
                     </motion.div>
 
-                    {/* Staggered Scroll Deck */}
                     <motion.div
                         className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch"
                         variants={gridContainerVariants}
@@ -268,7 +279,7 @@ export default function UnifiedHeroDeck() {
                                 whileHover={{ y: -5 }}
                                 className="bg-[#121017] border border-white/3 hover:border-white/10 p-7 rounded-2xl transition-all duration-300 shadow-[0_4px_25px_rgba(0,0,0,0.3)] flex flex-col gap-6 group relative overflow-hidden"
                             >
-                                <div className="absolute inset-0 bg-gradient-to-br from-white/1 to-transparent pointer-events-none" />
+                                <div className="absolute inset-0 bg-linear-to-br from-white/1 to-transparent pointer-events-none" />
                                 <div className={`w-11 h-11 rounded-xl flex items-center justify-center border transition-all duration-300 group-hover:scale-105 ${card.bgIconClass} ${card.colorClass}`}>
                                     <card.icon className="w-5 h-5 stroke-[1.8]" />
                                 </div>
@@ -293,10 +304,9 @@ export default function UnifiedHeroDeck() {
                 <div className="container mx-auto max-w-5xl">
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
 
-                        {/* Instructor Media Frame (With dedicated scroll entrance) */}
                         <div className="lg:col-span-5 flex justify-center relative">
                             {hasMounted && (
-                                <div className="absolute w-[340px] h-[340px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none overflow-visible z-0 opacity-40">
+                                <div className="absolute w-85 h-85 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none overflow-visible z-0 opacity-40">
                                     {instructorSparks.map((spark) => (
                                         <motion.span
                                             key={spark.id}
@@ -332,7 +342,6 @@ export default function UnifiedHeroDeck() {
                             </motion.div>
                         </div>
 
-                        {/* Instructor Text Columns (With responsive staggered scroll entry) */}
                         <motion.div
                             className="lg:col-span-7 flex flex-col items-center lg:items-start text-center lg:text-left"
                             initial="hidden"
