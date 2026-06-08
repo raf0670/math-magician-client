@@ -121,7 +121,7 @@ export default function ReadyToCrack() {
                     onClick={handleScrollToPrograms}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.98 }}
-                    className="px-10 py-4 rounded-2xl bg-gradient-to-r from-[#E6C687] via-[#D4AF37] to-[#AA7C11] text-xs font-bold text-black uppercase tracking-wider shadow-[0_10px_30px_rgba(212,175,55,0.25)] hover:shadow-[0_15px_40px_rgba(212,175,55,0.45)] transition-all duration-300 relative group overflow-hidden"
+                    className="px-10 py-4 rounded-2xl bg-linear-to-r from-[#E6C687] via-[#D4AF37] to-[#AA7C11] text-xs font-bold text-black uppercase tracking-wider shadow-[0_10px_30px_rgba(212,175,55,0.25)] hover:shadow-[0_15px_40px_rgba(212,175,55,0.45)] transition-all duration-300 relative group overflow-hidden"
                 >
                     Start Your Journey
                 </motion.button>

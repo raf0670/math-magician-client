@@ -2,202 +2,379 @@
 "use client";
 import { useEffect, useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Sparkles, Play, Target, Star, FileText } from "lucide-react";
+import { Sparkles, Play, Target, Star, FileText, Video, ClipboardCheck, UserCheck, Users, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 
-export default function Hero() {
-    const [session, setSession] = useState(null);
+export default function UnifiedHeroDeck() {
     const [hasMounted, setHasMounted] = useState(false);
 
     useEffect(() => {
         // eslint-disable-next-line react-hooks/set-state-in-effect
         setHasMounted(true);
-
-        // fetch("/api/auth/session")
-        //     .then((res) => {
-        //         if (!res.ok) throw new Error("Unauthorized");
-        //         return res.json();
-        //     })
-        //     .then((data) => setSession(data))
-        //     .catch(() => setSession(false));
     }, []);
 
+    // --- Hero Background Mathematical Glyphs Vault ---
     const floatingGlyphs = useMemo(() => {
         const symbols = [
             "∑", "π", "√", "∆", "∞", "≠", "∫", "A²", "B", "C", "x", "y", "IQ", "EQ",
-            "θ", "λ", "Ω", "α", "β", "μ", "GMAT", "IBA", "log", "f(x)", "π²", "3.14"
+            "θ", "λ", "Ω", "α", "β", "μ", "GMAT", "IBA", "log", "f(x)"
         ];
+        return Array.from({ length: 24 }).map((_, idx) => ({
+            id: idx,
+            char: symbols[idx % symbols.length],
+            left: `${Math.random() * 90 + 5}%`,
+            top: `${Math.random() * 90 + 5}%`,
+            size: Math.random() * 12 + 20,
+            opacity: Math.random() * 0.5 + 1,
+            delay: Math.random() * -10,
+            duration: Math.random() * 15 + 30,
+        }));
+    }, []);
 
-        return Array.from({ length: 28 }).map((_, idx) => {
-            const isLeft = idx % 2 === 0;
-            const initialX = isLeft ? Math.random() * 30 : Math.random() * 30 + 70;
-            const initialY = Math.random() * 85 + 5;
+    const statItems = [
+        { icon: Target, value: "92%", label: "Success Rate" },
+        { icon: Star, value: "1,200+", label: "Students Selected" },
+        { icon: FileText, value: "45+", label: "Full Mock Tests" },
+    ];
 
+    const featureCards = [
+        {
+            title: "Live Classes",
+            description: "Join interactive live sessions covering Math, English, Analytical Ability and Written. Ask questions. Solve problems in real time.",
+            icon: Video,
+            colorClass: "text-[#E6C687]",
+            bgIconClass: "bg-[#E6C687]/10 border-[#E6C687]/20",
+        },
+        {
+            title: "Mock Tests",
+            description: "Simulate the real IBA exam with timed full-length mock tests. Detailed answer keys and rank-based performance reports included.",
+            icon: ClipboardCheck,
+            colorClass: "text-[#A78BFA]",
+            bgIconClass: "bg-[#7C3AED]/10 border-[#7C3AED]/20",
+        },
+        {
+            title: "Personal Counselling",
+            description: "Get 1-on-1 guidance from mentors who cracked IBA themselves. Study plans, weak-area targeting, and mindset coaching.",
+            icon: UserCheck,
+            colorClass: "text-[#DFB15B]",
+            bgIconClass: "bg-[#DFB15B]/10 border-[#DFB15B]/20",
+        },
+        {
+            title: "Premium Community",
+            description: "Access our exclusive, highly moderated group. Share solutions, discuss hard problems, and stay accountable with top peers.",
+            icon: Users,
+            colorClass: "text-blue-400",
+            bgIconClass: "bg-blue-500/10 border-blue-500/20",
+        },
+    ];
+
+    const credentials = [
+        { text: "IBA, DU Graduate" },
+        { text: "GMAT 740" },
+        { text: "5+ Years Teaching" },
+        { text: "1,200+ Students Mentored" },
+    ];
+
+    const instructorSparks = useMemo(() => {
+        const magicGlyphs = ["★", "✦", "✧", "•"];
+        return Array.from({ length: 14 }).map((_, idx) => {
+            const angle = (idx / 14) * 2 * Math.PI;
+            const radius = 150 + Math.random() * 50;
             return {
                 id: idx,
-                char: symbols[idx % symbols.length],
-                x: `${initialX}%`,
-                y: `${initialY}%`,
-                size: Math.random() * 14 + 14,
-                opacity: Math.random() * 0.18 + 0.05,
-                driftX: [0, Math.random() * 40 - 20, Math.random() * 40 - 20, 0],
-                driftY: [0, Math.random() * 40 - 20, Math.random() * 40 - 20, 0],
-                duration: Math.random() * 15 + 2,
+                char: magicGlyphs[idx % magicGlyphs.length],
+                x: Math.cos(angle) * radius + 170,
+                y: Math.sin(angle) * radius + 170,
+                size: Math.random() * 6 + 9,
+                opacity: Math.random() * 0.35 + 0.15,
+                delay: Math.random() * -6,
             };
         });
     }, []);
 
-    // Structural orchestrations for screen entry
-    const containerVariants = {
+    // --- ANIMATION MASTER SPECIFICATIONS (RE-ESTABLISHED) ---
+    const heroContainerVariants = {
         hidden: { opacity: 0 },
         visible: {
             opacity: 1,
-            transition: { staggerChildren: 0.12, delayChildren: 0.1 },
-        },
+            transition: { staggerChildren: 0.12, delayChildren: 0.15 }
+        }
     };
 
-    const itemVariants = {
+    const heroItemVariants = {
+        hidden: { opacity: 0, y: 35 },
+        visible: {
+            opacity: 1,
+            y: 0,
+            transition: { duration: 0.8, ease: [0.25, 1, 0.5, 1] }
+        }
+    };
+
+    const blockHeaderVariants = {
         hidden: { opacity: 0, y: 25 },
         visible: {
             opacity: 1,
             y: 0,
-            transition: { duration: 0.6, ease: "easeOut" },
-        },
+            transition: { duration: 0.6, ease: [0.25, 1, 0.5, 1] }
+        }
     };
 
-    const statItems = [
-        { value: "3,200+", label: "Students Enrolled", icon: FileText },
-        { value: "94%", label: "IBA Selection Rate", icon: Target },
-        { value: "5★", label: "Average Rating", icon: Star },
-    ];
+    const gridContainerVariants = {
+        hidden: { opacity: 0 },
+        visible: {
+            opacity: 1,
+            transition: { staggerChildren: 0.1 }
+        }
+    };
+
+    const featureCardVariants = {
+        hidden: { opacity: 0, y: 35 },
+        visible: {
+            opacity: 1,
+            y: 0,
+            transition: { duration: 0.7, ease: [0.25, 1, 0.5, 1] }
+        }
+    };
 
     return (
-        <div className="w-full bg-[#0D0B14] min-h-[92vh] flex flex-col items-center justify-center pt-20 pb-12 px-6 relative overflow-hidden">
+        <div className="w-full bg-[#0D0B14] relative overflow-hidden select-none">
 
-            {/* 🌌 AMBIENT BACKGROUND GLOWS */}
-            <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_top,transparent_30%,#0D0B14_95%)] pointer-events-none z-0" />
-            <div className="absolute top-[-10%] left-[-15%] w-[55vw] h-[55vw] bg-[#7C3AED]/10 rounded-full blur-[130px] pointer-events-none animate-pulse" />
-            <div className="absolute bottom-[-10%] right-[-15%] w-[45vw] h-[45vw] bg-indigo-950/20 rounded-full blur-[140px] pointer-events-none" />
+            {/* 🌌 SYSTEM RADIANCE GRADIENTS (Continuous Backdrop Sheet) */}
+            <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[85vw] h-[85vw] bg-indigo-950/15 rounded-full blur-[150px] pointer-events-none" />
+            <div className="absolute top-[35%] right-[-15%] w-[55vw] h-[55vw] bg-[#7C3AED]/4 rounded-full blur-[140px] pointer-events-none" />
+            <div className="absolute bottom-[10%] left-[-10%] w-[50vw] h-[50vw] bg-indigo-950/15 rounded-full blur-[140px] pointer-events-none" />
 
-            {/* 🛸 FLOATING ARCANE MATH SYMBOLS MATRIX */}
-            <div className="absolute inset-0 pointer-events-none select-none z-0 overflow-hidden">
-                {hasMounted && floatingGlyphs.map((glyph) => (
-                    <motion.div
-                        key={glyph.id}
-                        className="absolute font-serif font-semibold text-[#DFB15B]"
-                        style={{
-                            left: glyph.x,
-                            top: glyph.y,
-                            fontSize: glyph.size,
-                            opacity: glyph.opacity,
-                            filter: "drop-shadow(0 0 4px rgba(223,177,91,0.15))",
-                        }}
-                        animate={{
-                            x: glyph.driftX,
-                            y: glyph.driftY,
-                            rotate: [0, Math.random() * 45 - 22.5, Math.random() * -45 + 22.5, 0],
-                        }}
-                        transition={{
-                            duration: glyph.duration,
-                            repeat: Infinity,
-                            ease: "easeInOut",
-                        }}
-                    >
-                        {glyph.char}
-                    </motion.div>
-                ))}
-            </div>
+            {/* Persistent Atmospheric Cosmic Spark Fields */}
+            {hasMounted && (
+                <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
+                    <AnimatePresence>
+                        {floatingGlyphs.map((glyph) => (
+                            <motion.span
+                                key={glyph.id}
+                                className="absolute font-serif text-white/40 selection:bg-transparent"
+                                style={{
+                                    left: glyph.left,
+                                    top: glyph.top,
+                                    fontSize: glyph.size,
+                                    opacity: glyph.opacity,
+                                }}
+                                animate={{
+                                    y: [0, -35, 0, 35, 0],
+                                    x: [0, 20, 0, -20, 0],
+                                    rotate: [0, 15, 0, -15, 0],
+                                }}
+                                transition={{
+                                    duration: glyph.duration,
+                                    repeat: Infinity,
+                                    ease: "easeInOut",
+                                    delay: glyph.delay,
+                                }}
+                            >
+                                {glyph.char}
+                            </motion.span>
+                        ))}
+                    </AnimatePresence>
+                </div>
+            )}
 
-            {/* 🏰 HERO CONTENT CONTAINER FRAME */}
-            {/* Controlled via whileInView with once: false to re-trigger every time it hitches into view */}
-            <motion.div
-                className="container mx-auto max-w-5xl text-center z-10 flex flex-col items-center justify-center"
-                variants={containerVariants}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: false, amount: 0.15 }}
-            >
-
-                {/* Badge */}
+            {/* =========================================================================
+                                     SECTION 1: HERO CONTAINER
+               ========================================================================= */}
+            <section className="w-full pt-36 pb-24 px-6 md:px-12 lg:px-24 flex flex-col items-center justify-center relative z-10 min-h-[90vh]">
                 <motion.div
-                    className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#7C3AED]/10 border border-[#7C3AED]/20 text-[10px] md:text-xs font-semibold uppercase tracking-widest text-[#DFB15B] shadow-[0_0_20px_rgba(124,58,237,0.15)] mb-6"
-                    variants={itemVariants}
+                    className="max-w-4xl w-full flex flex-col items-center text-center"
+                    variants={heroContainerVariants}
+                    initial="hidden"
+                    animate="visible"
                 >
-                    <Sparkles className="w-3.5 h-3.5 text-[#DFB15B]" />
-                    BANGLADESH’S #1 IBA ADMISSION PREP
-                </motion.div>
-
-                {/* Headline */}
-                <motion.h1
-                    className="font-serif text-4xl sm:text-6xl md:text-8xl tracking-tight text-white leading-[1.1]"
-                    variants={itemVariants}
-                >
-                    Welcome to the School <br />
-                    of <span className="text-[#DFB15B]">Magicians</span>
-                </motion.h1>
-
-                {/* Subtitle description */}
-                <motion.p
-                    className="text-[#8E8A9F] max-w-xl mt-6 text-xs md:text-sm font-medium leading-relaxed px-4"
-                    variants={itemVariants}
-                >
-                    Learn the magic to easily crack IBA — Dhaka University’s most coveted admission test. Everything you need. Right here.
-                </motion.p>
-
-                {/* Academic Modules Stack Links */}
-                <motion.div
-                    className="flex flex-wrap items-center justify-center gap-x-2.5 gap-y-1 mt-4 text-[#DFB15B] text-xs font-semibold tracking-wide"
-                    variants={itemVariants}
-                >
-                    {["Math", "English", "Analytical Ability", "Written"].map((sub, i) => (
-                        <span key={sub} className="flex items-center gap-2.5">
-                            <span className="hover:text-white transition-colors cursor-default">{sub}</span>
-                            {i < 3 && <span className="opacity-30 font-sans text-[10px]">|</span>}
+                    <motion.div variants={heroItemVariants} className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#DFB15B]/10 border border-[#DFB15B]/25 shadow-[0_0_15px_rgba(223,177,91,0.08)] mb-8">
+                        <Sparkles className="w-3.5 h-3.5 text-[#DFB15B]" />
+                        <span className="text-[10px] tracking-widest text-[#DFB15B] uppercase font-bold">
+                            The Ultimate IBA Preparation Ecosystem
                         </span>
-                    ))}
-                    <span className="opacity-40 text-[#8E8A9F] font-normal font-sans ml-0.5">— all in one place</span>
+                    </motion.div>
+
+                    <motion.h1 variants={heroItemVariants} className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-medium tracking-wide text-white leading-[1.12] mb-6">
+                        Crack the Code of <br />
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#E6C687] via-[#D4AF37] to-[#AA7C11]">
+                            IBA Admission
+                        </span>
+                    </motion.h1>
+
+                    <motion.p variants={heroItemVariants} className="text-[#8E8A9F] text-xs sm:text-sm md:text-base font-medium leading-relaxed max-w-2xl mb-12">
+                        Master quantitative modules, speed shortcuts, and critical analytical frameworks under structured blueprints designed by real top-tier IBA graduates.
+                    </motion.p>
+
+                    <motion.div variants={heroItemVariants} className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full mb-20">
+                        <Link href="#programs-section" className="inline-flex w-full sm:w-auto items-center justify-center px-8 py-3.5 rounded-full bg-gradient-to-r from-[#E6C687] via-[#D4AF37] to-[#AA7C11] text-xs font-bold text-black uppercase tracking-wider shadow-[0_4px_25px_rgba(212,175,55,0.2)] hover:shadow-[0_10px_35px_rgba(212,175,55,0.35)] transition-all duration-300 hover:scale-[1.02]">
+                            Explore Programs
+                        </Link>
+                        <Link href="#" className="inline-flex w-full sm:w-auto items-center justify-center gap-2 px-8 py-3.5 rounded-full border border-white/4 hover:border-[#DFB15B]/30 text-xs font-bold text-white uppercase tracking-wider bg-[#121017] hover:bg-[#1A1722] transition-all duration-300">
+                            <Play className="w-3 h-3 text-[#DFB15B] fill-[#DFB15B]" />
+                            Watch Demo
+                        </Link>
+                    </motion.div>
+
+                    <motion.div className="grid grid-cols-1 sm:grid-cols-3 gap-8 w-full max-w-4xl border-t border-white/3 pt-12" variants={heroItemVariants}>
+                        {statItems.map((stat) => (
+                            <div key={stat.label} className="flex flex-col items-center justify-center gap-1.5">
+                                <stat.icon className="w-4 h-4 text-[#DFB15B] opacity-80" />
+                                <span className="font-serif text-2xl md:text-3xl font-bold tracking-tight text-white">{stat.value}</span>
+                                <span className="text-[10px] md:text-xs font-semibold text-[#6B667B] tracking-wide uppercase">{stat.label}</span>
+                            </div>
+                        ))}
+                    </motion.div>
                 </motion.div>
+            </section>
 
-                {/* Core Interactive Portal Links */}
-                <motion.div
-                    className="flex flex-col sm:flex-row items-center gap-4 mt-12 mb-20 w-full max-w-md justify-center px-4"
-                    variants={itemVariants}
-                >
-                    <Link
-                        href="/enroll"
-                        className="px-8 py-3 w-full sm:w-auto rounded-full bg-linear-to-r from-[#E6C687] via-[#D4AF37] to-[#AA7C11] text-sm font-bold text-black tracking-wide shadow-[0_4px_14px_rgba(212,175,55,0.25)] hover:shadow-[0_4px_22px_rgba(212,175,55,0.45)] hover:brightness-110 transition-all duration-300 text-center"
+            {/* =========================================================================
+                                   SECTION 2: WHAT YOU GET VIEWPORT
+               ========================================================================= */}
+            <section className="w-full py-24 px-6 md:px-12 lg:px-24 relative z-10">
+                <div className="container mx-auto max-w-6xl">
+
+                    {/* Independent Viewport-Triggered Header Block */}
+                    <motion.div
+                        className="w-full flex flex-col items-center text-center mb-16"
+                        variants={blockHeaderVariants}
+                        initial="hidden"
+                        whileInView="visible"
+                        viewport={{ once: false, amount: 0.3 }}
                     >
-                        {session === null ? "Enroll Now" : "Login / Enroll Now"}
-                    </Link>
-
-                    <Link
-                        href="/demo"
-                        className="inline-flex w-full sm:w-auto items-center justify-center gap-2 px-8 py-3 rounded-full border border-white/4 hover:border-[#DFB15B]/30 text-sm font-semibold text-white tracking-wide bg-[#15131C] hover:bg-[#1E1A29] transition-all duration-300 text-center"
-                    >
-                        <Play className="w-3.5 h-3.5 text-[#DFB15B] fill-[#DFB15B]" />
-                        Watch Demo
-                    </Link>
-                </motion.div>
-
-                {/* Stats Analytics Dashboard Footprint */}
-                <motion.div
-                    className="grid grid-cols-1 sm:grid-cols-3 gap-8 w-full max-w-4xl border-t border-white/4 pt-12"
-                    variants={itemVariants}
-                >
-                    {statItems.map((stat) => (
-                        <div key={stat.label} className="flex flex-col items-center justify-center gap-1.5">
-                            <stat.icon className="w-5 h-5 text-[#DFB15B] opacity-80" />
-                            <span className="font-serif text-3xl font-bold tracking-tight text-white">
-                                {stat.value}
-                            </span>
-                            <span className="text-xs font-semibold text-[#8E8A9F] tracking-wide">
-                                {stat.label}
-                            </span>
+                        <div className="inline-block px-3 py-1 rounded-full bg-[#7C3AED]/10 border border-[#7C3AED]/20 text-[10px] tracking-widest text-[#A78BFA] uppercase font-bold mb-4">
+                            Features
                         </div>
-                    ))}
-                </motion.div>
+                        <h2 className="font-serif text-3xl md:text-5xl font-medium tracking-wide text-white mb-4">
+                            What You Actually Get
+                        </h2>
+                        <p className="text-[#6B667B] text-xs md:text-sm font-medium">
+                            A rigorous tactical ecosystem packed with premium assets to build real speed and exam confidence.
+                        </p>
+                    </motion.div>
 
-            </motion.div>
+                    {/* Staggered Scroll Deck */}
+                    <motion.div
+                        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch"
+                        variants={gridContainerVariants}
+                        initial="hidden"
+                        whileInView="visible"
+                        viewport={{ once: false, amount: 0.12 }}
+                    >
+                        {featureCards.map((card, idx) => (
+                            <motion.div
+                                key={idx}
+                                variants={featureCardVariants}
+                                whileHover={{ y: -5 }}
+                                className="bg-[#121017] border border-white/3 hover:border-white/10 p-7 rounded-2xl transition-all duration-300 shadow-[0_4px_25px_rgba(0,0,0,0.3)] flex flex-col gap-6 group relative overflow-hidden"
+                            >
+                                <div className="absolute inset-0 bg-gradient-to-br from-white/1 to-transparent pointer-events-none" />
+                                <div className={`w-11 h-11 rounded-xl flex items-center justify-center border transition-all duration-300 group-hover:scale-105 ${card.bgIconClass} ${card.colorClass}`}>
+                                    <card.icon className="w-5 h-5 stroke-[1.8]" />
+                                </div>
+                                <div className="flex flex-col gap-2.5">
+                                    <h3 className="font-serif text-lg font-medium text-white tracking-wide transition-colors duration-200 group-hover:text-[#DFB15B]">
+                                        {card.title}
+                                    </h3>
+                                    <p className="text-[#8E8A9F] text-xs leading-relaxed font-medium transition-colors duration-200 group-hover:text-white/70">
+                                        {card.description}
+                                    </p>
+                                </div>
+                            </motion.div>
+                        ))}
+                    </motion.div>
+                </div>
+            </section>
+
+            {/* =========================================================================
+                                   SECTION 3: INSTRUCTOR VIEWPORT
+               ========================================================================= */}
+            <section className="w-full py-24 px-6 md:px-12 lg:px-24 relative z-10">
+                <div className="container mx-auto max-w-5xl">
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
+
+                        {/* Instructor Media Frame (With dedicated scroll entrance) */}
+                        <div className="lg:col-span-5 flex justify-center relative">
+                            {hasMounted && (
+                                <div className="absolute w-[340px] h-[340px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none overflow-visible z-0 opacity-40">
+                                    {instructorSparks.map((spark) => (
+                                        <motion.span
+                                            key={spark.id}
+                                            className="absolute font-sans text-[#DFB15B]"
+                                            style={{ left: spark.x, top: spark.y, fontSize: spark.size }}
+                                            animate={{
+                                                scale: [1, 1.2, 0.9, 1],
+                                                opacity: [spark.opacity, spark.opacity * 1.8, spark.opacity * 0.5, spark.opacity],
+                                            }}
+                                            transition={{ duration: 4, repeat: Infinity, ease: "linear", delay: spark.delay }}
+                                        >
+                                            {spark.char}
+                                        </motion.span>
+                                    ))}
+                                </div>
+                            )}
+
+                            <motion.div
+                                className="w-72 h-80 md:w-80 md:h-96 rounded-3xl bg-[#121017] border border-[#DFB15B]/20 p-3.5 relative z-10 shadow-[0_15px_45px_rgba(0,0,0,0.5)] group overflow-hidden hover:border-white/10 transition-all duration-300"
+                                initial={{ opacity: 0, y: 40, scale: 0.95 }}
+                                whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                                viewport={{ once: false, amount: 0.25 }}
+                                transition={{ duration: 0.75, ease: [0.25, 1, 0.5, 1] }}
+                            >
+                                <div className="w-full h-full rounded-2xl overflow-hidden bg-[#16131C] border border-white/3 relative">
+                                    <Image
+                                        src="https://images.unsplash.com/photo-1534528741775-53994a69daeb"
+                                        alt="Instructor Portrait"
+                                        fill
+                                        className="object-cover grayscale brightness-[0.88] contrast-[1.03] group-hover:scale-[1.03] group-hover:grayscale-0 transition-all duration-700"
+                                    />
+                                </div>
+                            </motion.div>
+                        </div>
+
+                        {/* Instructor Text Columns (With responsive staggered scroll entry) */}
+                        <motion.div
+                            className="lg:col-span-7 flex flex-col items-center lg:items-start text-center lg:text-left"
+                            initial="hidden"
+                            whileInView="visible"
+                            viewport={{ once: false, amount: 0.25 }}
+                            variants={{
+                                hidden: { opacity: 0 },
+                                visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
+                            }}
+                        >
+                            <motion.div variants={featureCardVariants} className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#DFB15B]/10 border border-[#DFB15B]/20 text-[10px] tracking-widest text-[#DFB15B] uppercase font-bold mb-4">
+                                <Sparkles className="w-3 h-3 text-[#DFB15B]" />
+                                <span>Your Instructor</span>
+                            </motion.div>
+
+                            <motion.h2 variants={featureCardVariants} className="font-serif text-3xl md:text-5xl font-medium tracking-wide text-white mb-6 leading-tight">
+                                Learn from the Best. <br />
+                                <span className="text-[#DFB15B]">Not Just Anyone.</span>
+                            </motion.h2>
+
+                            <motion.p variants={featureCardVariants} className="text-[#8E8A9F] text-xs md:text-sm font-medium leading-relaxed max-w-xl mb-10">
+                                I’m an IBA graduate who’s helped thousands of students navigate the toughest admission test in Bangladesh. My approach is simple: no fluff, no fear — only strategy, shortcuts, and relentless practice. If IBA is your dream, I’ll make it your reality.
+                            </motion.p>
+
+                            <motion.div variants={featureCardVariants} className="flex flex-wrap gap-3 justify-center lg:justify-start w-full max-w-xl">
+                                {credentials.map((badge, idx) => (
+                                    <motion.div
+                                        key={idx}
+                                        whileHover={{ scale: 1.03, borderColor: "rgba(223, 177, 91, 0.35)" }}
+                                        className="flex items-center gap-2 px-4 py-2 rounded-full bg-[#121017] border border-white/4 text-xs font-semibold text-[#8E8A9F] hover:text-[#DFB15B] shadow-md transition-all duration-200 cursor-default"
+                                    >
+                                        <CheckCircle2 className="w-3.5 h-3.5 text-[#DFB15B] shrink-0 opacity-80" />
+                                        <span>{badge.text}</span>
+                                    </motion.div>
+                                ))}
+                            </motion.div>
+                        </motion.div>
+
+                    </div>
+                </div>
+            </section>
+
         </div>
     );
 }

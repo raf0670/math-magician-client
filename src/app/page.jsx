@@ -12,8 +12,8 @@ export default function LandingPage() {
   return (
     <div>
       <Hero></Hero>
-      <WhatYouGet></WhatYouGet>
-      <Instructor></Instructor>
+      {/* <WhatYouGet></WhatYouGet>
+      <Instructor></Instructor> */}
       <ThreeSteps></ThreeSteps>
       <div id="programs-section">
         <Programs></Programs>
