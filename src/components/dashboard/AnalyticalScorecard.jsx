@@ -1,138 +1,126 @@
 "use client";
-import { motion } from "framer-motion";
-import { Award, CheckCircle, XCircle, AlertTriangle, ArrowLeft, RefreshCw, BookOpen } from "lucide-react";
+import { CheckCircle, XCircle, AlertTriangle, BookOpen } from "lucide-react";
 import Link from "next/link";
 
-export default function AnalyticalScorecard({ answers, examData }) {
-    // 🔑 Hardcoded answer keys to simulate the backend scoring logic module
-    const solutionKeys = {
-        "q-1": "C",
-        "q-2": "B",
-        "q-3": "B"
-    };
+const OPTION_LABELS = ["A", "B", "C", "D", "E"];
 
-    // Calculate baseline evaluation performance numbers
+export default function AnalyticalScorecard({ answers, examData, submissionResult }) {
+    const normalizedAnswers = Array.isArray(answers) ? answers : [];
+
     let correctCount = 0;
     let incorrectCount = 0;
     let skippedCount = 0;
 
-    examData.questions.forEach(q => {
-        const userAnswer = answers[q.id];
-        if (!userAnswer) {
-            skippedCount++;
-        } else if (userAnswer === solutionKeys[q.id]) {
-            correctCount++;
+    const questions = examData?.questions || [];
+
+    questions.forEach((question, index) => {
+        const userAnswer = normalizedAnswers[index];
+        if (userAnswer === undefined || userAnswer === null || userAnswer === -1) {
+            skippedCount += 1;
+        } else if (userAnswer === question.correctOptionIndex) {
+            correctCount += 1;
         } else {
-            incorrectCount++;
+            incorrectCount += 1;
         }
     });
 
-    // 🧮 IBA Evaluation Formula: Score = Correct - (0.25 * Incorrect)
     const rawScore = correctCount - (incorrectCount * 0.25);
-    const maxPossibleScore = examData.questions.length;
-    const accuracyPercentage = maxPossibleScore > 0
-        ? ((correctCount / (correctCount + incorrectCount)) * 105).toFixed(1)
-        : 0;
+    const maxPossibleScore = questions.length;
 
     return (
-        <div className="w-full select-none flex flex-col gap-8 text-left">
+        <div className="flex w-full select-none flex-col gap-8 text-left">
+            <div className="relative overflow-hidden rounded-3xl border border-white/5 bg-[#121017] p-6 shadow-lg sm:p-8">
+                <div className="pointer-events-none absolute bottom-0 right-0 h-72 w-72 rounded-full bg-emerald-500/5 blur-[60px]" />
 
-            {/* 🏆 PRIMARY SUMMARY HERO HEADER BANNER */}
-            <div className="bg-[#121017] border border-white/5 rounded-3xl p-6 sm:p-8 relative overflow-hidden shadow-lg">
-                <div className="absolute right-0 bottom-0 w-72 h-72 bg-emerald-500/5 rounded-full blur-[60px] pointer-events-none" />
-
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-6 items-center">
-                    {/* Raw Combined Score Token */}
-                    <div className="bg-[#1A1722] border border-white/5 rounded-2xl p-6 flex flex-col items-center justify-center text-center">
-                        <span className="text-[10px] font-bold text-[#6B667B] uppercase tracking-widest">Calculated Score</span>
-                        <span className="font-serif text-4xl font-bold text-transparent bg-clip-text bg-linear-to-r from-emerald-400 to-teal-400 mt-2">
+                <div className="grid grid-cols-1 items-center gap-6 md:grid-cols-4">
+                    <div className="flex flex-col items-center justify-center rounded-2xl border border-white/5 bg-[#1A1722] p-6 text-center">
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-[#6B667B]">Calculated Score</span>
+                        <span className="mt-2 bg-linear-to-r from-emerald-400 to-teal-400 bg-clip-text font-serif text-4xl font-bold text-transparent">
                             {rawScore.toFixed(2)}
                         </span>
-                        <span className="text-[10px] font-semibold text-[#8E8A9F] mt-1">out of {maxPossibleScore}.00</span>
+                        <span className="mt-1 text-[10px] font-semibold text-[#8E8A9F]">out of {maxPossibleScore}.00</span>
                     </div>
 
-                    {/* Meta breakdowns rows */}
-                    <div className="md:col-span-3 grid grid-cols-3 gap-4">
-                        <div className="p-4 bg-emerald-500/5 border border-emerald-500/10 rounded-xl flex flex-col items-start">
-                            <div className="flex items-center gap-1.5 text-emerald-400 font-bold text-[10px] uppercase tracking-wide">
-                                <CheckCircle className="w-3.5 h-3.5" /> Correct
+                    <div className="grid grid-cols-3 gap-4 md:col-span-3">
+                        <div className="flex flex-col items-start rounded-xl border border-emerald-500/10 bg-emerald-500/5 p-4">
+                            <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wide text-emerald-400">
+                                <CheckCircle className="h-3.5 w-3.5" /> Correct
                             </div>
-                            <span className="text-xl font-bold text-white mt-1.5">{correctCount}</span>
+                            <span className="mt-1.5 text-xl font-bold text-white">{correctCount}</span>
                         </div>
-                        <div className="p-4 bg-red-500/5 border border-red-500/10 rounded-xl flex flex-col items-start">
-                            <div className="flex items-center gap-1.5 text-red-400 font-bold text-[10px] uppercase tracking-wide">
-                                <XCircle className="w-3.5 h-3.5" /> Incorrect
+                        <div className="flex flex-col items-start rounded-xl border border-red-500/10 bg-red-500/5 p-4">
+                            <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wide text-red-400">
+                                <XCircle className="h-3.5 w-3.5" /> Incorrect
                             </div>
-                            <span className="text-xl font-bold text-white mt-1.5">{incorrectCount}</span>
-                            <span className="text-[9px] text-red-400/70 font-semibold mt-0.5">Penalty: -{(incorrectCount * 0.25).toFixed(2)}</span>
+                            <span className="mt-1.5 text-xl font-bold text-white">{incorrectCount}</span>
+                            <span className="mt-0.5 text-[9px] font-semibold text-red-400/70">Penalty: -{(incorrectCount * 0.25).toFixed(2)}</span>
                         </div>
-                        <div className="p-4 bg-white/2 border border-white/5 rounded-xl flex flex-col items-start">
-                            <div className="flex items-center gap-1.5 text-[#8E8A9F] font-bold text-[10px] uppercase tracking-wide">
-                                <AlertTriangle className="w-3.5 h-3.5" /> Skipped
+                        <div className="flex flex-col items-start rounded-xl border border-white/5 bg-white/2 p-4">
+                            <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wide text-[#8E8A9F]">
+                                <AlertTriangle className="h-3.5 w-3.5" /> Skipped
                             </div>
-                            <span className="text-xl font-bold text-white mt-1.5">{skippedCount}</span>
+                            <span className="mt-1.5 text-xl font-bold text-white">{skippedCount}</span>
                         </div>
                     </div>
                 </div>
             </div>
 
-            {/* 🔍 INDEPTH TOPIC SOLUTION BOARD DIRECTORY */}
+            {submissionResult ? (
+                <div className="rounded-2xl border border-emerald-500/10 bg-emerald-500/5 p-4 text-sm text-emerald-300">
+                    Backend submission received. Score: {submissionResult.score} / {submissionResult.totalMarks}
+                </div>
+            ) : null}
+
             <div className="flex flex-col gap-4">
-                <h2 className="font-serif text-xl font-medium text-white tracking-wide flex items-center gap-2">
-                    <BookOpen className="w-5 h-5 text-[#DFB15B]" /> Solution Review Board
+                <h2 className="flex items-center gap-2 font-serif text-xl font-medium tracking-wide text-white">
+                    <BookOpen className="h-5 w-5 text-[#DFB15B]" /> Solution Review Board
                 </h2>
-                <p className="text-xs text-[#6B667B] font-medium -mt-2">
-                    Review mistake vectors. Incorrect choices trigger negative markings—verify math formulas and grammatical constraints.
+                <p className="-mt-2 text-xs font-medium text-[#6B667B]">
+                    Review each answer against the official solution matrix from the backend.
                 </p>
 
-                <div className="flex flex-col gap-4 mt-2">
-                    {examData.questions.map((q, idx) => {
-                        const userAns = answers[q.id];
-                        const correctAns = solutionKeys[q.id];
+                <div className="mt-2 flex flex-col gap-4">
+                    {questions.map((question, idx) => {
+                        const userAns = normalizedAnswers[idx];
+                        const correctAns = question.correctOptionIndex;
                         const isCorrect = userAns === correctAns;
+                        const selectedLabel = userAns === undefined || userAns === null || userAns === -1 ? null : OPTION_LABELS[userAns];
+                        const correctLabel = correctAns === undefined || correctAns === null ? null : OPTION_LABELS[correctAns];
 
                         return (
                             <div
-                                key={q.id}
-                                className={`border rounded-2xl p-5 flex flex-col items-start bg-[#121017]/60 ${!userAns
-                                        ? "border-white/5"
-                                        : isCorrect
-                                            ? "border-emerald-500/20 bg-emerald-500/1"
-                                            : "border-red-500/20 bg-red-500/1"
-                                    }`}
+                                key={question._id || question.id || idx}
+                                className={`flex flex-col items-start rounded-2xl border bg-[#121017]/60 p-5 ${userAns === undefined || userAns === null || userAns === -1 ? "border-white/5" : isCorrect ? "border-emerald-500/20 bg-emerald-500/1" : "border-red-500/20 bg-red-500/1"}`}
                             >
-                                {/* Header Data Flag tags */}
-                                <div className="flex flex-wrap items-center justify-between w-full gap-2 mb-3">
-                                    <span className="text-[10px] font-bold text-[#6B667B] uppercase tracking-wider">
-                                        Question {idx + 1} • {q.section}
+                                <div className="mb-3 flex w-full flex-wrap items-center justify-between gap-2">
+                                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#6B667B]">
+                                        Question {idx + 1} • {question.subject || "General"}
                                     </span>
 
-                                    {!userAns ? (
-                                        <span className="px-2 py-0.5 text-[9px] font-bold bg-white/5 text-[#8E8A9F] rounded uppercase">Skipped</span>
+                                    {userAns === undefined || userAns === null || userAns === -1 ? (
+                                        <span className="rounded bg-white/5 px-2 py-0.5 text-[9px] font-bold uppercase text-[#8E8A9F]">Skipped</span>
                                     ) : isCorrect ? (
-                                        <span className="px-2 py-0.5 text-[9px] font-bold bg-emerald-500/10 text-emerald-400 rounded uppercase">Correct (+1.00)</span>
+                                        <span className="rounded bg-emerald-500/10 px-2 py-0.5 text-[9px] font-bold uppercase text-emerald-400">Correct (+1.00)</span>
                                     ) : (
-                                        <span className="px-2 py-0.5 text-[9px] font-bold bg-red-500/10 text-red-400 rounded uppercase">Incorrect (-0.25)</span>
+                                        <span className="rounded bg-red-500/10 px-2 py-0.5 text-[9px] font-bold uppercase text-red-400">Incorrect (-0.25)</span>
                                     )}
                                 </div>
 
-                                {/* Text content block */}
-                                <p className="text-xs font-semibold text-white/90 leading-relaxed tracking-wide mb-4">
-                                    {q.questionText}
+                                <p className="mb-4 text-xs font-semibold leading-relaxed tracking-wide text-white/90">
+                                    {question.questionText}
                                 </p>
 
-                                {/* Option evaluation display line */}
-                                <div className="flex flex-col gap-2 w-full text-xs font-medium">
-                                    <div className="p-3 bg-[#1A1722]/50 border border-white/3 rounded-xl flex items-center gap-2">
-                                        <span className="text-[#6B667B] font-bold uppercase">Your Selection:</span>
-                                        <span className={userAns ? (isCorrect ? "text-emerald-400 font-semibold" : "text-red-400 font-semibold") : "text-[#6B667B]"}>
-                                            {userAns ? `${userAns}) ${q.options[userAns]}` : "No answer marked"}
+                                <div className="flex w-full flex-col gap-2 text-xs font-medium">
+                                    <div className="flex items-center gap-2 rounded-xl border border-white/3 bg-[#1A1722]/50 p-3">
+                                        <span className="font-bold uppercase text-[#6B667B]">Your Selection:</span>
+                                        <span className={selectedLabel ? (isCorrect ? "font-semibold text-emerald-400" : "font-semibold text-red-400") : "text-[#6B667B]"}>
+                                            {selectedLabel ? `${selectedLabel}) ${Array.isArray(question.options) ? question.options[userAns] : question.options?.[selectedLabel] || "—"}` : "No answer marked"}
                                         </span>
                                     </div>
-                                    {!isCorrect && (
-                                        <div className="p-3 bg-emerald-500/5 border border-emerald-500/10 rounded-xl flex items-center gap-2">
-                                            <span className="text-emerald-400 font-bold uppercase">Correct Matrix:</span>
-                                            <span className="text-white font-semibold">{correctAns}) {q.options[correctAns]}</span>
+                                    {!isCorrect && correctLabel && (
+                                        <div className="flex items-center gap-2 rounded-xl border border-emerald-500/10 bg-emerald-500/5 p-3">
+                                            <span className="font-bold uppercase text-emerald-400">Correct Matrix:</span>
+                                            <span className="font-semibold text-white">{correctLabel}) {Array.isArray(question.options) ? question.options[correctAns] : question.options?.[correctLabel] || "—"}</span>
                                         </div>
                                     )}
                                 </div>
@@ -142,16 +130,14 @@ export default function AnalyticalScorecard({ answers, examData }) {
                 </div>
             </div>
 
-            {/* 🚪 BOTTOM REACTION CONTROL CONTAINER ROW */}
-            <div className="flex items-center gap-4 pt-4 border-t border-white/5 mt-4">
+            <div className="mt-4 flex items-center gap-4 border-t border-white/5 pt-4">
                 <Link
                     href="/dashboard/mock-tests"
-                    className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-linear-to-r from-[#E6C687] to-[#AA7C11] text-xs font-bold text-black uppercase tracking-wider shadow-md hover:brightness-110 transition-all duration-150"
+                    className="inline-flex items-center gap-2 rounded-xl bg-linear-to-r from-[#E6C687] to-[#AA7C11] px-5 py-3 text-xs font-bold uppercase tracking-wider text-black shadow-md transition-all duration-150 hover:brightness-110"
                 >
                     Return to Directory
                 </Link>
             </div>
-
         </div>
     );
 }

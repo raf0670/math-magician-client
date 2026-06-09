@@ -1,36 +1,97 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
 import ExamEngine from "@/components/dashboard/ExamEngine";
-// 🪄 Import your brand new calculation scorecard component
 import AnalyticalScorecard from "@/components/dashboard/AnalyticalScorecard";
+import { getExamById, submitExam } from "@/lib/api";
 
-export default function ActiveMockExamArena({ params }) {
+export default function ActiveMockExamArena() {
+    const params = useParams();
+    const examId = params?.id;
     const [examFinished, setExamFinished] = useState(false);
-    const [userSelections, setUserSelections] = useState(null);
+    const [userSelections, setUserSelections] = useState([]);
     const [examDataPayload, setExamDataPayload] = useState(null);
+    const [submissionResult, setSubmissionResult] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
 
-    const handleEvaluationTrigger = (finalAnswers, examPayload) => {
-        setUserSelections(finalAnswers);
-        setExamDataPayload(examPayload);
-        setExamFinished(true);
+    useEffect(() => {
+        if (!examId) {
+            setLoading(false);
+            setError("The requested exam could not be found.");
+            setExamDataPayload(null);
+            setSubmissionResult(null);
+            setExamFinished(false);
+            setUserSelections([]);
+            return;
+        }
+
+        let isMounted = true;
+
+        setLoading(true);
+        setError("");
+        setExamDataPayload(null);
+        setSubmissionResult(null);
+        setExamFinished(false);
+        setUserSelections([]);
+
+        async function fetchExam() {
+            try {
+                const data = await getExamById(examId);
+                if (isMounted) {
+                    setExamDataPayload(data.data);
+                }
+            } catch (err) {
+                if (isMounted) {
+                    setError(err.message || "Unable to load this exam");
+                }
+            } finally {
+                if (isMounted) {
+                    setLoading(false);
+                }
+            }
+        }
+
+        fetchExam();
+        return () => {
+            isMounted = false;
+        };
+    }, [examId]);
+
+    const handleEvaluationTrigger = async (finalAnswers, examPayload) => {
+        try {
+            const data = await submitExam(params.id, finalAnswers);
+            setUserSelections(finalAnswers);
+            setExamDataPayload(examPayload);
+            setSubmissionResult(data);
+            setExamFinished(true);
+        } catch (err) {
+            setError(err.message || "Submission failed");
+        }
     };
 
-    // 🎯 If the student hits submit or time runs out, swap layouts seamlessly to display the results sheet!
+    if (loading) {
+        return <p className="text-sm text-[#8E8A9F]">Loading exam content...</p>;
+    }
+
+    if (error) {
+        return <p className="text-sm text-red-400">{error}</p>;
+    }
+
     if (examFinished) {
         return (
-            <div className="w-full flex flex-col gap-6">
-                <div className="flex flex-col items-start text-left gap-1">
+            <div className="flex w-full flex-col gap-6">
+                <div className="flex flex-col items-start gap-1 text-left">
                     <h1 className="font-serif text-3xl font-medium tracking-wide text-white">Performance Scorecard</h1>
-                    <p className="text-[#8E8A9F] text-xs sm:text-sm font-medium">
-                        Real-time score audit compiled under standard negative marking bounds. Review solutions down below.
+                    <p className="text-xs font-medium text-[#8E8A9F] sm:text-sm">
+                        Your submission has been scored against the backend evaluation logic.
                     </p>
                 </div>
 
-                {/* Mount the finished analytics scorecard module directly */}
-                <AnalyticalScorecard answers={userSelections} examData={examDataPayload} />
+                <AnalyticalScorecard answers={userSelections} examData={examDataPayload} submissionResult={submissionResult} />
             </div>
         );
     }
 
-    return <ExamEngine onComplete={handleEvaluationTrigger} />;
+    return <ExamEngine examData={examDataPayload} onComplete={handleEvaluationTrigger} />;
 }
