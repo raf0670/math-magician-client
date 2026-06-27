@@ -1,57 +1,45 @@
 "use client";
-import { useEffect, useMemo, useState } from "react";
-import { Timer, ChevronLeft, ChevronRight } from "lucide-react";
+import { useMemo, useState } from "react";
+import { Infinity, ChevronLeft, ChevronRight } from "lucide-react";
 
 const OPTION_LABELS = ["A", "B", "C", "D", "E"];
+
+function getQuestionId(question, index) {
+    const rawId = question?._id?.$oid || question?._id || question?.id;
+    return typeof rawId === "string" || typeof rawId === "number" ? rawId.toString() : `question-${index}`;
+}
+
+function getOptionMap(options) {
+    if (Array.isArray(options)) {
+        return options.reduce((acc, option, optionIndex) => {
+            acc[OPTION_LABELS[optionIndex]] = option;
+            return acc;
+        }, {});
+    }
+
+    return options && typeof options === "object" ? options : {};
+}
 
 export default function ExamEngine({ examData, onComplete }) {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [answers, setAnswers] = useState({});
-    const [timeLeft, setTimeLeft] = useState(60);
 
     const normalizedQuestions = useMemo(() => {
         if (!examData?.questions?.length) return [];
 
-        return examData.questions.map((question, index) => {
-            const optionMap = (question.options || []).reduce((acc, option, optionIndex) => {
-                acc[OPTION_LABELS[optionIndex]] = option;
-                return acc;
-            }, {});
-
+        return examData.questions.filter(Boolean).map((question, index) => {
             return {
                 ...question,
-                id: question._id || question.id || `question-${index}`,
-                options: optionMap,
+                id: getQuestionId(question, index),
+                questionText: question.questionText || question.question || "",
+                options: getOptionMap(question.options),
                 subject: question.subject || "General",
+                topic: question.topic || question.chapter || "",
             };
         });
     }, [examData]);
 
-    useEffect(() => {
-        if (!normalizedQuestions.length) return;
-        setTimeLeft(Math.max(60, (examData?.duration || 1) * 60));
-        setAnswers({});
-        setCurrentIndex(0);
-    }, [examData, normalizedQuestions.length]);
-
-    useEffect(() => {
-        if (!normalizedQuestions.length) return;
-        if (timeLeft <= 0) {
-            handleSubmit();
-            return;
-        }
-
-        const timer = setInterval(() => setTimeLeft((prev) => prev - 1), 1000);
-        return () => clearInterval(timer);
-    }, [timeLeft, normalizedQuestions.length]);
-
     const currentQuestion = normalizedQuestions[currentIndex];
-
-    const formatTime = (seconds) => {
-        const mins = Math.floor(seconds / 60);
-        const secs = seconds % 60;
-        return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
-    };
 
     const handleSelectOption = (optionIndex) => {
         if (!currentQuestion) return;
@@ -71,8 +59,6 @@ export default function ExamEngine({ examData, onComplete }) {
         if (onComplete) onComplete(submissionAnswers, examData);
     };
 
-    const isTimeUrgent = timeLeft < 300;
-
     if (!currentQuestion) {
         return <p className="text-sm text-[#8E8A9F]">Preparing the exam...</p>;
     }
@@ -84,9 +70,9 @@ export default function ExamEngine({ examData, onComplete }) {
                     <span className="block text-[10px] font-bold uppercase tracking-[0.3em] text-[#DFB15B]">Active Examination Sheet</span>
                     <h2 className="mt-0.5 text-sm font-semibold text-white">{examData?.title || "Live Mock Test"}</h2>
                 </div>
-                <div className={`flex items-center gap-2 self-start rounded-xl border px-4 py-2 font-mono text-sm font-bold sm:self-auto ${isTimeUrgent ? "animate-pulse border-red-500/20 bg-red-500/10 text-red-400" : "border-white/5 bg-[#1A1722] text-[#E6C687]"}`}>
-                    <Timer className="h-4 w-4" />
-                    <span>{formatTime(timeLeft)}</span>
+                <div className="flex items-center gap-2 self-start rounded-xl border border-emerald-500/15 bg-emerald-500/10 px-4 py-2 text-sm font-bold text-emerald-300 sm:self-auto">
+                    <Infinity className="h-4 w-4" />
+                    <span>Untimed practice</span>
                 </div>
             </div>
 
@@ -94,7 +80,7 @@ export default function ExamEngine({ examData, onComplete }) {
                 <div className="flex flex-col gap-6 rounded-3xl border border-white/5 bg-[#121017] p-6 sm:p-8 lg:col-span-7">
                     <div>
                         <span className="rounded border border-indigo-500/20 bg-indigo-500/10 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-indigo-400">
-                            {currentQuestion.subject}
+                            {currentQuestion.topic ? `${currentQuestion.subject} / ${currentQuestion.topic}` : currentQuestion.subject}
                         </span>
                         <div className="mt-3 text-[11px] font-bold uppercase tracking-wide text-[#6B667B]">
                             Question {currentIndex + 1} of {normalizedQuestions.length}

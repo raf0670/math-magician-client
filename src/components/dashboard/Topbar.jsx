@@ -64,7 +64,8 @@ export default function DashboardTopbar() {
     const streak = useMemo(() => {
         const uniqueDays = new Set(
             history
-                .map((item) => item?.submittedAt || Date.now())
+                .filter((item) => item?.submittedAt)
+                .map((item) => item.submittedAt)
                 .map((value) => new Date(value).toISOString().slice(0, 10))
         );
         return uniqueDays.size || 0;
@@ -125,7 +126,7 @@ export default function DashboardTopbar() {
                         <div className="hidden flex-col items-start text-left sm:flex">
                             <span className="text-xs font-bold text-white tracking-wide leading-none">{fullName}</span>
                             <span className="text-[9px] text-[#6B667B] font-bold mt-1 tracking-wide uppercase flex items-center gap-1">
-                                <ShieldCheck className="w-2.5 h-2.5 text-[#DFB15B]" /> {firstName}'s Workspace
+                                <ShieldCheck className="w-2.5 h-2.5 text-[#DFB15B]" /> {firstName}&apos;s Workspace
                             </span>
                         </div>
                         <ChevronDown className={`w-3.5 h-3.5 text-[#6B667B] group-hover:text-white transition-transform duration-200 ${showProfileMenu ? "rotate-180" : ""}`} />

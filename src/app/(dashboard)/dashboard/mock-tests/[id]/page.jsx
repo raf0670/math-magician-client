@@ -16,26 +16,22 @@ export default function ActiveMockExamArena() {
     const [error, setError] = useState("");
 
     useEffect(() => {
-        if (!examId) {
-            setLoading(false);
-            setError("The requested exam could not be found.");
+        let isMounted = true;
+
+        async function fetchExam() {
+            setLoading(true);
+            setError("");
             setExamDataPayload(null);
             setSubmissionResult(null);
             setExamFinished(false);
             setUserSelections([]);
-            return;
-        }
 
-        let isMounted = true;
+            if (!examId) {
+                setLoading(false);
+                setError("The requested exam could not be found.");
+                return;
+            }
 
-        setLoading(true);
-        setError("");
-        setExamDataPayload(null);
-        setSubmissionResult(null);
-        setExamFinished(false);
-        setUserSelections([]);
-
-        async function fetchExam() {
             try {
                 const data = await getExamById(examId);
                 if (isMounted) {
@@ -60,7 +56,7 @@ export default function ActiveMockExamArena() {
 
     const handleEvaluationTrigger = async (finalAnswers, examPayload) => {
         try {
-            const data = await submitExam(params.id, finalAnswers);
+            const data = await submitExam(examId, finalAnswers);
             setUserSelections(finalAnswers);
             setExamDataPayload(examPayload);
             setSubmissionResult(data);
@@ -93,5 +89,5 @@ export default function ActiveMockExamArena() {
         );
     }
 
-    return <ExamEngine examData={examDataPayload} onComplete={handleEvaluationTrigger} />;
+    return <ExamEngine key={examDataPayload?._id || examId} examData={examDataPayload} onComplete={handleEvaluationTrigger} />;
 }

@@ -12,13 +12,29 @@ export default function DashboardLayout({ children }) {
     useEffect(() => {
         if (typeof window === "undefined") return;
 
-        const token = window.localStorage.getItem("exam_archive_token");
-        if (!token && pathname !== "/login" && pathname !== "/register" && pathname !== "/signup" && pathname !== "/enroll") {
-            router.replace("/login");
-            return;
-        }
+        const publicPaths = ["/login", "/register", "/signup", "/enroll"];
+        const isPublicPath = publicPaths.includes(pathname);
+        const verifySession = () => {
+            const token = window.localStorage.getItem("exam_archive_token");
+            if (!token && !isPublicPath) {
+                router.replace("/login");
+                return false;
+            }
 
-        setReady(true);
+            return true;
+        };
+
+        if (!verifySession()) return;
+
+        window.addEventListener("auth-state-changed", verifySession);
+        window.addEventListener("storage", verifySession);
+
+        const readyTimer = window.setTimeout(() => setReady(true), 0);
+        return () => {
+            window.clearTimeout(readyTimer);
+            window.removeEventListener("auth-state-changed", verifySession);
+            window.removeEventListener("storage", verifySession);
+        };
     }, [pathname, router]);
 
     // 🔍 Detect if the student is actively inside the testing engine screen

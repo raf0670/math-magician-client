@@ -1,19 +1,17 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
-import { BarChart3, Target, Zap, Clock, Sparkles } from "lucide-react";
+import { BarChart3, Target, Zap, Clock, Sparkles, Trophy } from "lucide-react";
 import { getLeaderboard, getMyStats, getStoredUser } from "@/lib/api";
 
 export default function AnalyticsPortal() {
     const [stats, setStats] = useState(null);
     const [history, setHistory] = useState([]);
     const [leaderboard, setLeaderboard] = useState([]);
-    const [currentUser, setCurrentUser] = useState(null);
+    const [currentUser] = useState(() => getStoredUser());
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        setCurrentUser(getStoredUser());
-
         let isMounted = true;
         Promise.all([getMyStats(), getLeaderboard()])
             .then(([statsPayload, leaderboardPayload]) => {
@@ -53,7 +51,7 @@ export default function AnalyticsPortal() {
             totalMocksTaken,
             averageScore,
             totalTimeSpentMinutes,
-            globalRank: globalRank >= 0 ? globalRank + 1 : leaderboard.length ? "—" : "—",
+            globalRank: globalRank >= 0 ? globalRank + 1 : "-",
         };
     }, [stats, history, leaderboard, currentUser]);
 
@@ -83,7 +81,7 @@ export default function AnalyticsPortal() {
                     { label: "Mocks Evaluated", val: overviewMetrics.totalMocksTaken, icon: BarChart3, color: "text-indigo-400" },
                     { label: "Average Score", val: overviewMetrics.averageScore.toFixed(2), icon: Target, color: "text-[#DFB15B]" },
                     { label: "Time Committed", val: `${overviewMetrics.totalTimeSpentMinutes}m`, icon: Clock, color: "text-teal-400" },
-                    { label: "Global Standing", val: overviewMetrics.globalRank === "—" ? "—" : `#${overviewMetrics.globalRank}`, icon: Zap, color: "text-rose-400" }
+                    { label: "Global Standing", val: overviewMetrics.globalRank === "-" ? "-" : `#${overviewMetrics.globalRank}`, icon: Zap, color: "text-rose-400" }
                 ].map((item, i) => (
                     <div key={i} className="bg-[#121017] border border-white/5 p-5 rounded-2xl flex flex-col items-start gap-3">
                         <div className="w-8 h-8 rounded-xl bg-white/2 border border-white/5 flex items-center justify-center">
@@ -104,7 +102,7 @@ export default function AnalyticsPortal() {
                 </div>
 
                 {loading ? (
-                    <div className="text-sm text-[#8E8A9F]">Loading analytics from the database…</div>
+                    <div className="text-sm text-[#8E8A9F]">Loading analytics from the database...</div>
                 ) : timelineData.length === 0 ? (
                     <div className="text-sm text-[#8E8A9F]">Complete your first exam to populate this chart.</div>
                 ) : (
@@ -154,6 +152,46 @@ export default function AnalyticsPortal() {
                         ))
                     )}
                 </div>
+            </div>
+
+            <div className="bg-[#121017] border border-white/5 rounded-3xl p-6 w-full flex flex-col gap-6">
+                <div>
+                    <h3 className="text-sm font-semibold text-white tracking-wide">Global Leaderboard</h3>
+                    <p className="text-[11px] text-[#6B667B] font-medium mt-0.5">Ranked by total score, then average score as the tie-breaker.</p>
+                </div>
+
+                {leaderboard.length === 0 ? (
+                    <div className="text-sm text-[#8E8A9F]">No leaderboard entries are available yet.</div>
+                ) : (
+                    <div className="flex flex-col gap-2">
+                        {leaderboard.slice(0, 8).map((entry, index) => {
+                            const rank = entry.rank || index + 1;
+                            const userId = currentUser?._id || currentUser?.id;
+                            const isCurrentUser = userId && entry?.studentId?.toString() === userId.toString();
+
+                            return (
+                                <div
+                                    key={entry.studentId || `${entry.name}-${rank}`}
+                                    className={`grid grid-cols-[auto_1fr_auto] items-center gap-3 rounded-2xl border px-4 py-3 ${isCurrentUser ? "border-[#DFB15B]/25 bg-[#DFB15B]/10" : "border-white/5 bg-[#1A1722]/40"}`}
+                                >
+                                    <div className={`flex h-9 w-9 items-center justify-center rounded-xl border text-xs font-bold ${rank <= 3 ? "border-[#DFB15B]/20 bg-[#DFB15B]/10 text-[#DFB15B]" : "border-white/5 bg-[#121017] text-[#8E8A9F]"}`}>
+                                        {rank <= 3 ? <Trophy className="h-4 w-4" /> : `#${rank}`}
+                                    </div>
+                                    <div className="min-w-0">
+                                        <div className="truncate text-sm font-semibold text-white">{entry.name || "Student"}</div>
+                                        <div className="mt-0.5 text-[11px] font-medium text-[#8E8A9F]">
+                                            {entry.examsTaken || 0} exams - Avg {Number(entry.averageScore || 0).toFixed(2)} - Best {Number(entry.bestScore || 0).toFixed(2)}
+                                        </div>
+                                    </div>
+                                    <div className="text-right">
+                                        <div className="text-sm font-bold text-[#DFB15B]">{Number(entry.totalScore || 0).toFixed(2)}</div>
+                                        <div className="text-[10px] font-bold uppercase tracking-wide text-[#6B667B]">points</div>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                )}
             </div>
         </div>
     );
