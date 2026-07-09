@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
 import { BarChart3, Target, Zap, Clock, Sparkles, Trophy } from "lucide-react";
 import { getLeaderboard, getMyStats, getStoredUser } from "@/lib/api";
+import FlashyLoader from "@/components/shared/FlashyLoader";
 
 export default function AnalyticsPortal() {
     const [stats, setStats] = useState(null);
@@ -74,6 +75,19 @@ export default function AnalyticsPortal() {
         }));
     }, [history]);
 
+    if (loading) {
+        return (
+            <FlashyLoader
+                eyebrow="Analytics Portal"
+                title="Calculating your performance glow"
+                message="Scores, ranks, and recent attempts are being pulled from the database."
+                iconName="analytics"
+                skeleton="analytics"
+                className="min-h-[520px]"
+            />
+        );
+    }
+
     return (
         <div className="w-full flex flex-col gap-8 text-left select-none">
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 w-full">
@@ -101,9 +115,7 @@ export default function AnalyticsPortal() {
                     <p className="text-[11px] text-[#6B667B] font-medium mt-0.5">This chart is built from your latest backend submission records.</p>
                 </div>
 
-                {loading ? (
-                    <div className="text-sm text-[#8E8A9F]">Loading analytics from the database...</div>
-                ) : timelineData.length === 0 ? (
+                {timelineData.length === 0 ? (
                     <div className="text-sm text-[#8E8A9F]">Complete your first exam to populate this chart.</div>
                 ) : (
                     <div className="w-full h-64 mt-2 font-mono text-[10px]">

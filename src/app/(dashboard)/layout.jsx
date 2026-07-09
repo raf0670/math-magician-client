@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import DashboardSidebar from "@/components/dashboard/Sidebar";
 import DashboardTopbar from "@/components/dashboard/Topbar";
+import FlashyLoader from "@/components/shared/FlashyLoader";
 
 export default function DashboardLayout({ children }) {
     const pathname = usePathname();
@@ -43,9 +44,14 @@ export default function DashboardLayout({ children }) {
 
     if (!ready && pathname !== "/login" && pathname !== "/register" && pathname !== "/signup" && pathname !== "/enroll") {
         return (
-            <div className="flex min-h-screen items-center justify-center bg-[#0A090F] text-white">
-                <p className="text-sm text-[#8E8A9F]">Checking your session...</p>
-            </div>
+            <FlashyLoader
+                eyebrow="Secure Session"
+                title="Checking your student pass"
+                message="We are confirming your login before opening the dashboard."
+                iconName="lock"
+                skeleton="dashboard"
+                surface="screen"
+            />
         );
     }
 

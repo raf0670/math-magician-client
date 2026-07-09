@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { clearPendingPaymentPlan, getPendingPaymentPlan, loginUser, saveAuthSession } from "@/lib/api";
+import { LoadingButtonLabel } from "@/components/shared/FlashyLoader";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -74,9 +75,14 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-2xl bg-[#DFB15B] px-4 py-3 text-sm font-bold uppercase tracking-wider text-black transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-70"
+            className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-[#DFB15B] px-4 py-3 text-sm font-bold uppercase tracking-wider text-black transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-70"
           >
-            {loading ? "Signing in..." : "Sign in"}
+            <LoadingButtonLabel
+              loading={loading}
+              idleText="Sign in"
+              loadingText="Signing in..."
+              iconName="login"
+            />
           </button>
         </form>
 

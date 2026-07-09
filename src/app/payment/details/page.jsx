@@ -4,8 +4,9 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowLeft, Check, CreditCard, LockKeyhole, Sparkles, WandSparkles } from "lucide-react";
+import { ArrowLeft, Check, LockKeyhole, WandSparkles } from "lucide-react";
 import { createBkashPayment, getStoredToken, getStoredUser, savePendingEnrollment, savePendingPaymentPlan } from "@/lib/api";
+import FlashyLoader, { LoadingButtonLabel } from "@/components/shared/FlashyLoader";
 
 const PLANS = {
   offline: { title: "IBA Offline Batch", amount: "৳15,000" },
@@ -381,8 +382,12 @@ function PaymentDetailsContent() {
                 className="group relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-2xl bg-[#DFB15B] px-6 py-3 text-sm font-bold uppercase tracking-wider text-black shadow-[0_0_30px_rgba(223,177,91,0.22)] transition hover:brightness-110 disabled:cursor-wait disabled:opacity-70"
               >
                 <span className="absolute inset-y-0 -left-10 w-8 rotate-12 bg-white/40 blur-sm transition group-hover:left-full" />
-                <CreditCard className="h-4 w-4" />
-                {loading ? "Opening bKash..." : "Submit and Pay"}
+                <LoadingButtonLabel
+                  loading={loading}
+                  idleText="Submit and Pay"
+                  loadingText="Opening bKash..."
+                  iconName="credit"
+                />
               </motion.button>
             </motion.div>
           </form>
@@ -394,12 +399,14 @@ function PaymentDetailsContent() {
 
 function PaymentDetailsLoading() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#0A090F] px-4 text-white">
-      <div className="flex flex-col items-center gap-3 text-center">
-        <div className="h-10 w-10 animate-spin rounded-full border-2 border-[#DFB15B]/30 border-t-[#DFB15B]" />
-        <p className="text-sm font-medium text-[#8E8A9F]">Preparing enrollment form...</p>
-      </div>
-    </div>
+    <FlashyLoader
+      eyebrow="Enrollment Portal"
+      title="Preparing enrollment form"
+      message="Your selected plan and student profile fields are being aligned."
+      iconName="wand"
+      skeleton="cards"
+      surface="screen"
+    />
   );
 }
 

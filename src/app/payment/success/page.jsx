@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import { clearPendingEnrollment, getPendingEnrollment, getProfile, saveAuthSession, saveEnrollmentDetails } from "@/lib/api";
+import FlashyLoader from "@/components/shared/FlashyLoader";
 
 export default function PaymentSuccessPage() {
   return (
@@ -78,6 +79,19 @@ function PaymentSuccessContent() {
 }
 
 function PaymentSuccessShell({ statusText, detailsSaved = false, detailsError = "" }) {
+  if (!detailsSaved && !detailsError) {
+    return (
+      <FlashyLoader
+        eyebrow="Payment Portal"
+        title="Finalizing payment"
+        message={statusText}
+        iconName="credit"
+        skeleton="cards"
+        surface="screen"
+      />
+    );
+  }
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-[#0A090F] px-4 text-white">
       <div className="w-full max-w-md rounded-3xl border border-[#DFB15B]/20 bg-[#121017] p-8 text-center shadow-2xl">

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Award, BookOpen, Brain, Calculator, Check, ClipboardCheck, Layers, Play, SlidersHorizontal } from "lucide-react";
 import { getExams, getPracticeMeta, startPracticeExam } from "@/lib/api";
+import { InlineFlashyLoader, LoadingButtonLabel } from "@/components/shared/FlashyLoader";
 
 const SUBJECTS = [
     { name: "Math", label: "Maths", icon: Calculator },
@@ -146,7 +147,12 @@ export default function MockDirectory() {
                             <div>
                                 <span className="text-[10px] font-bold uppercase tracking-widest text-[#6B667B]">Sub-topic</span>
                                 {loading ? (
-                                    <p className="mt-3 text-sm text-[#8E8A9F]">Loading topics...</p>
+                                    <InlineFlashyLoader
+                                        text="Loading topic constellations..."
+                                        iconName="book"
+                                        rows={3}
+                                        className="mt-3"
+                                    />
                                 ) : currentSubject?.topics?.length ? (
                                     <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
                                         {currentSubject.topics.map((topic) => {
@@ -193,8 +199,12 @@ export default function MockDirectory() {
                                     disabled={!currentTopic || starting}
                                     className="inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-linear-to-r from-[#E6C687] to-[#AA7C11] px-5 text-xs font-bold uppercase tracking-wider text-black shadow-md transition-all hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
                                 >
-                                    <Play className="h-3.5 w-3.5 fill-current stroke-none" />
-                                    {starting ? "Starting..." : "Start Exam"}
+                                    <LoadingButtonLabel
+                                        loading={starting}
+                                        idleText="Start Exam"
+                                        loadingText="Opening Arena..."
+                                        iconName="zap"
+                                    />
                                 </button>
                             </div>
                         </div>
@@ -213,7 +223,11 @@ export default function MockDirectory() {
                 </div>
 
                 {loading ? (
-                    <p className="text-sm text-[#8E8A9F]">Loading available mock tests...</p>
+                    <InlineFlashyLoader
+                        text="Loading available mock papers..."
+                        iconName="clipboard"
+                        rows={3}
+                    />
                 ) : availableExams.length === 0 ? (
                     <p className="text-sm text-[#8E8A9F]">No saved mock papers are available right now.</p>
                 ) : (

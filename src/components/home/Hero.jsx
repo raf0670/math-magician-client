@@ -46,9 +46,9 @@ export default function UnifiedHeroDeck() {
     }, []);
 
     const statItems = [
-        { icon: Target, value: "92%", label: "Success Rate" },
-        { icon: Star, value: "1,200+", label: "Students Selected" },
-        { icon: FileText, value: "45+", label: "Full Mock Tests" },
+        { icon: Target, value: "80%", label: "Success Rate" },
+        { icon: Star, value: "170+", label: "Students Selected" },
+        { icon: FileText, value: "24+", label: "Live Classes" },
     ];
 
     const featureCards = [

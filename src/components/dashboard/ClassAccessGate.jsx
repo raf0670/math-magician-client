@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { LockKeyhole, Sparkles } from "lucide-react";
 import { getPaymentAccess, getProfile, saveAuthSession } from "@/lib/api";
+import FlashyLoader from "@/components/shared/FlashyLoader";
 
 export default function ClassAccessGate({ children }) {
     const [loading, setLoading] = useState(true);
@@ -41,12 +42,14 @@ export default function ClassAccessGate({ children }) {
 
     if (loading) {
         return (
-            <div className="flex min-h-[320px] items-center justify-center rounded-3xl border border-white/5 bg-[#121017] px-6 py-10">
-                <div className="flex flex-col items-center gap-3 text-center">
-                    <div className="h-10 w-10 animate-spin rounded-full border-2 border-[#DFB15B]/30 border-t-[#DFB15B]" />
-                    <p className="text-sm font-medium text-[#8E8A9F]">Checking class access...</p>
-                </div>
-            </div>
+            <FlashyLoader
+                eyebrow="Class Vault"
+                title="Checking class access"
+                message="Your payment access and student profile are being verified."
+                iconName="lock"
+                skeleton="cards"
+                className="min-h-[360px]"
+            />
         );
     }
 

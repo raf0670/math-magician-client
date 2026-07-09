@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import ExamEngine from "@/components/dashboard/ExamEngine";
 import AnalyticalScorecard from "@/components/dashboard/AnalyticalScorecard";
+import FlashyLoader from "@/components/shared/FlashyLoader";
 import { getExamById, submitExam } from "@/lib/api";
 
 export default function ActiveMockExamArena() {
@@ -67,7 +68,16 @@ export default function ActiveMockExamArena() {
     };
 
     if (loading) {
-        return <p className="text-sm text-[#8E8A9F]">Loading exam content...</p>;
+        return (
+            <FlashyLoader
+                eyebrow="Exam Arena"
+                title="Loading exam content"
+                message="Questions, answer options, and scoring rules are being prepared."
+                iconName="brain"
+                skeleton="exam"
+                surface="screen"
+            />
+        );
     }
 
     if (error) {
