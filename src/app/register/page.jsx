@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { registerUser, saveAuthSession } from "@/lib/api";
+import { clearPendingPaymentPlan, getPendingPaymentPlan, registerUser, saveAuthSession } from "@/lib/api";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -19,6 +19,14 @@ export default function RegisterPage() {
     try {
       const data = await registerUser(form);
       saveAuthSession(data.token, data.user);
+
+      const pendingPlan = getPendingPaymentPlan();
+      if (pendingPlan) {
+        clearPendingPaymentPlan();
+        router.push(`/payment/details?plan=${encodeURIComponent(pendingPlan)}`);
+        return;
+      }
+
       router.push("/dashboard");
     } catch (err) {
       setError(err.message || "Unable to create an account.");

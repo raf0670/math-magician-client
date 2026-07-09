@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { loginUser, saveAuthSession } from "@/lib/api";
+import { clearPendingPaymentPlan, getPendingPaymentPlan, loginUser, saveAuthSession } from "@/lib/api";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -19,6 +19,14 @@ export default function LoginPage() {
     try {
       const data = await loginUser(form);
       saveAuthSession(data.token, data.user);
+
+      const pendingPlan = getPendingPaymentPlan();
+      if (pendingPlan) {
+        clearPendingPaymentPlan();
+        router.push(`/payment/details?plan=${encodeURIComponent(pendingPlan)}`);
+        return;
+      }
+
       router.push("/dashboard");
     } catch (err) {
       setError(err.message || "Unable to sign in.");

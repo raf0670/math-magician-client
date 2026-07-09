@@ -4,9 +4,13 @@ import { useEffect, useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import { School, Building2, Laptop, Plus, Star } from "lucide-react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { getStoredToken, savePendingPaymentPlan } from "@/lib/api";
 
 export default function ProgramsAndTestimonials() {
+    const router = useRouter();
     const [hasMounted, setHasMounted] = useState(false);
+    const [selectedPlanId, setSelectedPlanId] = useState("");
 
     useEffect(() => {
         // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -33,6 +37,7 @@ export default function ProgramsAndTestimonials() {
     // --- Programs Data ---
     const cardsData = [
         {
+            id: "offline",
             badge: "Offline Intensive",
             title: "IBA Offline Batch",
             desc: "Full comprehensive offline preparation at our physical center with face-to-face mentorship and real-time exam simulations.",
@@ -53,6 +58,7 @@ export default function ProgramsAndTestimonials() {
             buttonStyle: "bg-white/5 hover:bg-white/10 text-white border border-white/10"
         },
         {
+            id: "premium",
             badge: "Most Popular Option",
             title: "IBA Premium Combo",
             desc: "Get the best of both worlds. Complete physical class access combined with our entire digital suite, video vaults, and remote mock portals.",
@@ -74,6 +80,7 @@ export default function ProgramsAndTestimonials() {
             isPopular: true
         },
         {
+            id: "online",
             badge: "Flexible Remote",
             title: "IBA Online Live",
             desc: "Prepare from anywhere in Bangladesh. Interactive live streaming broadcasts with complete access to saved records and digital resources.",
@@ -129,6 +136,18 @@ export default function ProgramsAndTestimonials() {
             y: 0,
             transition: { duration: 0.7, ease: [0.25, 1, 0.5, 1] }
         }
+    };
+
+    const handleEnroll = (planId) => {
+        setSelectedPlanId(planId);
+
+        if (!getStoredToken()) {
+            savePendingPaymentPlan(planId);
+            router.push("/signup");
+            return;
+        }
+
+        router.push(`/payment/details?plan=${encodeURIComponent(planId)}`);
     };
 
     return (
@@ -243,8 +262,13 @@ export default function ProgramsAndTestimonials() {
                                         </span>
                                     </div>
 
-                                    <button className={`w-full py-3.5 rounded-2xl text-xs tracking-wide transition-all duration-300 hover:brightness-110 active:scale-[0.98] ${card.buttonStyle}`}>
-                                        Enroll in This Program
+                                    <button
+                                        type="button"
+                                        onClick={() => handleEnroll(card.id)}
+                                        disabled={selectedPlanId === card.id}
+                                        className={`w-full py-3.5 rounded-2xl text-xs tracking-wide transition-all duration-300 hover:brightness-110 active:scale-[0.98] disabled:cursor-wait disabled:opacity-70 ${card.buttonStyle}`}
+                                    >
+                                        {selectedPlanId === card.id ? "Opening form..." : "Enroll in This Program"}
                                     </button>
                                 </div>
 

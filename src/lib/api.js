@@ -91,6 +91,42 @@ export function getStoredUser() {
   return raw ? JSON.parse(raw) : null;
 }
 
+export function getStoredToken() {
+  if (typeof window === "undefined") return null;
+  return window.localStorage.getItem("exam_archive_token");
+}
+
+export function savePendingPaymentPlan(planId) {
+  if (typeof window === "undefined") return;
+  window.localStorage.setItem("exam_archive_pending_plan", planId);
+}
+
+export function getPendingPaymentPlan() {
+  if (typeof window === "undefined") return null;
+  return window.localStorage.getItem("exam_archive_pending_plan");
+}
+
+export function clearPendingPaymentPlan() {
+  if (typeof window === "undefined") return;
+  window.localStorage.removeItem("exam_archive_pending_plan");
+}
+
+export function savePendingEnrollment(payload) {
+  if (typeof window === "undefined") return;
+  window.localStorage.setItem("exam_archive_pending_enrollment", JSON.stringify(payload));
+}
+
+export function getPendingEnrollment() {
+  if (typeof window === "undefined") return null;
+  const raw = window.localStorage.getItem("exam_archive_pending_enrollment");
+  return raw ? JSON.parse(raw) : null;
+}
+
+export function clearPendingEnrollment() {
+  if (typeof window === "undefined") return;
+  window.localStorage.removeItem("exam_archive_pending_enrollment");
+}
+
 export async function loginUser(payload) {
   return request("/api/auth/login", {
     method: "POST",
@@ -125,6 +161,36 @@ export async function changePassword(payload) {
 
 export async function getCourses() {
   return request("/api/courses");
+}
+
+export async function createBkashPayment(planId) {
+  return request("/api/payments/bkash/create", {
+    method: "POST",
+    body: { planId },
+  });
+}
+
+export async function beginBkashCheckout(planId) {
+  const payload = await createBkashPayment(planId);
+  const bkashURL = payload?.data?.bkashURL;
+
+  if (!bkashURL) {
+    throw new Error("Unable to start bKash checkout.");
+  }
+
+  clearPendingPaymentPlan();
+  window.location.href = bkashURL;
+}
+
+export async function saveEnrollmentDetails(payload) {
+  return request("/api/payments/enrollment-details", {
+    method: "POST",
+    body: payload,
+  });
+}
+
+export async function getPaymentAccess() {
+  return request("/api/payments/my-access");
 }
 
 export async function getExams() {
