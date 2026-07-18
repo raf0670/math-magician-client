@@ -2,7 +2,7 @@
 "use client";
 import { useEffect, useState, useMemo } from "react";
 import { motion } from "framer-motion";
-import { School, Building2, Laptop, Plus, Star } from "lucide-react";
+import { Clock3, School, Building2, Laptop, MapPin, Plus, Star } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { getStoredToken, savePendingPaymentPlan } from "@/lib/api";
@@ -38,18 +38,25 @@ export default function ProgramsAndTestimonials() {
     const cardsData = [
         {
             id: "offline",
-            badge: "Offline Intensive",
+            badge: "Offline - Farmgate",
             title: "IBA Offline Batch",
             desc: "Full comprehensive offline preparation at our physical center with face-to-face mentorship and real-time exam simulations.",
             icon: School,
+            location: {
+                text: "RH Home Center, Farmgate",
+                href: "https://maps.app.goo.gl/G6Qhf3stvisrsjXr6?g_st=ac"
+            },
+            schedule: {
+                days: "Sunday, Tuesday, Thursday",
+                time: "1:30 - 3:30 pm"
+            },
             features: [
-                "48+ Interactive Physical Lectures",
-                "Printed Strategy Lecture Sheets",
+                "24+ Interactive Physical Lectures",
                 "Weekly Specialized Topic Tests",
                 "15+ Realistic Full Mock Exams",
                 "Direct 1-on-1 Doubt Solving"
             ],
-            price: "৳15,000",
+            price: "৳18,000",
             period: "/ full program",
             borderClass: "border-white/3 hover:border-white/10",
             bgClass: "bg-[#121017]",
@@ -59,18 +66,24 @@ export default function ProgramsAndTestimonials() {
         },
         {
             id: "premium",
-            badge: "Most Popular Option",
-            title: "IBA Premium Combo",
-            desc: "Get the best of both worlds. Complete physical class access combined with our entire digital suite, video vaults, and remote mock portals.",
-            icon: Building2,
+            badge: "Online Batch",
+            title: "IBA Online Batch",
+            desc: "Take your preparation sitting in you cozy study room. Best suited for those who are living far from offline batch locations",
+            icon: Laptop,
+            location: {
+                text: "Your Cozy Study Room"
+            },
+            schedule: {
+                days: "Sunday, Tuesday, Thursday",
+                time: "7:30 - 9:30 pm"
+            },
             features: [
-                "Everything in Offline Batch",
-                "Full Online Portal Access 24/7",
-                "120+ Recorded Core Concept Videos",
-                "Exclusive GK & Analytical Vaults",
-                "Premium WhatsApp Group Support"
+               "24+ Interactive Online Lectures",
+                "Weekly Specialized Topic Tests",
+                "15+ Realistic Full Mock Exams",
+                "Direct 1-on-1 Doubt Solving"
             ],
-            price: "৳18,000",
+            price: "৳17,500",
             period: "/ full program",
             borderClass: "border-[#DFB15B]/25 shadow-[0_4px_30px_rgba(213,175,55,0.03)]",
             bgClass: "bg-[#121017]",
@@ -81,18 +94,25 @@ export default function ProgramsAndTestimonials() {
         },
         {
             id: "online",
-            badge: "Flexible Remote",
-            title: "IBA Online Live",
-            desc: "Prepare from anywhere in Bangladesh. Interactive live streaming broadcasts with complete access to saved records and digital resources.",
-            icon: Laptop,
+            badge: "Offline - Bailey road",
+            title: "IBA Offline batch",
+            desc: "Full comprehensive offline preparation at our physical center with face-to-face mentorship and real-time exam simulations.",
+            icon: Building2,
+            location: {
+                text: "Siddheswari Road, Bailey Road",
+                href: "https://maps.app.goo.gl/aoFZ4eWXtpVx1RzEA?g_st=ac"
+            },
+            schedule: {
+                days: "Sunday, Tuesday, Thursday",
+                time: "4:00 - 6:00 pm"
+            },
             features: [
-                "48+ Interactive HD Live Streams",
-                "Digital Strategy PDFs & Notes",
-                "Web-Based Sectional Timed Quizzes",
-                "15+ Automated Digital Mocks",
-                "Dedicated Group Doubt Chatrooms"
+               "24+ Interactive Physical Lectures",
+                "Weekly Specialized Topic Tests",
+                "15+ Realistic Full Mock Exams",
+                "Direct 1-on-1 Doubt Solving"
             ],
-            price: "৳12,000",
+            price: "৳18,000",
             period: "/ full program",
             borderClass: "border-white/3 hover:border-white/10",
             bgClass: "bg-[#121017]",
@@ -249,6 +269,46 @@ export default function ProgramsAndTestimonials() {
                                             </li>
                                         ))}
                                     </ul>
+
+                                    {card.location ? (
+                                        <a
+                                            href={card.location.href}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="mb-3 flex items-center gap-3 rounded-2xl border border-[#DFB15B]/20 bg-[#DFB15B]/8 px-4 py-3 text-left transition hover:border-[#DFB15B]/45 hover:bg-[#DFB15B]/12"
+                                        >
+                                            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#DFB15B] text-black shadow-[0_0_22px_rgba(223,177,91,0.22)]">
+                                                <MapPin className="h-4 w-4 fill-black/10 stroke-[2.4]" />
+                                            </span>
+                                            <span className="min-w-0">
+                                                {/* <span className="block text-[9px] font-bold uppercase tracking-[0.22em] text-[#DFB15B]">
+                                                    Offline Center
+                                                </span> */}
+                                                <span className="mt-1 block text-xs font-bold leading-5 text-white">
+                                                    {card.location.text}
+                                                </span>
+                                            </span>
+                                        </a>
+                                    ) : null}
+
+                                    {card.schedule ? (
+                                        <div className="mb-8 flex items-center gap-3 rounded-2xl border border-white/8 bg-white/4 px-4 py-3 text-left">
+                                            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-[#DFB15B]/25 bg-[#121017] text-[#DFB15B]">
+                                                <Clock3 className="h-4 w-4 stroke-[2.4]" />
+                                            </span>
+                                            <span className="min-w-0">
+                                                <span className="block text-[9px] font-bold uppercase tracking-[0.22em] text-[#DFB15B]">
+                                                    Class Time
+                                                </span>
+                                                <span className="mt-1 block text-xs font-bold leading-5 text-white">
+                                                    {card.schedule.days}
+                                                </span>
+                                                <span className="mt-0.5 block text-xs font-semibold leading-5 text-[#8E8A9F]">
+                                                    {card.schedule.time}
+                                                </span>
+                                            </span>
+                                        </div>
+                                    ) : null}
                                 </div>
 
                                 {/* Pricing Framework Footers */}

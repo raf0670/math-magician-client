@@ -163,34 +163,27 @@ export async function getCourses() {
   return request("/api/courses");
 }
 
-export async function createBkashPayment(planId) {
-  return request("/api/payments/bkash/create", {
+export async function submitManualEnrollment(planId, formData) {
+  return request("/api/payments/manual-enrollment", {
     method: "POST",
-    body: { planId },
-  });
-}
-
-export async function beginBkashCheckout(planId) {
-  const payload = await createBkashPayment(planId);
-  const bkashURL = payload?.data?.bkashURL;
-
-  if (!bkashURL) {
-    throw new Error("Unable to start bKash checkout.");
-  }
-
-  clearPendingPaymentPlan();
-  window.location.href = bkashURL;
-}
-
-export async function saveEnrollmentDetails(payload) {
-  return request("/api/payments/enrollment-details", {
-    method: "POST",
-    body: payload,
+    body: { planId, formData },
   });
 }
 
 export async function getPaymentAccess() {
   return request("/api/payments/my-access");
+}
+
+export async function getAdminEnrollmentReviews(status = "") {
+  const suffix = status ? `?status=${encodeURIComponent(status)}` : "";
+  return request(`/api/payments/admin/enrollments${suffix}`);
+}
+
+export async function updateAdminEnrollmentStatus(paymentId, status, reviewNote = "") {
+  return request(`/api/payments/admin/enrollments/${paymentId}/status`, {
+    method: "PATCH",
+    body: { status, reviewNote },
+  });
 }
 
 export async function getExams() {

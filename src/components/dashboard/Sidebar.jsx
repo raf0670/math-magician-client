@@ -3,8 +3,8 @@ import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { LayoutDashboard, Video, ClipboardCheck, BarChart3, User, LogOut, Sparkles } from "lucide-react";
-import { clearAuthSession, getStoredUser } from "@/lib/api";
+import { LayoutDashboard, Video, ClipboardCheck, BarChart3, User, LogOut, ShieldCheck, Sparkles } from "lucide-react";
+import { clearAuthSession, getProfile, getStoredUser, saveAuthSession } from "@/lib/api";
 
 export default function DashboardSidebar() {
     const pathname = usePathname();
@@ -13,7 +13,18 @@ export default function DashboardSidebar() {
 
     useEffect(() => {
         const syncUser = () => setCurrentUser(getStoredUser());
+        const refreshProfile = async () => {
+            const token = window.localStorage.getItem("exam_archive_token");
+            if (!token) return;
+
+            const payload = await getProfile().catch(() => null);
+            if (payload?.data) {
+                saveAuthSession(token, payload.data);
+            }
+        };
+
         syncUser();
+        refreshProfile();
         window.addEventListener("auth-state-changed", syncUser);
         window.addEventListener("storage", syncUser);
 
@@ -28,8 +39,9 @@ export default function DashboardSidebar() {
         { href: "/dashboard/classes", label: "Live Classes", icon: Video },
         { href: "/dashboard/mock-tests", label: "Mock Tests", icon: ClipboardCheck },
         { href: "/dashboard/analytics", label: "Analytics", icon: BarChart3 },
+        currentUser?.role === "admin" ? { href: "/dashboard/admin/enrollments", label: "Admin", icon: ShieldCheck } : null,
         { href: "/dashboard/profile", label: "Profile", icon: User },
-    ];
+    ].filter(Boolean);
 
     const firstName = currentUser?.name?.trim().split(" ")[0] || "Student";
 

@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowLeft, Check, LockKeyhole, WandSparkles } from "lucide-react";
-import { createBkashPayment, getStoredToken, getStoredUser, savePendingEnrollment, savePendingPaymentPlan } from "@/lib/api";
+import { ArrowLeft, Check, LockKeyhole, QrCode, WandSparkles } from "lucide-react";
+import { getStoredToken, getStoredUser, savePendingPaymentPlan, submitManualEnrollment } from "@/lib/api";
 import FlashyLoader, { LoadingButtonLabel } from "@/components/shared/FlashyLoader";
 
 const PLANS = {
@@ -31,6 +32,7 @@ const INITIAL_FORM = {
   strongestSection: "",
   weakestSection: "",
   preferredBatch: "",
+  bkashTrxID: "",
 };
 
 const REQUIRED_FIELDS = [
@@ -45,6 +47,7 @@ const REQUIRED_FIELDS = [
   "hscBatch",
   "backupChoice",
   "admissionSystemIdea",
+  "bkashTrxID",
 ];
 
 const SECTION_VARIANTS = {
@@ -163,18 +166,16 @@ function PaymentDetailsContent() {
 
     try {
       setLoading(true);
-      const payload = await createBkashPayment(planId);
+      const payload = await submitManualEnrollment(planId, form);
       const paymentId = payload?.data?.paymentId;
-      const bkashURL = payload?.data?.bkashURL;
 
-      if (!paymentId || !bkashURL) {
-        throw new Error("Unable to start bKash checkout.");
+      if (!paymentId) {
+        throw new Error("Unable to submit enrollment for review.");
       }
 
-      savePendingEnrollment({ paymentId, planId, formData: form });
-      window.location.href = bkashURL;
+      router.push(`/payment/success?paymentId=${encodeURIComponent(paymentId)}&status=pending`);
     } catch (err) {
-      setError(err.message || "Unable to start bKash checkout.");
+      setError(err.message || "Unable to submit enrollment for review.");
       setLoading(false);
     }
   };
@@ -185,7 +186,7 @@ function PaymentDetailsContent() {
         <motion.div
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mx-auto flex min-h-[480px] max-w-xl flex-col items-center justify-center text-center"
+          className="mx-auto flex min-h-120 max-w-xl flex-col items-center justify-center text-center"
         >
           <p className="text-xs font-bold uppercase tracking-[0.3em] text-[#DFB15B]">Plan Required</p>
           <h1 className="mt-3 font-serif text-3xl font-medium">Choose a program first</h1>
@@ -201,7 +202,7 @@ function PaymentDetailsContent() {
   return (
     <div className="relative min-h-screen overflow-hidden bg-[#0A090F] px-4 py-8 text-white sm:px-6 lg:px-8">
       <div className="pointer-events-none absolute inset-0 opacity-70">
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(223,177,91,0.055)_1px,transparent_1px),linear-gradient(90deg,rgba(124,58,237,0.045)_1px,transparent_1px)] bg-[size:46px_46px]" />
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(223,177,91,0.055)_1px,transparent_1px),linear-gradient(90deg,rgba(124,58,237,0.045)_1px,transparent_1px)] bg-size-[46px_46px]" />
         <div className="absolute inset-x-0 top-0 h-72 bg-[radial-gradient(ellipse_at_top,rgba(223,177,91,0.16),transparent_68%)]" />
         <div className="absolute inset-x-0 bottom-0 h-80 bg-[radial-gradient(ellipse_at_bottom,rgba(124,58,237,0.15),transparent_70%)]" />
         {DRIFTING_LIGHTS.map((light, index) => (
@@ -215,7 +216,7 @@ function PaymentDetailsContent() {
         {AURORA_BANDS.map((band, index) => (
           <motion.div
             key={`aurora-${index}`}
-            className={`absolute -left-1/3 h-28 w-[150vw] bg-gradient-to-r ${band.colors} blur-xl mix-blend-screen`}
+            className={`absolute -left-1/3 h-28 w-[150vw] bg-linear-to-r ${band.colors} blur-xl mix-blend-screen`}
             style={{ top: band.top, rotate: band.rotate }}
             animate={{ x: ["-18%", "18%", "-18%"], opacity: [0.18, 0.72, 0.18] }}
             transition={{ duration: band.duration, repeat: Infinity, delay: band.delay, ease: "easeInOut" }}
@@ -224,31 +225,31 @@ function PaymentDetailsContent() {
         {COMETS.map((comet, index) => (
           <motion.div
             key={`comet-${index}`}
-            className="absolute -left-56 h-1 w-56 rounded-full bg-gradient-to-r from-transparent via-[#DFB15B]/85 to-white/90 shadow-[0_0_28px_rgba(223,177,91,0.55)]"
+            className="absolute -left-56 h-1 w-56 rounded-full bg-linear-to-r from-transparent via-[#DFB15B]/85 to-white/90 shadow-[0_0_28px_rgba(223,177,91,0.55)]"
             style={{ top: comet.top, rotate: "-18deg" }}
             animate={{ x: ["0vw", "125vw"], opacity: [0, 1, 0] }}
             transition={{ duration: comet.duration, repeat: Infinity, delay: comet.delay, ease: "easeInOut" }}
           />
         ))}
         <motion.div
-          className="absolute left-1/2 top-24 h-[520px] w-[520px] -translate-x-1/2 rounded-full border border-[#DFB15B]/10"
+          className="absolute left-1/2 top-24 h-130 w-130 -translate-x-1/2 rounded-full border border-[#DFB15B]/10"
           animate={{ rotate: 360 }}
           transition={{ duration: 55, repeat: Infinity, ease: "linear" }}
         />
         <motion.div
-          className="absolute left-1/2 top-40 h-[380px] w-[380px] -translate-x-1/2 rounded-full border border-[#7C3AED]/12"
+          className="absolute left-1/2 top-40 h-95 w-95 -translate-x-1/2 rounded-full border border-[#7C3AED]/12"
           animate={{ rotate: -360 }}
           transition={{ duration: 42, repeat: Infinity, ease: "linear" }}
         />
         <motion.div
-          className="absolute left-1/2 top-20 h-[620px] w-[620px] -translate-x-1/2 rounded-full border border-dashed border-[#DFB15B]/18"
+          className="absolute left-1/2 top-20 h-155 w-155 -translate-x-1/2 rounded-full border border-dashed border-[#DFB15B]/18"
           animate={{ rotate: [0, 360], scale: [0.96, 1.04, 0.96], opacity: [0.18, 0.42, 0.18] }}
           transition={{ duration: 32, repeat: Infinity, ease: "linear" }}
         />
         {MAGIC_TRAILS.map((trail, index) => (
           <motion.span
             key={`trail-${index}`}
-            className="absolute top-full h-24 w-px rounded-full bg-gradient-to-b from-transparent via-[#DFB15B]/45 to-transparent"
+            className="absolute top-full h-24 w-px rounded-full bg-linear-to-b from-transparent via-[#DFB15B]/45 to-transparent"
             style={{ left: trail.left }}
             animate={{ y: ["0vh", "-130vh"], opacity: [0, 0.7, 0] }}
             transition={{ duration: trail.duration, repeat: Infinity, delay: trail.delay, ease: "linear" }}
@@ -289,14 +290,14 @@ function PaymentDetailsContent() {
         transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
         className="relative z-10 mx-auto max-w-5xl"
       >
-        <Link href="/#programs-section" className="inline-flex items-center gap-2 rounded-full border border-white/5 bg-white/[0.03] px-4 py-2 text-sm font-semibold text-[#8E8A9F] backdrop-blur transition hover:border-[#DFB15B]/25 hover:text-white">
+        <Link href="/#programs-section" className="inline-flex items-center gap-2 rounded-full border border-white/5 bg-white/3 px-4 py-2 text-sm font-semibold text-[#8E8A9F] backdrop-blur transition hover:border-[#DFB15B]/25 hover:text-white">
           <ArrowLeft className="h-4 w-4" />
           Back to pricing
         </Link>
 
         <div className="relative mt-6 overflow-hidden rounded-3xl border border-[#DFB15B]/15 bg-[#100E16]/95 shadow-[0_24px_80px_rgba(0,0,0,0.55)] backdrop-blur">
           <motion.div
-            className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#DFB15B] to-transparent"
+            className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-[#DFB15B] to-transparent"
             animate={{ x: ["-100%", "100%"] }}
             transition={{ duration: 4.5, repeat: Infinity, ease: "linear" }}
           />
@@ -312,7 +313,7 @@ function PaymentDetailsContent() {
                   Open the Portal
                 </h1>
                 <p className="mt-3 max-w-xl text-sm leading-6 text-[#A9A3BA]">
-                  Complete your student profile, then continue to bKash checkout to unlock the class arena.
+                  Complete your student profile, scan the bKash QR code, and submit your transaction ID for admin approval.
                 </p>
               </div>
               {/* <motion.div
@@ -362,6 +363,35 @@ function PaymentDetailsContent() {
               <RadioField label="Which batch do you want to be enrolled?" field="preferredBatch" value={form.preferredBatch} options={["Farmgate", "Bailey Road", "Online"]} onChange={updateField} />
             </FormSection>
 
+            <FormSection title="bKash Payment" description="Scan the QR code, complete payment, then enter the transaction ID from bKash." index={5}>
+              <div className="grid gap-5 lg:grid-cols-[280px_1fr] lg:items-center">
+                <div className="rounded-3xl border border-[#DFB15B]/20 bg-white p-4">
+                  <Image
+                    src="/bkash-qr.png"
+                    alt="bKash payment QR code"
+                    width={520}
+                    height={520}
+                    className="aspect-square w-full rounded-2xl object-contain"
+                  />
+                </div>
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3 rounded-2xl border border-[#DFB15B]/15 bg-[#DFB15B]/8 px-4 py-4 text-sm text-[#EBD39B]">
+                    <QrCode className="h-5 w-5 shrink-0 text-[#DFB15B]" />
+                    <span className="font-medium">Selected plan: {plan.title} - {plan.amount}</span>
+                  </div>
+                  <TextField
+                    label="BkashTrxID"
+                    field="bkashTrxID"
+                    required
+                    value={form.bkashTrxID}
+                    error={fieldErrors.bkashTrxID}
+                    onChange={updateField}
+                    placeholder="Example: A1B2C3D4E5"
+                  />
+                </div>
+              </div>
+            </FormSection>
+
             {error ? <p className="rounded-2xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm font-medium text-red-300">{error}</p> : null}
 
             <motion.div
@@ -372,7 +402,7 @@ function PaymentDetailsContent() {
             >
               <div className="flex items-center gap-2 text-xs font-medium text-[#8E8A9F]">
                 <LockKeyhole className="h-4 w-4 text-[#DFB15B]" />
-                Payment will open through bKash after submission.
+                Your enrollment will stay pending until an admin approves the transaction ID.
               </div>
               <motion.button
                 type="submit"
@@ -384,8 +414,8 @@ function PaymentDetailsContent() {
                 <span className="absolute inset-y-0 -left-10 w-8 rotate-12 bg-white/40 blur-sm transition group-hover:left-full" />
                 <LoadingButtonLabel
                   loading={loading}
-                  idleText="Submit and Pay"
-                  loadingText="Opening bKash..."
+                  idleText="Submit for Review"
+                  loadingText="Submitting..."
                   iconName="credit"
                 />
               </motion.button>
@@ -419,7 +449,7 @@ function FormSection({ title, description, children, index }) {
       viewport={{ once: true, amount: 0.16 }}
       className="relative overflow-hidden rounded-3xl border border-white/8 bg-[#15121D]/85 p-5 shadow-[0_16px_45px_rgba(0,0,0,0.24)] sm:p-6"
     >
-      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/15 to-transparent" />
+      <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-white/15 to-transparent" />
       <div className="mb-6 flex items-start gap-4">
         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-[#DFB15B]/20 bg-[#DFB15B]/10 font-serif text-lg font-bold text-[#DFB15B]">
           {index}

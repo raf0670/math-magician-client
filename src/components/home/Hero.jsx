@@ -74,7 +74,7 @@ export default function UnifiedHeroDeck() {
             bgIconClass: "bg-[#DFB15B]/10 border-[#DFB15B]/20",
         },
         {
-            title: "Premium Community",
+            title: "Best IBA aspirant Community",
             description: "Access our exclusive, highly moderated group. Share solutions, discuss hard problems, and stay accountable with top peers.",
             icon: Users,
             colorClass: "text-blue-400",
@@ -83,9 +83,9 @@ export default function UnifiedHeroDeck() {
     ];
 
     const credentials = [
-        { text: "IBA, DU Graduate" },
-        { text: "GMAT 740" },
-        { text: "5+ Years Teaching" },
+        { text: "IBA DU 8th" },
+        { text: "BUP FBS 11th" },
+        { text: "2+ Years Teaching" },
         { text: "1,200+ Students Mentored" },
     ];
 
@@ -217,14 +217,14 @@ export default function UnifiedHeroDeck() {
                     </motion.h1>
 
                     <motion.p variants={heroItemVariants} className="text-[#8E8A9F] text-xs sm:text-sm md:text-base font-medium leading-relaxed max-w-2xl mb-12">
-                        Master quantitative modules, speed shortcuts, and critical analytical frameworks under structured blueprints designed by real top-tier IBA graduates.
+                         Taking IBA preparation is easy if you can take it efficiently. Learn from the best how to crack the code of IBA admission test.
                     </motion.p>
 
                     <motion.div variants={heroItemVariants} className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full mb-20">
                         <Link href="#programs-section" className="inline-flex w-full sm:w-auto items-center justify-center px-8 py-3.5 rounded-full bg-linear-to-r from-[#E6C687] via-[#D4AF37] to-[#AA7C11] text-xs font-bold text-black uppercase tracking-wider shadow-[0_4px_25px_rgba(212,175,55,0.2)] hover:shadow-[0_10px_35px_rgba(212,175,55,0.35)] transition-all duration-300 hover:scale-[1.02]">
                             Explore Programs
                         </Link>
-                        <Link href="#" className="inline-flex w-full sm:w-auto items-center justify-center gap-2 px-8 py-3.5 rounded-full border border-white/4 hover:border-[#DFB15B]/30 text-xs font-bold text-white uppercase tracking-wider bg-[#121017] hover:bg-[#1A1722] transition-all duration-300">
+                        <Link href="https://youtube.com/@mehrab.du-iba?si=a60259jA6RWqzZp1" target="_blank" className="inline-flex w-full sm:w-auto items-center justify-center gap-2 px-8 py-3.5 rounded-full border border-white/4 hover:border-[#DFB15B]/30 text-xs font-bold text-white uppercase tracking-wider bg-[#121017] hover:bg-[#1A1722] transition-all duration-300">
                             <Play className="w-3 h-3 text-[#DFB15B] fill-[#DFB15B]" />
                             Watch Demo
                         </Link>
@@ -261,7 +261,7 @@ export default function UnifiedHeroDeck() {
                             What You Actually Get
                         </h2>
                         <p className="text-[#6B667B] text-xs md:text-sm font-medium">
-                            A rigorous tactical ecosystem packed with premium assets to build real speed and exam confidence.
+                            A rigorous tactical ecosystem packed with premium assets to build consistency and exam confidence.
                         </p>
                     </motion.div>
 
@@ -333,7 +333,7 @@ export default function UnifiedHeroDeck() {
                             >
                                 <div className="w-full h-full rounded-2xl overflow-hidden bg-[#16131C] border border-white/3 relative">
                                     <Image
-                                        src="https://images.unsplash.com/photo-1534528741775-53994a69daeb"
+                                        src="https://i.ibb.co.com/tM2pbsr2/f39e5b4b-432e-4c5c-8626-46ca7d6d6cc7.jpg"
                                         alt="Instructor Portrait"
                                         fill
                                         className="object-cover grayscale brightness-[0.88] contrast-[1.03] group-hover:scale-[1.03] group-hover:grayscale-0 transition-all duration-700"
@@ -359,11 +359,11 @@ export default function UnifiedHeroDeck() {
 
                             <motion.h2 variants={featureCardVariants} className="font-serif text-3xl md:text-5xl font-medium tracking-wide text-white mb-6 leading-tight">
                                 Learn from the Best. <br />
-                                <span className="text-[#DFB15B]">Not Just Anyone.</span>
+                                <span className="text-[#DFB15B]">Mehrabur Rahaman</span>
                             </motion.h2>
 
                             <motion.p variants={featureCardVariants} className="text-[#8E8A9F] text-xs md:text-sm font-medium leading-relaxed max-w-xl mb-10">
-                                I’m an IBA graduate who’s helped thousands of students navigate the toughest admission test in Bangladesh. My approach is simple: no fluff, no fear — only strategy, shortcuts, and relentless practice. If IBA is your dream, I’ll make it your reality.
+                                Hello good soul. This is your instructor Mehrab. To be honest, I can never make sure you get into IBA but surely enough I can make your path easier and smooth. I have already guided many aspirants in the same path who now go to the same campus as me. Join me in this journey, we&apos;ll share campus soon too. 
                             </motion.p>
 
                             <motion.div variants={featureCardVariants} className="flex flex-wrap gap-3 justify-center lg:justify-start w-full max-w-xl">
