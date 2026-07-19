@@ -126,18 +126,45 @@ export default function ProgramsAndTestimonials() {
     const reviews = [
         {
             name: "Sakib Al Hasan",
+            image: "https://i.ibb.co.com/Q4Y1bmW/one.jpg",
             meta: "IBA 48th Batch — Selected ✓",
-            text: '"MathMagician’s mock tests are identical in feel to the real IBA paper. The personal counselling sessions helped me fix my timing issues. I literally couldn’t have made it without this."',
+            text: '"Mehrab Bhai was a pivotal figure in one of the most challenging stages of my life. His constant guidance allowed me to find my weaknesses and fix them. He was an amazing teacher. His advices were very helpful for me in mocks and were crucial in the main exam. Without Mehrab Bhai, I would never have been able to get where I am today. For this, I will always be grateful to him."',
         },
         {
             name: "Nusrat Jahan",
+            image: "https://i.ibb.co.com/NcyJGJ4/two.jpg",
             meta: "IBA 47th Batch — Selected ✓",
-            text: '"I was weak in Math but the structured approach here changed everything. Short-cut techniques, pattern recognition drills — I scored 90%+ in quantitative. Absolutely worth every taka."',
+            text: '"I knew IBA maths prep was all about calculation hacks but i knew 0 of them till the last week of my admission prep. After watching Mehrab bhai\'s maths marathon class, i got to know the only math hacks i know to this day and i still use those tricks even after getting into IBA. Besides this, bhai is genuinely someone to look up to because of his work ethic and the way he juggles so many activities efficiently. Definitely one of the top IBA seniors."',
         },
         {
             name: "Rafiul Islam",
+            image: "https://plus.unsplash.com/premium_photo-1661942126259-fb08e7cce1e2",
             meta: "IBA 49th Batch — Selected ✓",
-            text: '"The community alone is worth enrolling for. Everyone is super serious and motivated. The live classes are engaging, and the instructor genuinely cares about each student\'s progress."',
+            text: '"I think what makes MathMagician different from other platforms is the dedication Bhaiya put in throughout the entire admission season. His consistency, effort, and genuine commitment to helping us succeed made a huge difference. Besides, he covered every topic thoroughly, starting from the basics and gradually moving to the advanced level.Furthermore,the community was one of the best parts of the batch. Everyone was supportive, and motivating. Being surrounded by people working toward the same goal made the journey much less stressful and kept me motivated throughout the admission season"',
+        },
+        {
+            name: "Rafiul Islam",
+            image: "https://i.ibb.co.com/DPPrV4TC/four.jpg",
+            meta: "IBA 49th Batch — Selected ✓",
+            text: '"I primarily joined Bhaiya’s batch to get better at solving hard math problems. However, his course offered much more than I expected; along with the advanced math playlist, I also got access to basic math modules and regular mock tests. Bhaiya was always active and supportive throughout our admission preparation phase. He constantly cleared our doubts, and it felt great to have someone reliable to count on."',
+        },
+        {
+            name: "Rafiul Islam",
+            image: "https://i.ibb.co.com/gZgVR57y/five.jpg",
+            meta: "IBA 49th Batch — Selected ✓",
+            text: '"It was just a few days before the IBA exam, and I knew that I was struggling a bit in Math. I signed up quickly and haven’t regretted the decision since.  The complete revision of all the math topics was all I needed and the classes were really interactive too. The classes were divided into timings convenient for us to ensure the proper attention. The topics I struggled with were resolved fully by vai’s classes and feedback. The worksheets were the perfect supplement for the last-minute revision I did the night before the exam. My confidence level was better than ever and the entire course played this huge role in acing the exam. I would definitely recommend every aspirant to sign up for Mehrab vai’s course anyday."',
+        },
+        {
+            name: "Rafiul Islam",
+            image: "https://i.ibb.co.com/842ZHf9w/six.jpg",
+            meta: "IBA 49th Batch — Selected ✓",
+            text: '"He is obviously one of the most well known IBA tutors out there right now. His classes are full of examples that actually make concepts stick. What really got me though were his exam questions, sitting for those under pressure taught me more about time management and strategy than I expected. That really helped me out on the main exam day."',
+        },
+        {
+            name: "Rafiul Islam",
+            image: "https://plus.unsplash.com/premium_photo-1661942126259-fb08e7cce1e2",
+            meta: "IBA 49th Batch — Selected ✓",
+            text: '"Mehrab bhai was the guardian angel Allah sent for me. I hated math, but his concise classes made me fall in love with quantitative math, at least during the IBA admission journey, and I\'m genuinely not exaggerating. Most importantly, his constant support, especially his words after my crash-outs in mock exams, was enough to keep me on the right track."',
         },
     ];
 
@@ -389,11 +416,12 @@ export default function ProgramsAndTestimonials() {
                             <div className="mt-8 pt-5 border-t border-white/3 flex items-center gap-3.5">
                                 <div className="w-11 h-11 rounded-full overflow-hidden bg-[#16131C] border border-white/8 relative shrink-0">
                                     <Image
-                                        src="https://plus.unsplash.com/premium_photo-1661942126259-fb08e7cce1e2"
+                                        src={item.image}
                                         alt={item.name}
                                         width={80}
                                         height={80}
-                                        className="w-full h-full object-cover grayscale brightness-[0.9] contrast-[1.05] group-hover:grayscale-0 group-hover:scale-105 transition-all duration-500"
+                                        unoptimized
+                                        className="w-full h-full object-cover brightness-[0.9] contrast-[1.05] group-hover:scale-105 transition-all duration-500"
                                     />
                                 </div>
 

@@ -161,7 +161,7 @@ export default function AboutExperience() {
 
           <motion.div variants={itemVariants} className="order-1 flex justify-center lg:order-2 lg:col-span-5">
             <motion.div
-              className="relative w-full max-w-[360px]"
+              className="relative w-full max-w-90"
               animate={{ y: [0, -8, 0] }}
               transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
             >
@@ -170,7 +170,7 @@ export default function AboutExperience() {
                 animate={{ rotate: [0, 1.5, -1.5, 0], opacity: [0.25, 0.55, 0.25] }}
                 transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
               />
-              <div className="aspect-[4/5] overflow-hidden rounded-2xl border border-[#DFB15B]/24 bg-[#121017] p-3 shadow-[0_24px_80px_rgba(0,0,0,0.42)]">
+              <div className="aspect-4/5 overflow-hidden rounded-2xl border border-[#DFB15B]/24 bg-[#121017] p-3 shadow-[0_24px_80px_rgba(0,0,0,0.42)]">
                 <div className="relative h-full overflow-hidden rounded-xl bg-[#16131C]">
                   <Image
                     src={instructor.portrait}

@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Video, ArrowUpRight, Sparkles } from "lucide-react";
+import { ClipboardCheck, ArrowUpRight, Sparkles } from "lucide-react";
 import { getExams, getStoredUser } from "@/lib/api";
 
 export default function WelcomeBanner() {
@@ -43,7 +43,7 @@ export default function WelcomeBanner() {
                     <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-md bg-red-500/10 border border-red-500/20 mb-4 animate-pulse">
                         <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
                         <span className="text-[10px] font-bold text-red-400 uppercase tracking-wider">
-                            DB-POWERED PREP
+                            EXPERT POWERED PREP
                         </span>
                     </div>
 
@@ -52,7 +52,7 @@ export default function WelcomeBanner() {
                     </h1>
 
                     <p className="text-[#8E8A9F] text-xs sm:text-sm font-medium leading-relaxed max-w-xl">
-                        Your latest exam from the database is <strong className="text-white">“{title}”</strong> with {questionCount} question{questionCount === 1 ? "" : "s"} ready for practice.
+                        Your latest exam was <strong className="text-white">“{title}”</strong> with {questionCount} question{questionCount === 1 ? "" : "s"}
                     </p>
 
                     <div className="flex items-center gap-6 mt-6 pt-5 border-t border-white/3 w-full max-w-md">
@@ -78,7 +78,7 @@ export default function WelcomeBanner() {
                         className="inline-flex items-center justify-between gap-4 w-full sm:w-auto px-6 py-4 rounded-2xl bg-linear-to-r from-[#E6C687] via-[#D4AF37] to-[#AA7C11] text-xs font-bold text-black uppercase tracking-wider shadow-lg transition-all duration-300"
                     >
                         <span className="flex items-center gap-2">
-                            <Video className="w-4 h-4 text-black stroke-[2.2]" />
+                            <ClipboardCheck className="w-4 h-4 text-black stroke-[2.2]" />
                             Start Practicing
                         </span>
                         <ArrowUpRight className="w-4 h-4 text-black stroke-[2.2]" />

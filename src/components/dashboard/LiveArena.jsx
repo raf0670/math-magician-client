@@ -28,13 +28,14 @@ export default function LiveArena() {
 
     const handleOpenExam = () => {
         if (activeExam?._id) {
-            router.push(`/dashboard/mock-tests/${activeExam._id}`);
+            // paste zoom live class link here
+            router.push(`https://www.zoom.com/`);
         }
     };
 
     return (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 w-full select-none items-start">
-            <div className="lg:col-span-8 flex flex-col gap-6">
+            <div className="lg:col-span-12 flex flex-col gap-6">
                 <div className="bg-[#121017] border border-white/5 rounded-3xl p-6 sm:p-8 relative overflow-hidden shadow-[0_15px_35px_rgba(0,0,0,0.4)]">
                     <div className="absolute right-0 top-0 w-64 h-64 bg-[#E6C687]/5 rounded-full blur-[60px] pointer-events-none" />
 
@@ -63,12 +64,12 @@ export default function LiveArena() {
                         className="w-full flex items-center justify-center gap-2.5 py-4 rounded-2xl bg-linear-to-r from-[#E6C687] via-[#D4AF37] to-[#AA7C11] text-xs font-bold text-black uppercase tracking-wider shadow-lg transition-all duration-300"
                     >
                         <Video className="w-4 h-4 text-black stroke-[2.2]" />
-                        <span>{activeExam ? "Open Latest Exam" : "Waiting for exam data"}</span>
+                        <span>{activeExam ? "Open Latest Class" : "Waiting for exam data"}</span>
                         <ExternalLink className="w-3.5 h-3.5 text-black stroke-[2.2]" />
                     </motion.button>
                 </div>
 
-                <div className="bg-[#121017] border border-white/5 rounded-3xl p-6 shadow-md">
+                {/* <div className="bg-[#121017] border border-white/5 rounded-3xl p-6 shadow-md">
                     <h3 className="text-xs font-bold uppercase text-[#8E8A9F] tracking-wider mb-4">Why this matters</h3>
                     <div className="flex flex-col gap-3">
                         {activeExam ? (
@@ -86,10 +87,10 @@ export default function LiveArena() {
                             <div className="text-sm text-[#8E8A9F]">No exam records have been synced from the database yet.</div>
                         )}
                     </div>
-                </div>
+                </div> */}
             </div>
 
-            <div className="lg:col-span-4 flex flex-col gap-6">
+            {/* <div className="lg:col-span-4 flex flex-col gap-6">
                 <div className="bg-[#121017] border border-white/5 rounded-3xl p-6 shadow-[0_4px_25px_rgba(0,0,0,0.25)]">
                     <div className="flex flex-col gap-1 mb-6 border-b border-white/3 pb-4">
                         <h2 className="text-xs font-bold uppercase text-white tracking-wider flex items-center gap-2">
@@ -128,7 +129,7 @@ export default function LiveArena() {
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> */}
         </div>
     );
 }

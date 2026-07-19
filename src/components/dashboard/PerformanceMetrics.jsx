@@ -2,56 +2,48 @@
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { ClipboardCheck, Target, Brain, TrendingUp } from "lucide-react";
-import { getExams, getMyStats } from "@/lib/api";
+import { getMyStats } from "@/lib/api";
 
 export default function PerformanceMetrics() {
     const [stats, setStats] = useState(null);
-    const [exams, setExams] = useState([]);
 
     useEffect(() => {
-        Promise.all([getMyStats(), getExams()])
-            .then(([statsPayload, examsPayload]) => {
+        getMyStats()
+            .then((statsPayload) => {
                 const studentStats = statsPayload?.stats || {};
-                const examList = Array.isArray(examsPayload?.data) ? examsPayload.data : [];
                 setStats(studentStats);
-                setExams(examList);
             })
             .catch(() => {
                 setStats(null);
-                setExams([]);
             });
     }, []);
 
-    const totalPossibleMarks = useMemo(() => {
-        if (!stats?.history?.length) return 0;
-        return stats.history.reduce((sum, submission) => sum + (submission?.exam?.totalMarks || 0), 0);
-    }, [stats]);
-
     const accuracy = useMemo(() => {
-        if (!stats?.history?.length || !totalPossibleMarks) return 0;
-        return ((stats.totalPointsEarned / totalPossibleMarks) * 100).toFixed(1);
-    }, [stats, totalPossibleMarks]);
-
-    const totalQuestions = useMemo(() => exams.reduce((sum, exam) => sum + (exam?.questions?.length || 0), 0), [exams]);
+        return Number(stats?.accuracyPercentage || 0).toFixed(1);
+    }, [stats]);
+    const totalExams = Number(stats?.totalExams || 0);
+    const availableExamCount = Number(stats?.availableExamCount || 0);
+    const questionBankCount = Number(stats?.questionBankCount || 0);
+    const totalPossibleMarks = Number(stats?.totalPossibleMarks || 0);
 
     const metrics = [
         {
             title: "Mock Tests Solved",
-            value: `${stats?.totalExams || 0}`,
-            subtext: `${exams.length} exams available in MongoDB`,
+            value: `${totalExams}`,
+            subtext: `${availableExamCount} official exam${availableExamCount === 1 ? "" : "s"} available`,
             icon: ClipboardCheck,
             colorClass: "text-[#A78BFA]",
             bgIconClass: "bg-[#7C3AED]/10 border-[#7C3AED]/20",
             renderFooter: () => (
                 <div className="w-full mt-4">
                     <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-wider text-[#6B667B] mb-1.5">
-                        <span>Database coverage</span>
-                        <span className="text-white">{exams.length}</span>
+                        <span>Progress coverage</span>
+                        <span className="text-white">{availableExamCount}</span>
                     </div>
                     <div className="w-full h-1.5 bg-[#1A1722] rounded-full overflow-hidden border border-white/5">
                         <motion.div
                             initial={{ width: 0 }}
-                            animate={{ width: exams.length ? `${Math.min((stats?.totalExams || 0) / exams.length * 100, 100)}%` : "0%" }}
+                            animate={{ width: availableExamCount ? `${Math.min((totalExams / availableExamCount) * 100, 100)}%` : "0%" }}
                             transition={{ duration: 1, ease: "easeOut" }}
                             className="h-full bg-linear-to-r from-indigo-500 to-[#A78BFA] rounded-full"
                         />
@@ -62,20 +54,20 @@ export default function PerformanceMetrics() {
         {
             title: "Overall Accuracy",
             value: `${accuracy}%`,
-            subtext: `Based on ${stats?.history?.length || 0} submission${(stats?.history?.length || 0) === 1 ? "" : "s"}`,
+            subtext: `Based on ${totalPossibleMarks} possible point${totalPossibleMarks === 1 ? "" : "s"}`,
             icon: Target,
             colorClass: "text-[#E6C687]",
             bgIconClass: "bg-[#E6C687]/10 border-[#E6C687]/20",
             renderFooter: () => (
                 <div className="w-full mt-4 flex items-center gap-2 text-[11px] font-semibold text-emerald-400 bg-emerald-500/5 border border-emerald-500/10 rounded-xl px-3 py-1.5">
                     <TrendingUp className="w-3.5 h-3.5" />
-                    <span>Performance is pulled from your MongoDB submission history</span>
+                    <span>Performance is pulled from your submission history</span>
                 </div>
             )
         },
         {
             title: "Questions in Bank",
-            value: `${totalQuestions}`,
+            value: `${questionBankCount}`,
             subtext: "Live question data from the database",
             icon: Brain,
             colorClass: "text-[#DFB15B]",
@@ -84,7 +76,7 @@ export default function PerformanceMetrics() {
                 <div className="w-full mt-4 flex gap-1.5 items-center">
                     <span className="text-[10px] font-bold uppercase tracking-wider text-[#6B667B]">Data source:</span>
                     <span className="px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
-                        MongoDB
+                        Your Well Wishers
                     </span>
                 </div>
             )
