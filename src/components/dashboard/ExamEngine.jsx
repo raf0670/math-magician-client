@@ -25,6 +25,18 @@ function getEffectivePenalty(value) {
     return Number.isFinite(penalty) && penalty > 0 ? penalty : 0.25;
 }
 
+function getStudentFacingExamTitle(title, fallback = "Live Mock Test") {
+    const cleanedTitle = title
+        ?.toString()
+        .replace(/\((\d+)\s+Random Questions\)/gi, "($1 Questions)")
+        .replace(/\bRandom Questions\b/gi, "Questions")
+        .replace(/\bRandom\b/gi, "")
+        .replace(/\s{2,}/g, " ")
+        .trim();
+
+    return cleanedTitle || fallback;
+}
+
 export default function ExamEngine({ examData, onComplete }) {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [answers, setAnswers] = useState({});
@@ -49,6 +61,7 @@ export default function ExamEngine({ examData, onComplete }) {
     const answeredCount = normalizedQuestions.filter((question) => answers[question.id] !== undefined).length;
     const skippedCount = normalizedQuestions.length - answeredCount;
     const penalty = getEffectivePenalty(examData?.negativeMarksPerQuestion);
+    const examTitle = getStudentFacingExamTitle(examData?.title);
 
     const handleSelectOption = (optionIndex) => {
         if (!currentQuestion) return;
@@ -79,7 +92,7 @@ export default function ExamEngine({ examData, onComplete }) {
                     <span className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-[#DFB15B]">
                         <Sparkles className="h-3.5 w-3.5" /> Active Examination Sheet
                     </span>
-                    <h2 className="mt-1 text-base font-semibold text-white">{examData?.title || "Live Mock Test"}</h2>
+                    <h2 className="mt-1 text-base font-semibold text-white">{examTitle}</h2>
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
                     <div className="flex items-center gap-2 rounded-xl border border-emerald-500/15 bg-emerald-500/10 px-4 py-2 text-sm font-bold text-emerald-300">

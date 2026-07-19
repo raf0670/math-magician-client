@@ -23,7 +23,7 @@ export default function Footer() {
   const supportLinks = [
     { name: "Contact Us", href: "/contact" },
     { name: "FAQs", href: "/faqs" },
-    { name: "Community", href: "/community" },
+    { name: "Community", href: "/#community-section" },
     { name: "Refund Policy", href: "/refund-policy" },
   ];
 

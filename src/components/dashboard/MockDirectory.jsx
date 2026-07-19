@@ -125,7 +125,7 @@ export default function MockDirectory() {
                             <SlidersHorizontal className="h-3.5 w-3.5" /> Exam Setup
                         </span>
                         <h2 className="text-xl font-semibold tracking-wide text-white">Choose your practice paper</h2>
-                        <p className="text-sm font-medium text-[#8E8A9F]">Pick a subject, topic, and how many questions you want. Every generated exam is untimed and randomized.</p>
+                        <p className="text-sm font-medium text-[#8E8A9F]">Pick a subject, topic, and how many questions you want. Every practice paper is untimed and built from your selected topic.</p>
                     </div>
 
                     <div className="grid grid-cols-1 gap-5 lg:grid-cols-[260px_minmax(0,1fr)]">
@@ -213,13 +213,13 @@ export default function MockDirectory() {
                                         </label>
 
                                         <span className="rounded-xl border border-emerald-400/20 bg-emerald-400/10 px-4 py-3 text-[11px] font-semibold text-emerald-200">
-                                            Randomly selected before the exam opens
+                                            Prepared before the exam opens
                                         </span>
                                     </div>
 
                                     <span className={`text-[11px] font-semibold ${hasValidQuestionCount ? "text-emerald-300" : "text-red-400"}`}>
                                         {hasValidQuestionCount
-                                            ? `${parsedQuestionCount} random question${parsedQuestionCount === 1 ? "" : "s"} will be selected from ${maxQuestionCount || 0} available.`
+                                            ? `${parsedQuestionCount} question${parsedQuestionCount === 1 ? "" : "s"} will be selected from ${maxQuestionCount || 0} available.`
                                             : "Choose a valid total within the available question count."}
                                     </span>
                                 </div>

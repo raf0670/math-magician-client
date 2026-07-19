@@ -25,20 +25,21 @@ export default function Navbar() {
         { name: "Home", href: "/" },
         { name: "About", href: "/about" },
         { name: "Programs", href: "/#programs-section" },
-        { name: "Community", href: "/community" },
+        { name: "Community", href: "/#community-section" },
     ];
 
     const toggleMenu = () => setIsOpen(!isOpen);
     const firstName = currentUser?.name?.trim().split(" ")[0] || "Student";
     const isLoggedIn = Boolean(currentUser);
     const handleNavClick = (event, link) => {
-        if (link.href === "/#programs-section" && pathname === "/") {
+        if (link.href.startsWith("/#") && pathname === "/") {
+            const sectionId = link.href.slice(2);
             event.preventDefault();
-            document.getElementById("programs-section")?.scrollIntoView({
+            document.getElementById(sectionId)?.scrollIntoView({
                 behavior: "smooth",
                 block: "start",
             });
-            window.history.replaceState(null, "", "/#programs-section");
+            window.history.replaceState(null, "", link.href);
         }
 
         setIsOpen(false);

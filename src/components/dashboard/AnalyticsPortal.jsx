@@ -5,6 +5,18 @@ import { BarChart3, Target, Zap, Clock, Sparkles, Trophy } from "lucide-react";
 import { getLeaderboard, getMyStats, getStoredUser } from "@/lib/api";
 import FlashyLoader from "@/components/shared/FlashyLoader";
 
+function getStudentFacingExamTitle(title, fallback = "Practice exam") {
+    const cleanedTitle = title
+        ?.toString()
+        .replace(/\((\d+)\s+Random Questions\)/gi, "($1 Questions)")
+        .replace(/\bRandom Questions\b/gi, "Questions")
+        .replace(/\bRandom\b/gi, "")
+        .replace(/\s{2,}/g, " ")
+        .trim();
+
+    return cleanedTitle || fallback;
+}
+
 export default function AnalyticsPortal() {
     const [stats, setStats] = useState(null);
     const [history, setHistory] = useState([]);
@@ -62,14 +74,14 @@ export default function AnalyticsPortal() {
             .reverse()
             .slice(0, 6)
             .map((item, index) => ({
-                name: item?.exam?.title || `Attempt ${index + 1}`,
+                name: getStudentFacingExamTitle(item?.exam?.title, `Attempt ${index + 1}`),
                 score: Number(item?.score || 0),
             }));
     }, [history]);
 
     const recentResults = useMemo(() => {
         return history.slice(0, 4).map((item) => ({
-            title: item?.exam?.title || "Practice exam",
+            title: getStudentFacingExamTitle(item?.exam?.title),
             score: Number(item?.score || 0),
             submittedAt: item?.submittedAt,
         }));

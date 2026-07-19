@@ -24,7 +24,7 @@ export default function Community() {
 
     return (
         // 🪄 Strict background matching anchor applied to section root element wrapper
-        <section className="w-full bg-[#0D0B14] py-24 px-6 md:px-12 lg:px-24 relative overflow-hidden select-none">
+        <section id="community-section" className="w-full scroll-mt-24 bg-[#0D0B14] py-24 px-6 md:px-12 lg:px-24 relative overflow-hidden select-none">
 
             {/* 🌌 CONSTRAINED LIGHT FIELD — We position this strictly high up to ensure no color bleeds into the bottom edge */}
             <div className="absolute top-[10%] left-[50%] -translate-x-1/2 w-[55vw] h-[55vw] bg-[#7C3AED]/5 rounded-full blur-[130px] pointer-events-none" />

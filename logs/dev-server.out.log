@@ -269,3 +269,60 @@ Creating turbopack project {
  GET /dashboard/classes 200 in 137ms (next.js: 52ms, application-code: 85ms)
  GET /dashboard/classes 200 in 29ms (next.js: 3ms, application-code: 26ms)
  GET /dashboard/mock-tests 200 in 110ms (next.js: 38ms, application-code: 72ms)
+✓ Compiled in 77ms
+ GET /dashboard/mock-tests 200 in 93ms (next.js: 54ms, application-code: 38ms)
+✓ Compiled in 109ms
+ GET /dashboard/mock-tests 200 in 244ms (next.js: 105ms, application-code: 139ms)
+ GET /dashboard/mock-tests 200 in 104ms (next.js: 4ms, application-code: 100ms)
+✓ Compiled in 71ms
+ GET /dashboard/mock-tests 200 in 123ms (next.js: 59ms, application-code: 63ms)
+ GET /dashboard/mock-tests 200 in 54ms (next.js: 3ms, application-code: 51ms)
+✓ Compiled in 168ms
+ GET /dashboard/mock-tests 200 in 161ms (next.js: 79ms, application-code: 83ms)
+ GET /dashboard/mock-tests 200 in 72ms (next.js: 3ms, application-code: 70ms)
+ GET /dashboard/mock-tests/6a5d0a7ccf85e4c72370fae9 200 in 351ms (next.js: 306ms, application-code: 45ms)
+ GET /dashboard/mock-tests 200 in 53ms (next.js: 8ms, application-code: 45ms)
+✓ Compiled in 67ms
+ GET /dashboard/mock-tests 200 in 96ms (next.js: 62ms, application-code: 34ms)
+✓ Compiled in 100ms
+ GET /dashboard/mock-tests 200 in 137ms (next.js: 78ms, application-code: 59ms)
+✓ Compiled in 81ms
+ GET /dashboard/mock-tests 200 in 152ms (next.js: 61ms, application-code: 91ms)
+✓ Compiled in 86ms
+ GET /dashboard/mock-tests 200 in 92ms (next.js: 46ms, application-code: 46ms)
+ GET /dashboard/analytics 200 in 135ms (next.js: 75ms, application-code: 60ms)
+ GET /dashboard/profile 200 in 120ms (next.js: 70ms, application-code: 50ms)
+✓ Compiled in 61ms
+ GET /dashboard/profile 200 in 103ms (next.js: 46ms, application-code: 58ms)
+✓ Compiled in 65ms
+ GET /dashboard/profile 200 in 86ms (next.js: 58ms, application-code: 27ms)
+✓ Compiled in 68ms
+ GET /dashboard/profile 200 in 103ms (next.js: 41ms, application-code: 62ms)
+ GET /dashboard/classes 200 in 242ms (next.js: 156ms, application-code: 86ms)
+ GET /dashboard/analytics 200 in 174ms (next.js: 123ms, application-code: 51ms)
+ GET /dashboard/mock-tests 200 in 184ms (next.js: 119ms, application-code: 65ms)
+ GET /dashboard/mock-tests/6a5d0c7fcf85e4c72370faeb 200 in 722ms (next.js: 650ms, application-code: 72ms)
+ GET /dashboard/mock-tests 200 in 51ms (next.js: 6ms, application-code: 45ms)
+ GET /dashboard/analytics 200 in 58ms (next.js: 8ms, application-code: 50ms)
+ GET /dashboard/profile 200 in 33ms (next.js: 6ms, application-code: 26ms)
+✓ Compiled in 88ms
+ GET /dashboard/profile 200 in 57ms (next.js: 38ms, application-code: 19ms)
+✓ Compiled in 79ms
+ GET /dashboard/profile 200 in 120ms (next.js: 69ms, application-code: 51ms)
+✓ Compiled in 79ms
+ GET /dashboard/profile 200 in 149ms (next.js: 94ms, application-code: 56ms)
+ GET /dashboard/profile 200 in 231ms (next.js: 6ms, application-code: 225ms)
+✓ Compiled in 96ms
+ GET /dashboard/profile 200 in 135ms (next.js: 80ms, application-code: 55ms)
+ GET /dashboard/profile 200 in 279ms (next.js: 8ms, application-code: 272ms)
+ GET /community 404 in 103ms (next.js: 45ms, application-code: 58ms)
+ GET /community 404 in 108ms (next.js: 11ms, application-code: 97ms)
+ GET / 200 in 56ms (next.js: 24ms, application-code: 32ms)
+✓ Compiled in 85ms
+ GET / 200 in 95ms (next.js: 40ms, application-code: 55ms)
+✓ Compiled in 152ms
+ GET / 200 in 117ms (next.js: 36ms, application-code: 80ms)
+✓ Compiled in 83ms
+ GET / 200 in 84ms (next.js: 40ms, application-code: 43ms)
+ GET / 200 in 51ms (next.js: 3ms, application-code: 48ms)
+ GET /dashboard 200 in 155ms (next.js: 94ms, application-code: 61ms)

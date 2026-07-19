@@ -63,9 +63,9 @@ export default function ProfileSettings() {
                     level,
                     currentXp,
                     nextLevelXp,
-                    institution: completed > 0 ? "Database-backed progress" : "Practice dashboard",
+                    institution: completed > 0 ? "Self-paced progress" : "Practice dashboard",
                     department: completed > 0 ? `${completed} exam${completed === 1 ? "" : "s"} tracked` : "Exam history will appear here",
-                    targetGoal: completed > 0 ? `Average score ${averageScore.toFixed(2)}%` : "Complete your first mock exam",
+                    targetGoal: completed > 0 ? `Average score ${averageScore.toFixed(2)}` : "Complete your first mock exam",
                     focusArea: completed > 0 ? `${history.length} submission${history.length === 1 ? "" : "s"} recorded` : "No submissions yet",
                 }));
             })
