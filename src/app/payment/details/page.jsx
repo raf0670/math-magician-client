@@ -53,6 +53,7 @@ const REQUIRED_FIELDS = [
   "hscBatch",
   "backupChoice",
   "admissionSystemIdea",
+  "preferredBatch",
   "bkashTrxID",
 ];
 
@@ -382,8 +383,8 @@ function PaymentDetailsContent() {
               <RadioField label="What section of IBA exam you think is your weakest side?" field="weakestSection" value={form.weakestSection} options={["English", "Math", "Analytical", "Writing"]} onChange={updateField} />
             </FormSection>
 
-            <FormSection title="Batch Information" description="Description (optional)" index={4}>
-              <RadioField label="Which batch do you want to be enrolled?" field="preferredBatch" value={form.preferredBatch} options={["Farmgate", "Bailey Road", "Online"]} onChange={updateField} />
+            <FormSection title="Batch Information" description="Description (required)" index={4}>
+              <RadioField label="Which batch do you want to be enrolled?" field="preferredBatch" required value={form.preferredBatch} error={fieldErrors.preferredBatch} options={["Farmgate", "Bailey Road", "Online"]} onChange={updateField} />
             </FormSection>
 
             <FormSection title="bKash Payment" description="Scan the QR code, complete payment, then enter the transaction ID from bKash." index={5}>

@@ -57,8 +57,13 @@ export default function AdminEnrollmentReviewsPage() {
     }, {});
   }, [items]);
 
-  const loadReviews = useCallback(async (nextStatus = "") => {
-    setLoading(true);
+  const loadReviews = useCallback(async (nextStatus = "", options = {}) => {
+    const silent = Boolean(options.silent);
+
+    if (!silent) {
+      setLoading(true);
+    }
+
     setError("");
 
     try {
@@ -67,7 +72,9 @@ export default function AdminEnrollmentReviewsPage() {
     } catch (err) {
       setError(err.message || "Unable to load enrollment reviews.");
     } finally {
-      setLoading(false);
+      if (!silent) {
+        setLoading(false);
+      }
     }
   }, []);
 
@@ -107,6 +114,26 @@ export default function AdminEnrollmentReviewsPage() {
     };
   }, [loadReviews]);
 
+  useEffect(() => {
+    if (!isAdmin) return undefined;
+
+    const syncVisibleReviews = () => {
+      if (document.visibilityState === "visible") {
+        loadReviews(status, { silent: true });
+      }
+    };
+
+    window.addEventListener("focus", syncVisibleReviews);
+    document.addEventListener("visibilitychange", syncVisibleReviews);
+    const syncTimer = window.setInterval(syncVisibleReviews, 15000);
+
+    return () => {
+      window.removeEventListener("focus", syncVisibleReviews);
+      document.removeEventListener("visibilitychange", syncVisibleReviews);
+      window.clearInterval(syncTimer);
+    };
+  }, [isAdmin, loadReviews, status]);
+
   const handleTabChange = (nextStatus) => {
     setStatus(nextStatus);
     loadReviews(nextStatus);
@@ -126,8 +153,16 @@ export default function AdminEnrollmentReviewsPage() {
       const updated = payload?.data;
 
       if (updated) {
-        setItems((current) => current.map((item) => (item.paymentId === paymentId ? updated : item)));
+        setItems((current) => {
+          if (status && updated.status !== status) {
+            return current.filter((item) => item.paymentId !== paymentId);
+          }
+
+          return current.map((item) => (item.paymentId === paymentId ? updated : item));
+        });
       }
+
+      await loadReviews(status, { silent: true });
     } catch (err) {
       setError(err.message || `Unable to mark enrollment as ${nextStatus}.`);
     } finally {
@@ -232,6 +267,7 @@ export default function AdminEnrollmentReviewsPage() {
             const note = reviewNotes[paymentId] ?? item.reviewNote ?? "";
             const approveKey = `${paymentId}:approved`;
             const rejectKey = `${paymentId}:rejected`;
+            const isPending = item.status === "pending";
 
             return (
               <section key={paymentId} className="rounded-3xl border border-white/6 bg-[#121017] p-5">
@@ -268,42 +304,49 @@ export default function AdminEnrollmentReviewsPage() {
                     <textarea
                       value={note}
                       onChange={(event) => handleReviewNoteChange(paymentId, event.target.value)}
+                      readOnly={!isPending}
                       rows={3}
-                      className="mt-2 w-full rounded-2xl border border-white/8 bg-[#0F0D15] px-4 py-3 text-sm text-white outline-none transition placeholder:text-[#6B667B] focus:border-[#DFB15B]/35"
+                      className={`mt-2 w-full rounded-2xl border px-4 py-3 text-sm text-white outline-none transition placeholder:text-[#6B667B] ${isPending ? "border-white/8 bg-[#0F0D15] focus:border-[#DFB15B]/35" : "border-white/5 bg-[#0F0D15]/60 text-[#8E8A9F]"}`}
                       placeholder="Optional note for this decision"
                     />
                   </label>
 
-                  <div className="flex flex-col gap-2 sm:flex-row">
-                    <button
-                      type="button"
-                      disabled={Boolean(activeAction)}
-                      onClick={() => handleStatusUpdate(paymentId, "approved")}
-                      className="inline-flex items-center justify-center gap-2 rounded-2xl bg-emerald-400 px-4 py-3 text-sm font-bold uppercase tracking-wider text-black transition hover:brightness-110 disabled:cursor-wait disabled:opacity-70"
-                    >
-                      <LoadingButtonLabel
-                        loading={activeAction === approveKey}
-                        idleText="Approve"
-                        loadingText="Approving..."
-                        iconName="check"
-                      />
-                    </button>
-                    <button
-                      type="button"
-                      disabled={Boolean(activeAction)}
-                      onClick={() => handleStatusUpdate(paymentId, "rejected")}
-                      className="inline-flex items-center justify-center gap-2 rounded-2xl border border-red-400/35 bg-red-500/10 px-4 py-3 text-sm font-bold uppercase tracking-wider text-red-200 transition hover:bg-red-500/20 disabled:cursor-wait disabled:opacity-70"
-                    >
-                      {activeAction === rejectKey ? (
-                        "Rejecting..."
-                      ) : (
-                        <>
-                          <XCircle className="h-4 w-4" />
-                          Reject
-                        </>
-                      )}
-                    </button>
-                  </div>
+                  {isPending ? (
+                    <div className="flex flex-col gap-2 sm:flex-row">
+                      <button
+                        type="button"
+                        disabled={Boolean(activeAction)}
+                        onClick={() => handleStatusUpdate(paymentId, "approved")}
+                        className="inline-flex items-center justify-center gap-2 rounded-2xl bg-emerald-400 px-4 py-3 text-sm font-bold uppercase tracking-wider text-black transition hover:brightness-110 disabled:cursor-wait disabled:opacity-70"
+                      >
+                        <LoadingButtonLabel
+                          loading={activeAction === approveKey}
+                          idleText="Approve"
+                          loadingText="Approving..."
+                          iconName="check"
+                        />
+                      </button>
+                      <button
+                        type="button"
+                        disabled={Boolean(activeAction)}
+                        onClick={() => handleStatusUpdate(paymentId, "rejected")}
+                        className="inline-flex items-center justify-center gap-2 rounded-2xl border border-red-400/35 bg-red-500/10 px-4 py-3 text-sm font-bold uppercase tracking-wider text-red-200 transition hover:bg-red-500/20 disabled:cursor-wait disabled:opacity-70"
+                      >
+                        {activeAction === rejectKey ? (
+                          "Rejecting..."
+                        ) : (
+                          <>
+                            <XCircle className="h-4 w-4" />
+                            Reject
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="rounded-2xl border border-white/6 bg-[#0F0D15] px-4 py-3 text-sm font-semibold text-[#8E8A9F]">
+                      Decision recorded
+                    </div>
+                  )}
                 </div>
 
                 <div className="mt-4 flex flex-wrap items-center gap-2 text-xs text-[#6B667B]">
