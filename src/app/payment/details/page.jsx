@@ -31,7 +31,7 @@ const INITIAL_FORM = {
   college: "",
   group: "",
   hscBatch: "",
-  backupChoice: "",
+  backupChoice: [],
   admissionSystemIdea: "",
   previousIbaPreparation: "",
   previousStudyDetails: "",
@@ -55,6 +55,10 @@ const REQUIRED_FIELDS = [
   "admissionSystemIdea",
   "bkashTrxID",
 ];
+
+function isFieldComplete(value) {
+  return Array.isArray(value) ? value.length > 0 : Boolean(value?.trim());
+}
 
 const SECTION_VARIANTS = {
   hidden: { opacity: 0, y: 28 },
@@ -153,7 +157,7 @@ function PaymentDetailsContent() {
   const fieldErrors = useMemo(() => {
     const missing = {};
     REQUIRED_FIELDS.forEach((field) => {
-      if (!form[field]?.trim()) missing[field] = true;
+      if (!isFieldComplete(form[field])) missing[field] = true;
     });
     return missing;
   }, [form]);
@@ -162,11 +166,22 @@ function PaymentDetailsContent() {
     setForm((current) => ({ ...current, [field]: value }));
   };
 
+  const toggleMultiChoice = (field, option) => {
+    setForm((current) => {
+      const selected = Array.isArray(current[field]) ? current[field] : [];
+      const nextValue = selected.includes(option)
+        ? selected.filter((item) => item !== option)
+        : [...selected, option];
+
+      return { ...current, [field]: nextValue };
+    });
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     setError("");
 
-    const hasMissingRequired = REQUIRED_FIELDS.some((field) => !form[field]?.trim());
+    const hasMissingRequired = REQUIRED_FIELDS.some((field) => !isFieldComplete(form[field]));
     if (hasMissingRequired) {
       setError("Please complete all required fields before continuing.");
       return;
@@ -356,7 +371,7 @@ function PaymentDetailsContent() {
               <TextField label="Your College" field="college" required value={form.college} error={fieldErrors.college} onChange={updateField} />
               <RadioField label="Group:" field="group" required value={form.group} error={fieldErrors.group} options={["Science", "Arts", "Commerce", "Others"]} onChange={updateField} />
               <RadioField label="HSC Batch" field="hscBatch" required value={form.hscBatch} error={fieldErrors.hscBatch} options={["2025 or equivalent", "2026 or equivalent", "2027 or equivalent", "Others"]} onChange={updateField} />
-              <RadioField label="What is/are your back-up(s)" field="backupChoice" required value={form.backupChoice} error={fieldErrors.backupChoice} options={["IBA JU", "BUP BBA Gen", "BUP FBS", "DU B/C unit", "Engineering", "Medical", "DU A unit", "Private Uni", "Abroad"]} onChange={updateField} />
+              <MultiSelectField label="What is/are your back-up(s)" field="backupChoice" required value={form.backupChoice} error={fieldErrors.backupChoice} options={["IBA JU", "BUP BBA Gen", "BUP FBS", "DU B/C unit", "Engineering", "Medical", "DU A unit", "Private Uni", "Abroad"]} onChange={toggleMultiChoice} />
             </FormSection>
 
             <FormSection title="IBA Preparation" description="Description (optional)" index={3}>
@@ -400,7 +415,7 @@ function PaymentDetailsContent() {
               </div>
             </FormSection>
 
-            {error ? <p className="rounded-2xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm font-medium text-red-300">{error}</p> : null}
+            {error ? <p className="rounded-2xl border border-[#F2A7A7]/30 bg-[#F2A7A7]/10 px-4 py-3 text-sm font-medium text-[#F8C7C0]">{error}</p> : null}
 
             <motion.div
               initial={{ opacity: 0, y: 16 }}
@@ -473,36 +488,47 @@ function FormSection({ title, description, children, index }) {
 }
 
 function TextField({ label, field, value, onChange, required = false, type = "text", placeholder = "Short answer text", error = false }) {
+  const complete = isFieldComplete(value);
+  const labelTone = error ? "text-[#F8C7C0]" : complete ? "text-[#B7F3D0]" : "text-white";
+  const inputBorder = error
+    ? "border-[#F2A7A7]"
+    : complete
+      ? "border-[#74D99F] focus:border-[#8EE6B2]"
+      : "border-white/20 focus:border-[#DFB15B]";
+
   return (
-    <motion.label whileFocusWithin={{ y: -2 }} className="block rounded-2xl border border-white/5 bg-[#0F0D15]/70 px-4 py-4 transition focus-within:border-[#DFB15B]/35 focus-within:bg-[#15111C]">
-      <span className="text-sm font-semibold text-white">
+    <motion.label whileFocusWithin={{ y: -2 }} className={`block rounded-2xl border px-4 py-4 transition focus-within:bg-[#15111C] ${error ? "border-[#F2A7A7]/35 bg-[#2A171B]/50 focus-within:border-[#F2A7A7]/55" : complete ? "border-[#74D99F]/30 bg-[#102019]/55 focus-within:border-[#74D99F]/50" : "border-white/5 bg-[#0F0D15]/70 focus-within:border-[#DFB15B]/35"}`}>
+      <span className={`text-sm font-semibold ${labelTone}`}>
         {label}
-        {required ? <span className="text-red-400"> *</span> : null}
+        {required ? <span className={error ? "text-[#F2A7A7]" : "text-[#DFB15B]"}> *</span> : null}
       </span>
       <input
         type={type}
         value={value}
         onChange={(event) => onChange(field, event.target.value)}
         placeholder={placeholder}
-        className={`mt-3 w-full border-0 border-b bg-transparent px-0 py-2 text-sm text-white outline-none transition placeholder:text-[#6B667B] ${error ? "border-red-400" : "border-white/20 focus:border-[#DFB15B]"}`}
+        className={`mt-3 w-full border-0 border-b bg-transparent px-0 py-2 text-sm text-white outline-none transition placeholder:text-[#6B667B] ${inputBorder}`}
       />
     </motion.label>
   );
 }
 
 function RadioField({ label, field, value, options, onChange, required = false, error = false }) {
+  const complete = isFieldComplete(value);
+  const labelTone = error ? "text-[#F8C7C0]" : complete ? "text-[#B7F3D0]" : "text-white";
+
   return (
     <fieldset>
-      <legend className="text-sm font-semibold text-white">
+      <legend className={`text-sm font-semibold ${labelTone}`}>
         {label}
-        {required ? <span className="text-red-400"> *</span> : null}
+        {required ? <span className={error ? "text-[#F2A7A7]" : "text-[#DFB15B]"}> *</span> : null}
       </legend>
-      <div className={`mt-4 grid gap-3 rounded-2xl border p-3 sm:grid-cols-2 ${error ? "border-red-400/60 bg-red-500/5" : "border-white/5 bg-[#0F0D15]/70"}`}>
+      <div className={`mt-4 grid gap-3 rounded-2xl border p-3 sm:grid-cols-2 ${error ? "border-[#F2A7A7]/45 bg-[#2A171B]/45" : complete ? "border-[#74D99F]/30 bg-[#102019]/50" : "border-white/5 bg-[#0F0D15]/70"}`}>
         {options.map((option) => (
           <motion.label
             key={option}
             whileHover={{ y: -2 }}
-            className={`flex cursor-pointer items-center gap-3 rounded-2xl border px-4 py-3 text-sm font-medium transition ${value === option ? "border-[#DFB15B]/45 bg-[#DFB15B]/12 text-white shadow-[0_0_24px_rgba(223,177,91,0.08)]" : "border-white/5 bg-[#17131F]/70 text-[#D8D4E5] hover:border-white/12 hover:bg-[#1E1928]"}`}
+            className={`flex cursor-pointer items-center gap-3 rounded-2xl border px-4 py-3 text-sm font-medium transition ${value === option ? "border-[#74D99F]/50 bg-[#74D99F]/15 text-white shadow-[0_0_24px_rgba(116,217,159,0.08)]" : "border-white/5 bg-[#17131F]/70 text-[#D8D4E5] hover:border-white/12 hover:bg-[#1E1928]"}`}
           >
             <input
               type="radio"
@@ -512,12 +538,53 @@ function RadioField({ label, field, value, options, onChange, required = false, 
               onChange={(event) => onChange(field, event.target.value)}
               className="sr-only"
             />
-            <span className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border ${value === option ? "border-[#DFB15B] bg-[#DFB15B]" : "border-[#8E8A9F]"}`}>
+            <span className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border ${value === option ? "border-[#74D99F] bg-[#74D99F]" : "border-[#8E8A9F]"}`}>
               {value === option ? <Check className="h-3 w-3 text-black" /> : null}
             </span>
             <span>{option}</span>
           </motion.label>
         ))}
+      </div>
+    </fieldset>
+  );
+}
+
+function MultiSelectField({ label, field, value, options, onChange, required = false, error = false }) {
+  const selected = Array.isArray(value) ? value : [];
+  const complete = selected.length > 0;
+  const labelTone = error ? "text-[#F8C7C0]" : complete ? "text-[#B7F3D0]" : "text-white";
+
+  return (
+    <fieldset>
+      <legend className={`text-sm font-semibold ${labelTone}`}>
+        {label}
+        {required ? <span className={error ? "text-[#F2A7A7]" : "text-[#DFB15B]"}> *</span> : null}
+      </legend>
+      <div className={`mt-4 grid gap-3 rounded-2xl border p-3 sm:grid-cols-2 ${error ? "border-[#F2A7A7]/45 bg-[#2A171B]/45" : complete ? "border-[#74D99F]/30 bg-[#102019]/50" : "border-white/5 bg-[#0F0D15]/70"}`}>
+        {options.map((option) => {
+          const checked = selected.includes(option);
+
+          return (
+            <motion.label
+              key={option}
+              whileHover={{ y: -2 }}
+              className={`flex cursor-pointer items-center gap-3 rounded-2xl border px-4 py-3 text-sm font-medium transition ${checked ? "border-[#74D99F]/50 bg-[#74D99F]/15 text-white shadow-[0_0_24px_rgba(116,217,159,0.08)]" : "border-white/5 bg-[#17131F]/70 text-[#D8D4E5] hover:border-white/12 hover:bg-[#1E1928]"}`}
+            >
+              <input
+                type="checkbox"
+                name={`${field}[]`}
+                value={option}
+                checked={checked}
+                onChange={() => onChange(field, option)}
+                className="sr-only"
+              />
+              <span className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-md border ${checked ? "border-[#74D99F] bg-[#74D99F]" : "border-[#8E8A9F]"}`}>
+                {checked ? <Check className="h-3 w-3 text-black" /> : null}
+              </span>
+              <span>{option}</span>
+            </motion.label>
+          );
+        })}
       </div>
     </fieldset>
   );

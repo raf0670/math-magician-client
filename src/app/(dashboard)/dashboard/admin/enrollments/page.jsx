@@ -35,6 +35,11 @@ function getEnrollmentName(item) {
   return item.enrollment?.yourName || item.user?.name || "Unnamed student";
 }
 
+function formatInfoValue(value) {
+  if (Array.isArray(value)) return value.length ? value.join(", ") : "";
+  return value;
+}
+
 export default function AdminEnrollmentReviewsPage() {
   const [status, setStatus] = useState("pending");
   const [items, setItems] = useState([]);
@@ -315,10 +320,12 @@ export default function AdminEnrollmentReviewsPage() {
 }
 
 function Info({ label, value }) {
+  const displayValue = formatInfoValue(value);
+
   return (
     <div className="rounded-2xl border border-white/5 bg-[#0F0D15] px-4 py-3">
       <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#6B667B]">{label}</p>
-      <p className="mt-1 wrap-break-word font-medium text-white">{value || "Not provided"}</p>
+      <p className="mt-1 wrap-break-word font-medium text-white">{displayValue || "Not provided"}</p>
     </div>
   );
 }
