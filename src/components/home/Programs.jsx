@@ -56,7 +56,7 @@ export default function ProgramsAndTestimonials() {
                 "15+ Realistic Full Mock Exams",
                 "Direct 1-on-1 Doubt Solving"
             ],
-            price: "৳18,000",
+            price: "BDT 18,000",
             period: "/ full program",
             borderClass: "border-white/3 hover:border-white/10",
             bgClass: "bg-[#121017]",
@@ -83,7 +83,7 @@ export default function ProgramsAndTestimonials() {
                 "15+ Realistic Full Mock Exams",
                 "Direct 1-on-1 Doubt Solving"
             ],
-            price: "৳17,500",
+            price: "BDT 17,500",
             period: "/ full program",
             borderClass: "border-[#DFB15B]/25 shadow-[0_4px_30px_rgba(213,175,55,0.03)]",
             bgClass: "bg-[#121017]",
@@ -95,7 +95,7 @@ export default function ProgramsAndTestimonials() {
         {
             id: "online",
             badge: "Offline - Bailey road",
-            title: "IBA Offline batch",
+            title: "IBA Offline Batch",
             desc: "Full comprehensive offline preparation at our physical center with face-to-face mentorship and real-time exam simulations.",
             icon: Building2,
             location: {
@@ -112,7 +112,7 @@ export default function ProgramsAndTestimonials() {
                 "15+ Realistic Full Mock Exams",
                 "Direct 1-on-1 Doubt Solving"
             ],
-            price: "৳18,000",
+            price: "BDT 18,000",
             period: "/ full program",
             borderClass: "border-white/3 hover:border-white/10",
             bgClass: "bg-[#121017]",

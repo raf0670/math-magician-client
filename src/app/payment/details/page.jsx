@@ -10,9 +10,15 @@ import { getStoredToken, getStoredUser, savePendingPaymentPlan, submitManualEnro
 import FlashyLoader, { LoadingButtonLabel } from "@/components/shared/FlashyLoader";
 
 const PLANS = {
-  offline: { title: "IBA Offline Batch", amount: "৳15,000" },
-  premium: { title: "IBA Premium Combo", amount: "৳18,000" },
-  online: { title: "IBA Online Live", amount: "৳12,000" },
+  offline: { title: "IBA Offline Batch - Farmgate", amount: "BDT 18,000" },
+  premium: { title: "IBA Online Batch", amount: "BDT 17,500" },
+  online: { title: "IBA Offline Batch - Bailey Road", amount: "BDT 18,000" },
+};
+
+const BATCH_PLAN_IDS = {
+  Farmgate: "offline",
+  "Bailey Road": "online",
+  Online: "premium",
 };
 
 const INITIAL_FORM = {
@@ -119,6 +125,8 @@ function PaymentDetailsContent() {
   const [form, setForm] = useState(INITIAL_FORM);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const selectedPlanId = BATCH_PLAN_IDS[form.preferredBatch] || planId;
+  const selectedPlan = PLANS[selectedPlanId] || plan;
 
   useEffect(() => {
     if (!plan) return;
@@ -166,7 +174,7 @@ function PaymentDetailsContent() {
 
     try {
       setLoading(true);
-      const payload = await submitManualEnrollment(planId, form);
+      const payload = await submitManualEnrollment(selectedPlanId, form);
       const paymentId = payload?.data?.paymentId;
 
       if (!paymentId) {
@@ -377,7 +385,7 @@ function PaymentDetailsContent() {
                 <div className="space-y-4">
                   <div className="flex items-center gap-3 rounded-2xl border border-[#DFB15B]/15 bg-[#DFB15B]/8 px-4 py-4 text-sm text-[#EBD39B]">
                     <QrCode className="h-5 w-5 shrink-0 text-[#DFB15B]" />
-                    <span className="font-medium">Selected plan: {plan.title} - {plan.amount}</span>
+                    <span className="font-medium">Selected plan: {selectedPlan.title} - {selectedPlan.amount}</span>
                   </div>
                   <TextField
                     label="BkashTrxID"
