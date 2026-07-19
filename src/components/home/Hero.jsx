@@ -336,7 +336,7 @@ export default function UnifiedHeroDeck() {
                                         src="https://i.ibb.co.com/tM2pbsr2/f39e5b4b-432e-4c5c-8626-46ca7d6d6cc7.jpg"
                                         alt="Instructor Portrait"
                                         fill
-                                        className="object-cover grayscale brightness-[0.88] contrast-[1.03] group-hover:scale-[1.03] group-hover:grayscale-0 transition-all duration-700"
+                                        className="object-cover brightness-[0.88] contrast-[1.03] group-hover:scale-[1.03] transition-all duration-700"
                                     />
                                 </div>
                             </motion.div>
