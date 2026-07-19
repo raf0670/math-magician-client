@@ -13,24 +13,9 @@ const SUBJECTS = [
     { name: "Analytical", label: "Analytical", icon: Brain },
 ];
 
-function getTopicRange(topic) {
-    const minQuestionNo = Number(topic?.minQuestionNo);
-    const maxQuestionNo = Number(topic?.maxQuestionNo);
-    const hasRange = Number.isInteger(minQuestionNo) && Number.isInteger(maxQuestionNo) && minQuestionNo > 0 && maxQuestionNo >= minQuestionNo;
-
-    return {
-        hasRange,
-        minQuestionNo: hasRange ? minQuestionNo : 1,
-        maxQuestionNo: hasRange ? maxQuestionNo : 1,
-    };
-}
-
-function getDefaultRange(topic) {
-    const { minQuestionNo, maxQuestionNo } = getTopicRange(topic);
-    return {
-        from: minQuestionNo,
-        to: Math.min(maxQuestionNo, minQuestionNo + 9),
-    };
+function getDefaultQuestionCount(topic) {
+    const availableCount = Number(topic?.questionCount) || 0;
+    return availableCount ? Math.min(10, availableCount) : "";
 }
 
 export default function MockDirectory() {
@@ -38,8 +23,7 @@ export default function MockDirectory() {
     const [subjects, setSubjects] = useState(SUBJECTS.map((subject) => ({ ...subject, topics: [] })));
     const [activeSubject, setActiveSubject] = useState("Math");
     const [selectedTopic, setSelectedTopic] = useState("");
-    const [fromQuestionNo, setFromQuestionNo] = useState("");
-    const [toQuestionNo, setToQuestionNo] = useState("");
+    const [questionCount, setQuestionCount] = useState("");
     const [mockExams, setMockExams] = useState([]);
     const [loading, setLoading] = useState(true);
     const [starting, setStarting] = useState(false);
@@ -64,11 +48,9 @@ export default function MockDirectory() {
 
                 const firstSubjectWithTopic = mergedSubjects.find((subject) => subject.topics.length);
                 if (firstSubjectWithTopic) {
-                    const defaultRange = getDefaultRange(firstSubjectWithTopic.topics[0]);
                     setActiveSubject(firstSubjectWithTopic.name);
                     setSelectedTopic(firstSubjectWithTopic.topics[0].name);
-                    setFromQuestionNo(defaultRange.from);
-                    setToQuestionNo(defaultRange.to);
+                    setQuestionCount(getDefaultQuestionCount(firstSubjectWithTopic.topics[0]));
                 }
             } catch (err) {
                 if (isMounted) setError(err.message || "Unable to load the exam system");
@@ -92,16 +74,10 @@ export default function MockDirectory() {
     }, [currentSubject, selectedTopic]);
 
     const maxQuestionCount = currentTopic?.questionCount || 0;
-    const topicRange = getTopicRange(currentTopic);
-    const parsedFromQuestionNo = Number(fromQuestionNo);
-    const parsedToQuestionNo = Number(toQuestionNo);
-    const hasValidRange = topicRange.hasRange
-        && Number.isInteger(parsedFromQuestionNo)
-        && Number.isInteger(parsedToQuestionNo)
-        && parsedFromQuestionNo >= topicRange.minQuestionNo
-        && parsedToQuestionNo <= topicRange.maxQuestionNo
-        && parsedFromQuestionNo <= parsedToQuestionNo;
-    const selectedRangeSize = hasValidRange ? parsedToQuestionNo - parsedFromQuestionNo + 1 : 0;
+    const parsedQuestionCount = Number(questionCount);
+    const hasValidQuestionCount = Number.isInteger(parsedQuestionCount)
+        && parsedQuestionCount > 0
+        && parsedQuestionCount <= maxQuestionCount;
 
     const availableExams = mockExams
         .filter((exam) => !exam.isLiveExam || !exam.startTime || new Date(exam.startTime) <= new Date())
@@ -113,20 +89,16 @@ export default function MockDirectory() {
 
         setActiveSubject(subjectName);
         setSelectedTopic(nextTopic?.name || "");
-        const defaultRange = getDefaultRange(nextTopic);
-        setFromQuestionNo(nextTopic ? defaultRange.from : "");
-        setToQuestionNo(nextTopic ? defaultRange.to : "");
+        setQuestionCount(getDefaultQuestionCount(nextTopic));
     };
 
     const handleTopicChange = (topic) => {
-        const defaultRange = getDefaultRange(topic);
         setSelectedTopic(topic.name);
-        setFromQuestionNo(defaultRange.from);
-        setToQuestionNo(defaultRange.to);
+        setQuestionCount(getDefaultQuestionCount(topic));
     };
 
     const handleStartPractice = async () => {
-        if (!currentTopic || !hasValidRange || starting) return;
+        if (!currentTopic || !hasValidQuestionCount || starting) return;
 
         setStarting(true);
         setError("");
@@ -135,8 +107,7 @@ export default function MockDirectory() {
             const payload = await startPracticeExam({
                 subject: activeSubject,
                 topic: currentTopic.name,
-                fromQuestionNo: parsedFromQuestionNo,
-                toQuestionNo: parsedToQuestionNo,
+                questionCount: parsedQuestionCount,
             });
             router.push(`/dashboard/mock-tests/${payload.data._id}`);
         } catch (err) {
@@ -154,7 +125,7 @@ export default function MockDirectory() {
                             <SlidersHorizontal className="h-3.5 w-3.5" /> Exam Setup
                         </span>
                         <h2 className="text-xl font-semibold tracking-wide text-white">Choose your practice paper</h2>
-                        <p className="text-sm font-medium text-[#8E8A9F]">Pick a subject, topic, and stored question number range. Every generated exam is untimed.</p>
+                        <p className="text-sm font-medium text-[#8E8A9F]">Pick a subject, topic, and how many questions you want. Every generated exam is untimed and randomized.</p>
                     </div>
 
                     <div className="grid grid-cols-1 gap-5 lg:grid-cols-[260px_minmax(0,1fr)]">
@@ -203,7 +174,7 @@ export default function MockDirectory() {
                                                     <span>
                                                         <span className="block text-sm font-semibold text-white">{topic.name}</span>
                                                         <span className="mt-0.5 block text-[11px] font-medium text-[#8E8A9F]">
-                                                            {topic.questionCount} questions / #{topic.minQuestionNo}-{topic.maxQuestionNo}
+                                                            {topic.questionCount} questions
                                                         </span>
                                                     </span>
                                                     {isSelected ? <Check className="h-4 w-4 text-emerald-400" /> : <Layers className="h-4 w-4 text-[#6B667B]" />}
@@ -220,51 +191,42 @@ export default function MockDirectory() {
                                 <div className="flex flex-col gap-3">
                                     <div className="flex flex-wrap items-center justify-between gap-3">
                                         <span className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[#6B667B]">
-                                            <Hash className="h-3.5 w-3.5" /> Question number range
+                                            <Hash className="h-3.5 w-3.5" /> Total questions
                                         </span>
                                         <span className="rounded-lg border border-white/5 bg-[#121017] px-2.5 py-1 text-[10px] font-bold text-[#8E8A9F]">
-                                            Available: #{topicRange.minQuestionNo}-{topicRange.maxQuestionNo}
+                                            Available: {maxQuestionCount || 0}
                                         </span>
                                     </div>
 
-                                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
                                         <label className="flex flex-col gap-2">
-                                            <span className="text-[10px] font-bold uppercase tracking-widest text-[#6B667B]">From question no.</span>
+                                            <span className="text-[10px] font-bold uppercase tracking-widest text-[#6B667B]">Number of questions</span>
                                             <input
                                                 type="number"
-                                                min={topicRange.minQuestionNo}
-                                                max={topicRange.maxQuestionNo}
-                                                value={fromQuestionNo}
-                                                disabled={!currentTopic || !topicRange.hasRange}
-                                                onChange={(event) => setFromQuestionNo(Number(event.target.value))}
+                                                min={1}
+                                                max={maxQuestionCount || 1}
+                                                value={questionCount}
+                                                disabled={!currentTopic || !maxQuestionCount}
+                                                onChange={(event) => setQuestionCount(event.target.value)}
                                                 className="h-12 rounded-xl border border-white/5 bg-[#121017] px-4 text-sm font-bold text-white outline-none transition-colors focus:border-[#DFB15B]/40 disabled:cursor-not-allowed disabled:opacity-50"
                                             />
                                         </label>
 
-                                        <label className="flex flex-col gap-2">
-                                            <span className="text-[10px] font-bold uppercase tracking-widest text-[#6B667B]">To question no.</span>
-                                            <input
-                                                type="number"
-                                                min={topicRange.minQuestionNo}
-                                                max={topicRange.maxQuestionNo}
-                                                value={toQuestionNo}
-                                                disabled={!currentTopic || !topicRange.hasRange}
-                                                onChange={(event) => setToQuestionNo(Number(event.target.value))}
-                                                className="h-12 rounded-xl border border-white/5 bg-[#121017] px-4 text-sm font-bold text-white outline-none transition-colors focus:border-[#DFB15B]/40 disabled:cursor-not-allowed disabled:opacity-50"
-                                            />
-                                        </label>
+                                        <span className="rounded-xl border border-emerald-400/20 bg-emerald-400/10 px-4 py-3 text-[11px] font-semibold text-emerald-200">
+                                            Randomly selected before the exam opens
+                                        </span>
                                     </div>
 
-                                    <span className={`text-[11px] font-semibold ${hasValidRange ? "text-emerald-300" : "text-red-400"}`}>
-                                        {hasValidRange
-                                            ? `Selected span: ${selectedRangeSize} question number${selectedRangeSize === 1 ? "" : "s"} from ${maxQuestionCount || 0} available.`
-                                            : "Choose a valid inclusive range inside the available question numbers."}
+                                    <span className={`text-[11px] font-semibold ${hasValidQuestionCount ? "text-emerald-300" : "text-red-400"}`}>
+                                        {hasValidQuestionCount
+                                            ? `${parsedQuestionCount} random question${parsedQuestionCount === 1 ? "" : "s"} will be selected from ${maxQuestionCount || 0} available.`
+                                            : "Choose a valid total within the available question count."}
                                     </span>
                                 </div>
 
                                 <button
                                     onClick={handleStartPractice}
-                                    disabled={!currentTopic || !hasValidRange || starting}
+                                    disabled={!currentTopic || !hasValidQuestionCount || starting}
                                     className="inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-linear-to-r from-[#E6C687] to-[#AA7C11] px-5 text-xs font-bold uppercase tracking-wider text-black shadow-md transition-all hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
                                 >
                                     <LoadingButtonLabel
