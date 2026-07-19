@@ -367,7 +367,7 @@ function PaymentDetailsContent() {
               <div className="grid gap-5 lg:grid-cols-[280px_1fr] lg:items-center">
                 <div className="rounded-3xl border border-[#DFB15B]/20 bg-white p-4">
                   <Image
-                    src="/bkash-qr.png"
+                    src="/bkash-qr.jpg"
                     alt="bKash payment QR code"
                     width={520}
                     height={520}
