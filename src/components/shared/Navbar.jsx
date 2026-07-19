@@ -24,13 +24,25 @@ export default function Navbar() {
     const navLinks = [
         { name: "Home", href: "/" },
         { name: "About", href: "/about" },
-        { name: "Programs", href: "/programs" },
+        { name: "Programs", href: "/#programs-section" },
         { name: "Community", href: "/community" },
     ];
 
     const toggleMenu = () => setIsOpen(!isOpen);
     const firstName = currentUser?.name?.trim().split(" ")[0] || "Student";
     const isLoggedIn = Boolean(currentUser);
+    const handleNavClick = (event, link) => {
+        if (link.href === "/#programs-section" && pathname === "/") {
+            event.preventDefault();
+            document.getElementById("programs-section")?.scrollIntoView({
+                behavior: "smooth",
+                block: "start",
+            });
+            window.history.replaceState(null, "", "/#programs-section");
+        }
+
+        setIsOpen(false);
+    };
 
     return (
         <nav className="w-full bg-[#111015] border-b border-white/4 px-4 md:px-6 py-4 flex items-center justify-between relative z-50">
@@ -50,6 +62,7 @@ export default function Navbar() {
                         <Link
                             key={link.name}
                             href={link.href}
+                            onClick={(event) => handleNavClick(event, link)}
                             className={`text-sm tracking-wide font-medium transition-colors duration-200 ${isActive ? "text-white" : "text-[#8E8A9F] hover:text-white"}`}
                         >
                             {link.name}
@@ -107,7 +120,7 @@ export default function Navbar() {
                             <Link
                                 key={link.name}
                                 href={link.href}
-                                onClick={() => setIsOpen(false)}
+                                onClick={(event) => handleNavClick(event, link)}
                                 className={`text-lg tracking-wide font-medium transition-colors ${isActive ? "text-white" : "text-[#8E8A9F]"}`}
                             >
                                 {link.name}
