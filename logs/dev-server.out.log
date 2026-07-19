@@ -248,3 +248,24 @@ Creating turbopack project {
  GET /dashboard/classes 200 in 81ms (next.js: 50ms, application-code: 31ms)
 ✓ Compiled in 278ms
  GET /dashboard/classes 200 in 212ms (next.js: 123ms, application-code: 89ms)
+✓ Compiled in 160ms
+ GET /dashboard/classes 500 in 24ms (next.js: 14ms, application-code: 10ms)
+ GET /dashboard/classes 500 in 13ms (next.js: 6ms, application-code: 7ms)
+ GET /dashboard/classes 500 in 11ms (next.js: 4ms, application-code: 7ms)
+ GET /dashboard/classes 500 in 11ms (next.js: 5ms, application-code: 6ms)
+ GET /dashboard/classes 500 in 15ms (next.js: 6ms, application-code: 10ms)
+✓ Compiled in 192ms
+ GET /dashboard/classes 200 in 205ms (next.js: 62ms, application-code: 143ms)
+✓ Compiled in 62ms
+ GET /dashboard/classes 200 in 100ms (next.js: 48ms, application-code: 53ms)
+ GET /dashboard/classes 200 in 75ms (next.js: 2ms, application-code: 73ms)
+✓ Compiled in 217ms
+ GET /dashboard/classes 200 in 208ms (next.js: 144ms, application-code: 64ms)
+✓ Compiled in 85ms
+ GET /dashboard/classes 200 in 101ms (next.js: 61ms, application-code: 40ms)
+✓ Compiled in 83ms
+ GET /dashboard/classes 200 in 167ms (next.js: 103ms, application-code: 64ms)
+✓ Compiled in 192ms
+ GET /dashboard/classes 200 in 137ms (next.js: 52ms, application-code: 85ms)
+ GET /dashboard/classes 200 in 29ms (next.js: 3ms, application-code: 26ms)
+ GET /dashboard/mock-tests 200 in 110ms (next.js: 38ms, application-code: 72ms)

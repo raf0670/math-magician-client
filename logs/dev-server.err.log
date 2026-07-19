@@ -914,3 +914,187 @@ Import trace:
     at <unknown> (Error: (./src/components/dashboard/PerformanceMetrics.jsx:45:33)
 [browser] Image with src "https://i.ibb.co.com/tM2pbsr2/f39e5b4b-432e-4c5c-8626-46ca7d6d6cc7.jpg" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes (file://C:/Users/Rafsan Rahman/Desktop/Batch 13/exam-archive-frontend/.next/dev/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477:13)
 [browser] Image with src "https://i.ibb.co.com/tM2pbsr2/f39e5b4b-432e-4c5c-8626-46ca7d6d6cc7.jpg" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes (file://C:/Users/Rafsan Rahman/Desktop/Batch 13/exam-archive-frontend/.next/dev/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477:13)
+⨯ ./src/app/(dashboard)/dashboard/classes/page.jsx:2:1
+Module not found: Can't resolve '@/components/dashboard/ClassVault'
+  [90m1 |[0m [36mimport[0m [33mClassAccessGate[0m [36mfrom[0m [32m"@/components/dashboard/ClassAccessGate"[0m;
+[31m[1m>[0m [90m2 |[0m [36mimport[0m [33mClassVault[0m [36mfrom[0m [32m"@/components/dashboard/ClassVault"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m3 |[0m [36mimport[0m [33mLiveArena[0m [36mfrom[0m [32m"@/components/dashboard/LiveArena"[0m;
+  [90m4 |[0m
+  [90m5 |[0m [36mexport[0m [36mdefault[0m [36mfunction[0m [33mDashboardClassesWorkspace[0m() {
+
+Import map: aliased to relative './src/components/dashboard/ClassVault' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/app/(dashboard)/dashboard/classes/page.jsx:2:1
+Module not found: Can't resolve '@/components/dashboard/ClassVault'
+  [90m1 |[0m [36mimport[0m [33mClassAccessGate[0m [36mfrom[0m [32m"@/components/dashboard/ClassAccessGate"[0m;
+[31m[1m>[0m [90m2 |[0m [36mimport[0m [33mClassVault[0m [36mfrom[0m [32m"@/components/dashboard/ClassVault"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m3 |[0m [36mimport[0m [33mLiveArena[0m [36mfrom[0m [32m"@/components/dashboard/LiveArena"[0m;
+  [90m4 |[0m
+  [90m5 |[0m [36mexport[0m [36mdefault[0m [36mfunction[0m [33mDashboardClassesWorkspace[0m() {
+
+Import map: aliased to relative './src/components/dashboard/ClassVault' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/app/(dashboard)/dashboard/classes/page.jsx:2:1
+Module not found: Can't resolve '@/components/dashboard/ClassVault'
+  [90m1 |[0m [36mimport[0m [33mClassAccessGate[0m [36mfrom[0m [32m"@/components/dashboard/ClassAccessGate"[0m;
+[31m[1m>[0m [90m2 |[0m [36mimport[0m [33mClassVault[0m [36mfrom[0m [32m"@/components/dashboard/ClassVault"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m3 |[0m [36mimport[0m [33mLiveArena[0m [36mfrom[0m [32m"@/components/dashboard/LiveArena"[0m;
+  [90m4 |[0m
+  [90m5 |[0m [36mexport[0m [36mdefault[0m [36mfunction[0m [33mDashboardClassesWorkspace[0m() {
+
+Import map: aliased to relative './src/components/dashboard/ClassVault' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/app/(dashboard)/dashboard/classes/page.jsx:2:1
+Module not found: Can't resolve '@/components/dashboard/ClassVault'
+  [90m1 |[0m [36mimport[0m [33mClassAccessGate[0m [36mfrom[0m [32m"@/components/dashboard/ClassAccessGate"[0m;
+[31m[1m>[0m [90m2 |[0m [36mimport[0m [33mClassVault[0m [36mfrom[0m [32m"@/components/dashboard/ClassVault"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m3 |[0m [36mimport[0m [33mLiveArena[0m [36mfrom[0m [32m"@/components/dashboard/LiveArena"[0m;
+  [90m4 |[0m
+  [90m5 |[0m [36mexport[0m [36mdefault[0m [36mfunction[0m [33mDashboardClassesWorkspace[0m() {
+
+Import map: aliased to relative './src/components/dashboard/ClassVault' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/app/(dashboard)/dashboard/classes/page.jsx:2:1
+Module not found: Can't resolve '@/components/dashboard/ClassVault'
+  [90m1 |[0m [36mimport[0m [33mClassAccessGate[0m [36mfrom[0m [32m"@/components/dashboard/ClassAccessGate"[0m;
+[31m[1m>[0m [90m2 |[0m [36mimport[0m [33mClassVault[0m [36mfrom[0m [32m"@/components/dashboard/ClassVault"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m3 |[0m [36mimport[0m [33mLiveArena[0m [36mfrom[0m [32m"@/components/dashboard/LiveArena"[0m;
+  [90m4 |[0m
+  [90m5 |[0m [36mexport[0m [36mdefault[0m [36mfunction[0m [33mDashboardClassesWorkspace[0m() {
+
+Import map: aliased to relative './src/components/dashboard/ClassVault' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/app/(dashboard)/dashboard/classes/page.jsx:2:1
+Module not found: Can't resolve '@/components/dashboard/ClassVault'
+  [90m1 |[0m [36mimport[0m [33mClassAccessGate[0m [36mfrom[0m [32m"@/components/dashboard/ClassAccessGate"[0m;
+[31m[1m>[0m [90m2 |[0m [36mimport[0m [33mClassVault[0m [36mfrom[0m [32m"@/components/dashboard/ClassVault"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m3 |[0m [36mimport[0m [33mLiveArena[0m [36mfrom[0m [32m"@/components/dashboard/LiveArena"[0m;
+  [90m4 |[0m
+  [90m5 |[0m [36mexport[0m [36mdefault[0m [36mfunction[0m [33mDashboardClassesWorkspace[0m() {
+
+Import map: aliased to relative './src/components/dashboard/ClassVault' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/app/(dashboard)/dashboard/classes/page.jsx:2:1
+Module not found: Can't resolve '@/components/dashboard/ClassVault'
+  [90m1 |[0m [36mimport[0m [33mClassAccessGate[0m [36mfrom[0m [32m"@/components/dashboard/ClassAccessGate"[0m;
+[31m[1m>[0m [90m2 |[0m [36mimport[0m [33mClassVault[0m [36mfrom[0m [32m"@/components/dashboard/ClassVault"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m3 |[0m [36mimport[0m [33mLiveArena[0m [36mfrom[0m [32m"@/components/dashboard/LiveArena"[0m;
+  [90m4 |[0m
+  [90m5 |[0m [36mexport[0m [36mdefault[0m [36mfunction[0m [33mDashboardClassesWorkspace[0m() {
+
+Import map: aliased to relative './src/components/dashboard/ClassVault' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/app/(dashboard)/dashboard/classes/page.jsx:2:1
+Module not found: Can't resolve '@/components/dashboard/ClassVault'
+  [90m1 |[0m [36mimport[0m [33mClassAccessGate[0m [36mfrom[0m [32m"@/components/dashboard/ClassAccessGate"[0m;
+[31m[1m>[0m [90m2 |[0m [36mimport[0m [33mClassVault[0m [36mfrom[0m [32m"@/components/dashboard/ClassVault"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m3 |[0m [36mimport[0m [33mLiveArena[0m [36mfrom[0m [32m"@/components/dashboard/LiveArena"[0m;
+  [90m4 |[0m
+  [90m5 |[0m [36mexport[0m [36mdefault[0m [36mfunction[0m [33mDashboardClassesWorkspace[0m() {
+
+Import map: aliased to relative './src/components/dashboard/ClassVault' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/app/(dashboard)/dashboard/classes/page.jsx:2:1
+Module not found: Can't resolve '@/components/dashboard/ClassVault'
+  [90m1 |[0m [36mimport[0m [33mClassAccessGate[0m [36mfrom[0m [32m"@/components/dashboard/ClassAccessGate"[0m;
+[31m[1m>[0m [90m2 |[0m [36mimport[0m [33mClassVault[0m [36mfrom[0m [32m"@/components/dashboard/ClassVault"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m3 |[0m [36mimport[0m [33mLiveArena[0m [36mfrom[0m [32m"@/components/dashboard/LiveArena"[0m;
+  [90m4 |[0m
+  [90m5 |[0m [36mexport[0m [36mdefault[0m [36mfunction[0m [33mDashboardClassesWorkspace[0m() {
+
+Import map: aliased to relative './src/components/dashboard/ClassVault' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/app/(dashboard)/dashboard/classes/page.jsx:2:1
+Module not found: Can't resolve '@/components/dashboard/ClassVault'
+  [90m1 |[0m [36mimport[0m [33mClassAccessGate[0m [36mfrom[0m [32m"@/components/dashboard/ClassAccessGate"[0m;
+[31m[1m>[0m [90m2 |[0m [36mimport[0m [33mClassVault[0m [36mfrom[0m [32m"@/components/dashboard/ClassVault"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m3 |[0m [36mimport[0m [33mLiveArena[0m [36mfrom[0m [32m"@/components/dashboard/LiveArena"[0m;
+  [90m4 |[0m
+  [90m5 |[0m [36mexport[0m [36mdefault[0m [36mfunction[0m [33mDashboardClassesWorkspace[0m() {
+
+Import map: aliased to relative './src/components/dashboard/ClassVault' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/app/(dashboard)/dashboard/classes/page.jsx:2:1
+Module not found: Can't resolve '@/components/dashboard/ClassVault'
+  [90m1 |[0m [36mimport[0m [33mClassAccessGate[0m [36mfrom[0m [32m"@/components/dashboard/ClassAccessGate"[0m;
+[31m[1m>[0m [90m2 |[0m [36mimport[0m [33mClassVault[0m [36mfrom[0m [32m"@/components/dashboard/ClassVault"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m3 |[0m [36mimport[0m [33mLiveArena[0m [36mfrom[0m [32m"@/components/dashboard/LiveArena"[0m;
+  [90m4 |[0m
+  [90m5 |[0m [36mexport[0m [36mdefault[0m [36mfunction[0m [33mDashboardClassesWorkspace[0m() {
+
+Import map: aliased to relative './src/components/dashboard/ClassVault' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[browser] Uncaught Error: ./src/app/(dashboard)/dashboard/classes/page.jsx:2:1
+Module not found: Can't resolve '@/components/dashboard/ClassVault'
+  1 | import ClassAccessGate from "@/components/dashboard/ClassAccessGate";
+> 2 | import ClassVault from "@/components/dashboard/ClassVault";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  3 | import LiveArena from "@/components/dashboard/LiveArena";
+  4 |
+  5 | export default function DashboardClassesWorkspace() {
+
+Import map: aliased to relative './src/components/dashboard/ClassVault' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+    at <unknown> (Error: ./src/app/(dashboard)/dashboard/classes/page.jsx:2:1)
+    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+    at <unknown> (Error: (./src/app/(dashboard)/dashboard/classes/page.jsx:2:1)
+    at <unknown> (https://nextjs.org/docs/messages/module-not-found)

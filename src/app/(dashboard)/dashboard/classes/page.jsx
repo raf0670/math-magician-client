@@ -19,10 +19,10 @@ export default function DashboardClassesWorkspace() {
 
                 <div className="flex flex-col items-start text-left gap-1 mt-6">
                     <h2 className="font-serif text-xl font-medium text-white tracking-wide">
-                        Archived Video Class Vault
+                        Class Materials Drive
                     </h2>
                     <p className="text-[#6B667B] text-xs font-medium">
-                        Select a segment to instantly pull recorded video playback sequences and companion folders from Google Drive.
+                        Open the shared Google Drive folder for recordings, slides, worksheets, and companion resources.
                     </p>
                 </div>
                 <ClassVault />
