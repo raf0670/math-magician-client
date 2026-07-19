@@ -243,8 +243,8 @@ export default function MockDirectory() {
                     {error ? <p className="text-sm font-medium text-red-400">{error}</p> : null}
                 </div>
             </section>
-
-            <section className="flex w-full flex-col gap-4">
+            
+            {/* <section className="flex w-full flex-col gap-4">
                 <div className="flex items-center justify-between gap-4">
                     <div>
                         <h2 className="text-sm font-semibold tracking-wide text-white">Existing mock papers</h2>
@@ -302,7 +302,7 @@ export default function MockDirectory() {
                         </AnimatePresence>
                     </motion.div>
                 )}
-            </section>
+            </section> */}
         </div>
     );
 }

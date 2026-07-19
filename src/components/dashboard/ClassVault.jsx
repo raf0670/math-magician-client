@@ -72,7 +72,7 @@ export default function ClassVault() {
                                     transition={{ duration: 0.35, delay: 0.12 + index * 0.05 }}
                                     className="flex items-center gap-3 rounded-2xl border border-white/5 bg-[#1A1722]/45 p-3.5"
                                 >
-                                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-white/5 bg-white/[0.03] text-[#DFB15B]">
+                                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-white/5 bg-white/3 text-[#DFB15B]">
                                         <Icon className="h-4 w-4" />
                                     </div>
                                     <div className="min-w-0 text-left">
