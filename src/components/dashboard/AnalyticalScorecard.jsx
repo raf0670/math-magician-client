@@ -1,5 +1,5 @@
 "use client";
-import { AlertTriangle, BookOpen, CheckCircle, ClipboardCheck, XCircle } from "lucide-react";
+import { AlertTriangle, BookOpen, CheckCircle, XCircle } from "lucide-react";
 import Link from "next/link";
 
 const OPTION_LABELS = ["A", "B", "C", "D", "E"];
@@ -85,7 +85,7 @@ export default function AnalyticalScorecard({ answers, examData, submissionResul
                         <span className="mt-1 text-xs font-semibold text-[#8E8A9F]">out of {maxPossibleScore.toFixed(2)}</span>
                     </div>
 
-                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
                         <div className="rounded-2xl border border-emerald-500/10 bg-emerald-500/5 p-4">
                             <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wide text-emerald-300">
                                 <CheckCircle className="h-3.5 w-3.5" /> Correct
@@ -106,13 +106,6 @@ export default function AnalyticalScorecard({ answers, examData, submissionResul
                             </div>
                             <span className="mt-2 block text-2xl font-bold text-white">{skippedCount}</span>
                             <span className="text-[10px] font-semibold text-[#8E8A9F]">No penalty</span>
-                        </div>
-                        <div className="rounded-2xl border border-[#DFB15B]/10 bg-[#1A1722]/70 p-4">
-                            <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wide text-[#DFB15B]">
-                                <ClipboardCheck className="h-3.5 w-3.5" /> Rule
-                            </div>
-                            <span className="mt-2 block text-lg font-bold text-white">-{penalty.toFixed(2)}</span>
-                            <span className="text-[10px] font-semibold text-[#8E8A9F]">per wrong answer</span>
                         </div>
                     </div>
                 </div>

@@ -204,25 +204,6 @@ export default function ExamEngine({ examData, onComplete }) {
                         </p>
                     </div>
 
-                    <div className="border-t border-white/5 pt-4">
-                        <span className="mb-2 block text-[10px] font-bold uppercase tracking-wider text-[#6B667B]">Jump to Question</span>
-                        <div className="flex flex-wrap gap-1.5">
-                            {normalizedQuestions.map((question, idx) => {
-                                const isAnswered = answers[question.id] !== undefined;
-                                const isCurrent = idx === currentIndex;
-                                return (
-                                    <button
-                                        key={question.id}
-                                        onClick={() => setCurrentIndex(idx)}
-                                        className={`flex h-9 min-w-11 items-center justify-center rounded-lg border px-2 text-[11px] font-bold transition-colors ${isCurrent ? "border-[#DFB15B] bg-[#DFB15B]/10 text-[#DFB15B]" : isAnswered ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-300" : "border-white/5 bg-[#1A1722] text-[#6B667B] hover:text-white"}`}
-                                    >
-                                        #{question.questionNo}
-                                    </button>
-                                );
-                            })}
-                        </div>
-                    </div>
-
                     <button
                         onClick={handleSubmit}
                         className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-linear-to-r from-emerald-500 to-teal-600 py-3.5 text-xs font-bold uppercase tracking-wider text-white shadow-md transition-all hover:brightness-110"

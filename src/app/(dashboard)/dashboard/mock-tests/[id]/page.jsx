@@ -81,23 +81,35 @@ export default function ActiveMockExamArena() {
     }
 
     if (error) {
-        return <p className="text-sm text-red-400">{error}</p>;
-    }
-
-    if (examFinished) {
         return (
-            <div className="flex w-full flex-col gap-6">
-                <div className="flex flex-col items-start gap-1 text-left">
-                    <h1 className="font-serif text-3xl font-medium tracking-wide text-white">Performance Scorecard</h1>
-                    <p className="text-xs font-medium text-[#8E8A9F] sm:text-sm">
-                        Your submission has been scored against the backend evaluation logic.
-                    </p>
-                </div>
-
-                <AnalyticalScorecard answers={userSelections} examData={examDataPayload} submissionResult={submissionResult} />
+            <div className="min-h-screen w-full px-4 py-6 sm:px-6 lg:px-8">
+                <p className="text-sm text-red-400">{error}</p>
             </div>
         );
     }
 
-    return <ExamEngine key={examDataPayload?._id || examId} examData={examDataPayload} onComplete={handleEvaluationTrigger} />;
+    if (examFinished) {
+        return (
+            <div className="min-h-screen w-full px-4 py-6 sm:px-6 lg:px-10">
+                <div className="mx-auto flex w-full max-w-7xl flex-col gap-6">
+                    <div className="flex flex-col items-start gap-1 text-left">
+                        <h1 className="font-serif text-3xl font-medium tracking-wide text-white">Performance Scorecard</h1>
+                        <p className="text-xs font-medium text-[#8E8A9F] sm:text-sm">
+                            Your submission has been scored against the backend evaluation logic.
+                        </p>
+                    </div>
+
+                    <AnalyticalScorecard answers={userSelections} examData={examDataPayload} submissionResult={submissionResult} />
+                </div>
+            </div>
+        );
+    }
+
+    return (
+        <div className="min-h-screen w-full px-4 py-6 sm:px-6 lg:px-10">
+            <div className="mx-auto w-full max-w-7xl">
+                <ExamEngine key={examDataPayload?._id || examId} examData={examDataPayload} onComplete={handleEvaluationTrigger} />
+            </div>
+        </div>
+    );
 }
