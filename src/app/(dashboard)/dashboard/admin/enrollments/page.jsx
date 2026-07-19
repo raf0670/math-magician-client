@@ -144,7 +144,7 @@ export default function AdminEnrollmentReviewsPage() {
 
   if (!isAdmin) {
     return (
-      <div className="flex min-h-[420px] items-center justify-center rounded-3xl border border-red-500/20 bg-red-500/10 px-6 py-12 text-center">
+      <div className="flex min-h-105 items-center justify-center rounded-3xl border border-red-500/20 bg-red-500/10 px-6 py-12 text-center">
         <div className="max-w-md">
           <ShieldAlert className="mx-auto h-10 w-10 text-red-300" />
           <p className="mt-5 text-xs font-bold uppercase tracking-[0.3em] text-red-300">Admins Only</p>
@@ -208,7 +208,7 @@ export default function AdminEnrollmentReviewsPage() {
           message="Pending bKash submissions are being fetched."
           iconName="credit"
           skeleton="cards"
-          className="min-h-[360px]"
+          className="min-h-90"
         />
       ) : null}
 
@@ -318,7 +318,7 @@ function Info({ label, value }) {
   return (
     <div className="rounded-2xl border border-white/5 bg-[#0F0D15] px-4 py-3">
       <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#6B667B]">{label}</p>
-      <p className="mt-1 break-words font-medium text-white">{value || "Not provided"}</p>
+      <p className="mt-1 wrap-break-word font-medium text-white">{value || "Not provided"}</p>
     </div>
   );
 }
