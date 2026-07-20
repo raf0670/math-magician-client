@@ -5,6 +5,9 @@ import ExamEngine from "@/components/dashboard/ExamEngine";
 import AnalyticalScorecard from "@/components/dashboard/AnalyticalScorecard";
 import FlashyLoader from "@/components/shared/FlashyLoader";
 import { getExamById, submitExam } from "@/lib/api";
+import ExamNotFound from "./not-found";
+
+const MONGO_OBJECT_ID_PATTERN = /^[a-f\d]{24}$/i;
 
 export default function ActiveMockExamArena() {
     const params = useParams();
@@ -14,22 +17,26 @@ export default function ActiveMockExamArena() {
     const [examDataPayload, setExamDataPayload] = useState(null);
     const [submissionResult, setSubmissionResult] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState("");
+    const [notFound, setNotFound] = useState(false);
+    const [fatalError, setFatalError] = useState(null);
+    const [submissionError, setSubmissionError] = useState("");
 
     useEffect(() => {
         let isMounted = true;
 
         async function fetchExam() {
             setLoading(true);
-            setError("");
+            setNotFound(false);
+            setFatalError(null);
+            setSubmissionError("");
             setExamDataPayload(null);
             setSubmissionResult(null);
             setExamFinished(false);
             setUserSelections([]);
 
-            if (!examId) {
+            if (!examId || !MONGO_OBJECT_ID_PATTERN.test(examId)) {
                 setLoading(false);
-                setError("The requested exam could not be found.");
+                setNotFound(true);
                 return;
             }
 
@@ -40,7 +47,11 @@ export default function ActiveMockExamArena() {
                 }
             } catch (err) {
                 if (isMounted) {
-                    setError(err.message || "Unable to load this exam");
+                    if (err.status === 404) {
+                        setNotFound(true);
+                    } else {
+                        setFatalError(err);
+                    }
                 }
             } finally {
                 if (isMounted) {
@@ -62,10 +73,15 @@ export default function ActiveMockExamArena() {
             setExamDataPayload(examPayload);
             setSubmissionResult(data);
             setExamFinished(true);
+            setSubmissionError("");
         } catch (err) {
-            setError(err.message || "Submission failed");
+            setSubmissionError("We could not submit your answers right now. Please check your connection and try again.");
         }
     };
+
+    if (fatalError) {
+        throw fatalError;
+    }
 
     if (loading) {
         return (
@@ -80,12 +96,8 @@ export default function ActiveMockExamArena() {
         );
     }
 
-    if (error) {
-        return (
-            <div className="min-h-screen w-full px-4 py-6 sm:px-6 lg:px-8">
-                <p className="text-sm text-red-400">{error}</p>
-            </div>
-        );
+    if (notFound) {
+        return <ExamNotFound />;
     }
 
     if (examFinished) {
@@ -107,7 +119,12 @@ export default function ActiveMockExamArena() {
 
     return (
         <div className="min-h-screen w-full px-4 py-6 sm:px-6 lg:px-10">
-            <div className="mx-auto w-full max-w-7xl">
+            <div className="mx-auto flex w-full max-w-7xl flex-col gap-4">
+                {submissionError ? (
+                    <div className="rounded-2xl border border-red-400/20 bg-red-500/10 px-4 py-3 text-sm font-semibold text-red-200">
+                        {submissionError}
+                    </div>
+                ) : null}
                 <ExamEngine key={examDataPayload?._id || examId} examData={examDataPayload} onComplete={handleEvaluationTrigger} />
             </div>
         </div>

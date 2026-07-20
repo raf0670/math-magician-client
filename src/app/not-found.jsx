@@ -19,10 +19,10 @@ export default function NotFound() {
   return (
     <main className="relative flex min-h-[calc(100vh-73px)] items-center justify-center overflow-hidden bg-[#0D0B14] px-4 py-12 text-white sm:px-6">
       <div className="pointer-events-none absolute inset-0">
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(223,177,91,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(56,189,248,0.04)_1px,transparent_1px)] bg-[size:40px_40px]" />
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(223,177,91,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(56,189,248,0.04)_1px,transparent_1px)] bg-size-[40px_40px]" />
         <div className="absolute inset-x-0 top-0 h-72 bg-[radial-gradient(ellipse_at_top,rgba(223,177,91,0.18),transparent_70%)]" />
         <div className="absolute inset-x-0 bottom-0 h-80 bg-[radial-gradient(ellipse_at_bottom,rgba(56,189,248,0.14),transparent_72%)]" />
-        <div className="absolute left-1/2 top-1/2 h-[34rem] w-[34rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#7C3AED]/10 blur-[130px]" />
+        <div className="absolute left-1/2 top-1/2 h-136 w-136 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#7C3AED]/10 blur-[130px]" />
 
         {PATH_MARKS.map((mark) => (
           <motion.span

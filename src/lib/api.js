@@ -1,6 +1,15 @@
 const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000").replace(/\/$/, "");
 const BACKEND_ROOT_URL = API_BASE_URL.replace(/\/api$/, "");
 
+export class ApiError extends Error {
+  constructor(message, status, data = {}) {
+    super(message);
+    this.name = "ApiError";
+    this.status = status;
+    this.data = data;
+  }
+}
+
 function buildUrl(path) {
   const normalizedPath = path.startsWith("/") ? path : `/${path}`;
   const base = API_BASE_URL.endsWith("/api") ? API_BASE_URL : `${API_BASE_URL}/api`;
@@ -76,7 +85,7 @@ async function request(path, options = {}) {
         clearAuthSession();
       }
 
-      throw new Error(data.message || "Request failed");
+      throw new ApiError(data.message || "Request failed", response.status, data);
     }
 
     return data;
