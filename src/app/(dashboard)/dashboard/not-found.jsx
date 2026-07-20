@@ -15,9 +15,9 @@ export default function DashboardNotFound() {
   const shouldReduceMotion = useReducedMotion();
 
   return (
-    <section className="relative min-h-[520px] overflow-hidden rounded-3xl border border-[#DFB15B]/18 bg-[#121017] px-5 py-8 shadow-[0_24px_70px_rgba(0,0,0,0.32)] sm:px-8 lg:px-10">
+    <section className="relative min-h-130 overflow-hidden rounded-3xl border border-[#DFB15B]/18 bg-[#121017] px-5 py-8 shadow-[0_24px_70px_rgba(0,0,0,0.32)] sm:px-8 lg:px-10">
       <div className="pointer-events-none absolute inset-0">
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(223,177,91,0.045)_1px,transparent_1px),linear-gradient(90deg,rgba(56,189,248,0.035)_1px,transparent_1px)] bg-[size:36px_36px]" />
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(223,177,91,0.045)_1px,transparent_1px),linear-gradient(90deg,rgba(56,189,248,0.035)_1px,transparent_1px)] bg-size-[36px_36px]" />
         <div className="absolute -top-24 left-1/2 h-80 w-80 -translate-x-1/2 rounded-full bg-[#DFB15B]/14 blur-[95px]" />
         <div className="absolute -bottom-28 right-8 h-96 w-96 rounded-full bg-[#7C3AED]/12 blur-[110px]" />
 
@@ -39,7 +39,7 @@ export default function DashboardNotFound() {
       </div>
 
       <motion.div
-        className="relative z-10 flex min-h-[440px] flex-col justify-center"
+        className="relative z-10 flex min-h-110 flex-col justify-center"
         initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 18 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: [0.25, 1, 0.5, 1] }}
