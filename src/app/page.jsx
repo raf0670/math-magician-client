@@ -1,4 +1,5 @@
 import Community from "@/components/home/Community";
+import BackendWarmup from "@/components/home/BackendWarmup";
 import FAQ from "@/components/home/FAQ";
 import Hero from "@/components/home/Hero";
 import Instructor from "@/components/home/Instructor";
@@ -12,6 +13,7 @@ import Footer from "@/components/shared/Footer";
 export default function LandingPage() {
   return (
     <div>
+      <BackendWarmup></BackendWarmup>
       <Hero></Hero>
       {/* <WhatYouGet></WhatYouGet>
       <Instructor></Instructor> */}

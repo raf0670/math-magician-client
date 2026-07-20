@@ -1,4 +1,5 @@
 const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000").replace(/\/$/, "");
+const BACKEND_ROOT_URL = API_BASE_URL.replace(/\/api$/, "");
 
 function buildUrl(path) {
   const normalizedPath = path.startsWith("/") ? path : `/${path}`;
@@ -14,6 +15,25 @@ function buildUrl(path) {
 function emitAuthStateChange() {
   if (typeof window !== "undefined") {
     window.dispatchEvent(new Event("auth-state-changed"));
+  }
+}
+
+export async function warmBackend() {
+  const controller = typeof AbortController !== "undefined" ? new AbortController() : null;
+  const timeoutId = controller
+    ? setTimeout(() => controller.abort(), 4000)
+    : null;
+
+  try {
+    await fetch(BACKEND_ROOT_URL, {
+      method: "GET",
+      cache: "no-store",
+      signal: controller?.signal,
+    });
+  } catch {
+    // Warm-up failures should never affect the landing page.
+  } finally {
+    if (timeoutId) clearTimeout(timeoutId);
   }
 }
 
