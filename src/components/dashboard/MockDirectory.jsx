@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Award, BookOpen, Brain, Calculator, Check, ClipboardCheck, Hash, Layers, Play, SlidersHorizontal } from "lucide-react";
+import { AlertTriangle, Award, BookOpen, Brain, Calculator, Check, ClipboardCheck, Hash, Layers, Play, SlidersHorizontal } from "lucide-react";
 import { getExams, getPracticeMeta, startPracticeExam } from "@/lib/api";
 import { InlineFlashyLoader, LoadingButtonLabel } from "@/components/shared/FlashyLoader";
 
@@ -28,11 +28,14 @@ export default function MockDirectory() {
     const [loading, setLoading] = useState(true);
     const [starting, setStarting] = useState(false);
     const [error, setError] = useState("");
+    const [fatalError, setFatalError] = useState(null);
 
     useEffect(() => {
         let isMounted = true;
 
         async function fetchExamSystem() {
+            setFatalError(null);
+
             try {
                 const [metaPayload, examsPayload] = await Promise.all([getPracticeMeta(), getExams()]);
                 if (!isMounted) return;
@@ -53,7 +56,7 @@ export default function MockDirectory() {
                     setQuestionCount(getDefaultQuestionCount(firstSubjectWithTopic.topics[0]));
                 }
             } catch (err) {
-                if (isMounted) setError(err.message || "Unable to load the exam system");
+                if (isMounted) setFatalError(err);
             } finally {
                 if (isMounted) setLoading(false);
             }
@@ -115,6 +118,10 @@ export default function MockDirectory() {
             setStarting(false);
         }
     };
+
+    if (fatalError) {
+        throw fatalError;
+    }
 
     return (
         <div className="flex w-full flex-col gap-8 text-left">
@@ -240,7 +247,19 @@ export default function MockDirectory() {
                         </div>
                     </div>
 
-                    {error ? <p className="text-sm font-medium text-red-400">{error}</p> : null}
+                    {error ? (
+                        <div className="flex items-start gap-3 rounded-2xl border border-red-400/20 bg-red-500/10 px-4 py-3 text-left shadow-[0_14px_35px_rgba(0,0,0,0.18)]">
+                            <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border border-red-300/20 bg-red-400/10 text-red-200">
+                                <AlertTriangle className="h-4 w-4" />
+                            </span>
+                            <span>
+                                <span className="block text-sm font-bold text-red-100">Could not open the exam arena</span>
+                                <span className="mt-1 block text-xs font-medium leading-5 text-red-100/75">
+                                    {error}
+                                </span>
+                            </span>
+                        </div>
+                    ) : null}
                 </div>
             </section>
             
