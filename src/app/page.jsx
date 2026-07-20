@@ -2,6 +2,7 @@ import Community from "@/components/home/Community";
 import BackendWarmup from "@/components/home/BackendWarmup";
 import FAQ from "@/components/home/FAQ";
 import Hero from "@/components/home/Hero";
+import HomeIntroPopup from "@/components/home/HomeIntroPopup";
 import Instructor from "@/components/home/Instructor";
 import Programs from "@/components/home/Programs";
 import ReadyToCrack from "@/components/home/ReadyToCrack";
@@ -14,6 +15,7 @@ export default function LandingPage() {
   return (
     <div>
       <BackendWarmup></BackendWarmup>
+      <HomeIntroPopup></HomeIntroPopup>
       <Hero></Hero>
       {/* <WhatYouGet></WhatYouGet>
       <Instructor></Instructor> */}
