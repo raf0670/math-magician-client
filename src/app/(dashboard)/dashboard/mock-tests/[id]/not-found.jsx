@@ -56,10 +56,10 @@ export default function ExamNotFound() {
           </div>
 
           <h1 className="mt-5 font-serif text-3xl font-medium leading-tight tracking-wide text-white sm:text-5xl">
-            This mock test is not in the arena.
+            This practice paper is not in the arena.
           </h1>
           <p className="mt-4 text-sm leading-7 text-[#A9A3BA] sm:text-base">
-            The paper may have moved, expired, or the link may be incorrect. Return to the mock test library to open an available exam.
+            The paper may have moved, expired, or the link may be incorrect. Return to Practice to open an available exam.
           </p>
 
           <div className="mt-6 grid gap-3">
@@ -77,7 +77,7 @@ export default function ExamNotFound() {
               className="inline-flex items-center justify-center gap-2 rounded-full bg-linear-to-r from-[#E6C687] via-[#D4AF37] to-[#AA7C11] px-6 py-3 text-xs font-bold uppercase tracking-wider text-black transition hover:brightness-110 active:scale-[0.98]"
             >
               <Library className="h-4 w-4" />
-              Browse Mock Tests
+              Browse Practice
             </Link>
             <Link
               href="/dashboard"

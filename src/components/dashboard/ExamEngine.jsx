@@ -1,6 +1,6 @@
 "use client";
-import { useMemo, useState } from "react";
-import { CheckCircle, ChevronLeft, ChevronRight, Eraser, Infinity, Send, Sparkles } from "lucide-react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { CheckCircle, ChevronLeft, ChevronRight, Clock3, Eraser, Infinity, Send, Sparkles } from "lucide-react";
 
 const OPTION_LABELS = ["A", "B", "C", "D", "E"];
 
@@ -37,9 +37,23 @@ function getStudentFacingExamTitle(title, fallback = "Live Mock Test") {
     return cleanedTitle || fallback;
 }
 
+function getInitialRemainingSeconds(examData) {
+    const duration = Number(examData?.duration);
+    return Number.isFinite(duration) && duration > 0 ? Math.floor(duration * 60) : null;
+}
+
+function formatRemainingTime(totalSeconds) {
+    const safeSeconds = Math.max(Number(totalSeconds) || 0, 0);
+    const minutes = Math.floor(safeSeconds / 60).toString().padStart(2, "0");
+    const seconds = (safeSeconds % 60).toString().padStart(2, "0");
+    return `${minutes}:${seconds}`;
+}
+
 export default function ExamEngine({ examData, onComplete }) {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [answers, setAnswers] = useState({});
+    const [remainingSeconds, setRemainingSeconds] = useState(() => getInitialRemainingSeconds(examData));
+    const timerSubmittedRef = useRef(false);
 
     const normalizedQuestions = useMemo(() => {
         if (!examData?.questions?.length) return [];
@@ -62,6 +76,7 @@ export default function ExamEngine({ examData, onComplete }) {
     const skippedCount = normalizedQuestions.length - answeredCount;
     const penalty = getEffectivePenalty(examData?.negativeMarksPerQuestion);
     const examTitle = getStudentFacingExamTitle(examData?.title);
+    const hasTimedExam = remainingSeconds !== null;
 
     const handleSelectOption = (optionIndex) => {
         if (!currentQuestion) return;
@@ -75,11 +90,35 @@ export default function ExamEngine({ examData, onComplete }) {
         setAnswers(updatedAnswers);
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = useCallback(() => {
         if (!normalizedQuestions.length) return;
         const submissionAnswers = normalizedQuestions.map((question) => answers[question.id] ?? -1);
         if (onComplete) onComplete(submissionAnswers, examData);
-    };
+    }, [answers, examData, normalizedQuestions, onComplete]);
+
+    useEffect(() => {
+        if (!hasTimedExam) return undefined;
+
+        const timerId = window.setInterval(() => {
+            setRemainingSeconds((currentSeconds) => {
+                if (currentSeconds === null || currentSeconds <= 0) return currentSeconds;
+                return currentSeconds - 1;
+            });
+        }, 1000);
+
+        return () => window.clearInterval(timerId);
+    }, [hasTimedExam]);
+
+    useEffect(() => {
+        if (!hasTimedExam || remainingSeconds !== 0 || timerSubmittedRef.current) return undefined;
+
+        timerSubmittedRef.current = true;
+        const submitTimer = window.setTimeout(() => {
+            handleSubmit();
+        }, 0);
+
+        return () => window.clearTimeout(submitTimer);
+    }, [handleSubmit, hasTimedExam, remainingSeconds]);
 
     if (!currentQuestion) {
         return <p className="text-sm text-[#8E8A9F]">Preparing the exam...</p>;
@@ -95,10 +134,17 @@ export default function ExamEngine({ examData, onComplete }) {
                     <h2 className="mt-1 text-base font-semibold text-white">{examTitle}</h2>
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
-                    <div className="flex items-center gap-2 rounded-xl border border-emerald-500/15 bg-emerald-500/10 px-4 py-2 text-sm font-bold text-emerald-300">
-                        <Infinity className="h-4 w-4" />
-                        <span>Untimed practice</span>
-                    </div>
+                    {hasTimedExam ? (
+                        <div className={`flex items-center gap-2 rounded-xl border px-4 py-2 text-sm font-bold ${remainingSeconds <= 60 ? "border-red-500/20 bg-red-500/10 text-red-300" : "border-emerald-500/15 bg-emerald-500/10 text-emerald-300"}`}>
+                            <Clock3 className="h-4 w-4" />
+                            <span>{formatRemainingTime(remainingSeconds)} left</span>
+                        </div>
+                    ) : (
+                        <div className="flex items-center gap-2 rounded-xl border border-emerald-500/15 bg-emerald-500/10 px-4 py-2 text-sm font-bold text-emerald-300">
+                            <Infinity className="h-4 w-4" />
+                            <span>Untimed practice</span>
+                        </div>
+                    )}
                     <div className="rounded-xl border border-red-500/15 bg-red-500/10 px-4 py-2 text-xs font-bold text-red-300">
                         Wrong: -{penalty.toFixed(2)}
                     </div>

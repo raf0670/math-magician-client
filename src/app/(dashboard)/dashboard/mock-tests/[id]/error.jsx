@@ -61,10 +61,10 @@ export default function ExamError({ error, reset }) {
           </div>
 
           <h1 className="mt-5 font-serif text-3xl font-medium leading-tight tracking-wide text-white sm:text-5xl">
-            This mock test did not open cleanly.
+            This practice paper did not open cleanly.
           </h1>
           <p className="mt-4 text-sm leading-7 text-[#A9A3BA] sm:text-base">
-            The question field could not finish loading. You can safely retry the exam screen, or return to the mock test library and choose another paper.
+            The question field could not finish loading. You can safely retry the exam screen, or return to Practice and choose another paper.
           </p>
 
           <div className="mt-6 grid gap-3">
@@ -90,7 +90,7 @@ export default function ExamError({ error, reset }) {
               className="inline-flex items-center justify-center gap-2 rounded-full border border-white/8 bg-white/5 px-6 py-3 text-xs font-bold uppercase tracking-wider text-white transition hover:border-[#DFB15B]/30 hover:text-[#DFB15B]"
             >
               <ArrowLeft className="h-4 w-4" />
-              Back to Mock Tests
+              Back to Practice
             </Link>
             <Link
               href="/dashboard"

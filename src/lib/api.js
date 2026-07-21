@@ -230,6 +230,13 @@ export async function startPracticeExam(payload) {
   });
 }
 
+export async function startQuizExam(payload) {
+  return request("/api/exams/quiz/start", {
+    method: "POST",
+    body: payload,
+  });
+}
+
 export async function getMyStats() {
   return request("/api/analytics/my-stats");
 }

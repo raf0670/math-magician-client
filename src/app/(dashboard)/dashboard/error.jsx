@@ -77,7 +77,7 @@ export default function DashboardError({ error, reset }) {
                 href="/dashboard/mock-tests"
                 className="inline-flex items-center justify-center gap-2 rounded-full border border-[#DFB15B]/20 bg-[#DFB15B]/10 px-6 py-3 text-xs font-bold uppercase tracking-wider text-[#DFB15B] transition hover:bg-[#DFB15B] hover:text-black"
               >
-                Open Mock Tests
+                Open Practice
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </div>

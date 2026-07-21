@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
-import { ArrowRight, ClipboardList, FileQuestion, Home, Library, Search } from "lucide-react";
+import { ArrowRight, ClipboardList, FileQuestion, Library, Search } from "lucide-react";
 
 const MOCK_CATEGORIES = [
-  { label: "Full mocks", note: "Timed papers" },
+  { label: "Practice papers", note: "Saved exams" },
   { label: "Practice sets", note: "Topic drills" },
   { label: "Reports", note: "Score review" },
 ];
@@ -29,14 +29,14 @@ export default function MockTestsNotFound() {
         <div className="flex min-h-72 flex-col justify-center">
           <div className="inline-flex w-fit items-center gap-2 rounded-full border border-[#DFB15B]/20 bg-[#DFB15B]/10 px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-[#DFB15B]">
             <FileQuestion className="h-3.5 w-3.5" />
-            Mock route missing
+            Practice route missing
           </div>
 
           <h1 className="mt-5 max-w-xl font-serif text-3xl font-medium leading-tight tracking-wide text-white sm:text-5xl">
-            This mock test aisle is empty.
+            This practice aisle is empty.
           </h1>
           <p className="mt-4 max-w-xl text-sm leading-7 text-[#A9A3BA] sm:text-base">
-            The exam page you requested is not available from this route. Head back to the mock test library and choose a listed paper.
+            The exam page you requested is not available from this route. Head back to Practice and choose a listed paper.
           </p>
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -45,7 +45,7 @@ export default function MockTestsNotFound() {
               className="inline-flex items-center justify-center gap-2 rounded-full bg-linear-to-r from-[#E6C687] via-[#D4AF37] to-[#AA7C11] px-6 py-3 text-xs font-bold uppercase tracking-wider text-black transition hover:brightness-110 active:scale-[0.98]"
             >
               <Library className="h-4 w-4" />
-              Mock Test Library
+              Practice Library
             </Link>
             <Link
               href="/dashboard"
@@ -61,7 +61,7 @@ export default function MockTestsNotFound() {
           <div className="flex items-center justify-between rounded-xl border border-[#DFB15B]/15 bg-[#DFB15B]/8 px-4 py-4">
             <div>
               <p className="text-[10px] font-bold uppercase tracking-widest text-[#DFB15B]">Suggested path</p>
-              <p className="mt-1 text-sm text-[#A9A3BA]">Use the official library list.</p>
+              <p className="mt-1 text-sm text-[#A9A3BA]">Use the Practice list.</p>
             </div>
             <Search className="h-7 w-7 text-[#DFB15B]" />
           </div>

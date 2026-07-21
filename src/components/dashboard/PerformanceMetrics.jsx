@@ -28,7 +28,7 @@ export default function PerformanceMetrics() {
 
     const metrics = [
         {
-            title: "Mock Tests Solved",
+            title: "Practice Solved",
             value: `${totalExams}`,
             subtext: `${availableExamCount} official exam${availableExamCount === 1 ? "" : "s"} available`,
             icon: ClipboardCheck,

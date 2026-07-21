@@ -208,7 +208,7 @@ export default function AnalyticalScorecard({ answers, examData, submissionResul
                     href="/dashboard/mock-tests"
                     className="inline-flex items-center gap-2 rounded-xl bg-linear-to-r from-[#E6C687] to-[#AA7C11] px-5 py-3 text-xs font-bold uppercase tracking-wider text-black shadow-md transition-all duration-150 hover:brightness-110"
                 >
-                    Return to Exam System
+                    Return to Practice
                 </Link>
             </div>
         </div>

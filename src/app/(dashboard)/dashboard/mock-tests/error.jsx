@@ -6,7 +6,7 @@ import { motion, useReducedMotion } from "framer-motion";
 import { ArrowRight, ClipboardList, Library, RefreshCw, SearchX, Sparkles } from "lucide-react";
 
 const MOCK_ROWS = [
-  { label: "Full mocks", state: "Waiting" },
+  { label: "Practice sets", state: "Waiting" },
   { label: "Practice sets", state: "Waiting" },
   { label: "Rank reports", state: "Waiting" },
 ];
@@ -38,10 +38,10 @@ export default function MockTestsError({ error, reset }) {
           </div>
 
           <h1 className="mt-5 max-w-xl font-serif text-3xl font-medium leading-tight tracking-wide text-white sm:text-5xl">
-            The mock test shelf did not open.
+            Practice did not open.
           </h1>
           <p className="mt-4 max-w-xl text-sm leading-7 text-[#A9A3BA] sm:text-base">
-            We could not load the available exams right now. Give it another try, or return to your dashboard while the library catches up.
+            We could not load the available practice exams right now. Give it another try, or return to your dashboard while the library catches up.
           </p>
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -66,7 +66,7 @@ export default function MockTestsError({ error, reset }) {
         <div className="rounded-2xl border border-white/8 bg-black/20 p-5 backdrop-blur">
           <div className="flex items-center justify-between rounded-xl border border-[#DFB15B]/15 bg-[#DFB15B]/8 px-4 py-4">
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-widest text-[#DFB15B]">Mock directory</p>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-[#DFB15B]">Practice directory</p>
               <p className="mt-1 text-sm text-[#A9A3BA]">Preparing a clean reload path.</p>
             </div>
             <Library className="h-7 w-7 text-[#DFB15B]" />

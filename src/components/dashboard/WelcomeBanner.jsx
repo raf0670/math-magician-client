@@ -64,7 +64,7 @@ export default function WelcomeBanner() {
                         <div>
                             <span className="text-[10px] font-bold uppercase tracking-wider text-[#6B667B] block">Next Step</span>
                             <span className="text-xs font-bold text-white mt-0.5 flex items-center gap-1">
-                                <Sparkles className="w-3 h-3 text-[#DFB15B]" /> Open the mock test hub
+                                <Sparkles className="w-3 h-3 text-[#DFB15B]" /> Open Practice
                             </span>
                         </div>
                     </div>

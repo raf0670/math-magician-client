@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { LayoutDashboard, Video, ClipboardCheck, BarChart3, User, LogOut, ShieldCheck, Sparkles } from "lucide-react";
+import { LayoutDashboard, Video, ClipboardCheck, BarChart3, User, LogOut, ShieldCheck, Sparkles, Brain } from "lucide-react";
 import { clearAuthSession, getProfile, getStoredUser, saveAuthSession } from "@/lib/api";
 
 export default function DashboardSidebar() {
@@ -37,7 +37,8 @@ export default function DashboardSidebar() {
     const navItems = [
         { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
         { href: "/dashboard/classes", label: "Live Classes", icon: Video },
-        { href: "/dashboard/mock-tests", label: "Mock Tests", icon: ClipboardCheck },
+        { href: "/dashboard/mock-tests", label: "Practice", icon: ClipboardCheck },
+        { href: "/dashboard/quiz", label: "Quiz", icon: Brain },
         { href: "/dashboard/analytics", label: "Analytics", icon: BarChart3 },
         currentUser?.role === "admin" ? { href: "/dashboard/admin/enrollments", label: "Admin", icon: ShieldCheck } : null,
         { href: "/dashboard/profile", label: "Profile", icon: User },
