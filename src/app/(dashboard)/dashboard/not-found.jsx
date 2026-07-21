@@ -78,7 +78,7 @@ export default function DashboardNotFound() {
 
           <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
             {[
-              { href: "/dashboard/classes", label: "Classes", text: "Open class materials", icon: BookOpenCheck },
+              { href: "/dashboard/archived-classes", label: "Archived Classes", text: "Open class materials", icon: BookOpenCheck },
               { href: "/dashboard/analytics", label: "Analytics", text: "Review performance", icon: BarChart3 },
               { href: "/dashboard/profile", label: "Profile", text: "Check your account", icon: Search },
             ].map((item) => (

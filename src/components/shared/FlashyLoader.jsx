@@ -144,7 +144,7 @@ export default function FlashyLoader({
   return (
     <div className={`relative flex items-center justify-center overflow-hidden bg-[#0F0D15] px-4 py-10 text-white shadow-[0_24px_90px_rgba(0,0,0,0.38)] ${wrapperClass} ${className}`}>
       <div className="pointer-events-none absolute inset-0">
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(223,177,91,0.055)_1px,transparent_1px),linear-gradient(90deg,rgba(124,58,237,0.045)_1px,transparent_1px)] bg-[size:42px_42px]" />
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(223,177,91,0.055)_1px,transparent_1px),linear-gradient(90deg,rgba(124,58,237,0.045)_1px,transparent_1px)] bg-size-[42px_42px]" />
         <div className="absolute inset-x-0 top-0 h-48 bg-[radial-gradient(ellipse_at_top,rgba(223,177,91,0.2),transparent_70%)]" />
         <div className="absolute inset-x-0 bottom-0 h-56 bg-[radial-gradient(ellipse_at_bottom,rgba(56,189,248,0.13),transparent_70%)]" />
         <motion.div
