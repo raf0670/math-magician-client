@@ -118,7 +118,7 @@ export default function HomeIntroPopup() {
             aria-modal="true"
             aria-labelledby="home-intro-title"
             aria-describedby="home-intro-description"
-            className="relative max-h-[92vh] w-full max-w-5xl overflow-y-auto rounded-[28px] border border-[#DFB15B]/20 bg-[#0D0B14]/95 p-5 shadow-[0_28px_90px_rgba(0,0,0,0.6)] sm:p-7 lg:p-9"
+            className="relative max-h-[92vh] w-full max-w-5xl overflow-y-auto rounded-[28px] border border-[#DFB15B]/20 bg-[#0D0B14]/95 p-5 pt-16 shadow-[0_28px_90px_rgba(0,0,0,0.6)] sm:p-7 lg:p-9"
             initial={{ opacity: 0, y: 28, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 18, scale: 0.98 }}
@@ -134,7 +134,7 @@ export default function HomeIntroPopup() {
               type="button"
               aria-label="Close intro pop-up"
               onClick={closePopup}
-              className="absolute right-4 top-4 z-10 flex h-10 w-10 items-center justify-center rounded-full border border-white/8 bg-white/5 text-white/70 transition hover:border-[#DFB15B]/30 hover:text-white"
+              className="absolute right-3 top-3 z-20 flex h-10 w-10 items-center justify-center rounded-full border border-white/8 bg-white/5 text-white/70 transition hover:border-[#DFB15B]/30 hover:text-white sm:right-4 sm:top-4"
             >
               <X className="h-4 w-4" />
             </button>
