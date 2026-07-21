@@ -21,7 +21,7 @@ export default function ExamError({ error, reset }) {
   return (
     <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#0A090F] px-4 py-8 text-white sm:px-6">
       <div className="pointer-events-none absolute inset-0">
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(223,177,91,0.045)_1px,transparent_1px),linear-gradient(90deg,rgba(56,189,248,0.035)_1px,transparent_1px)] bg-[size:42px_42px]" />
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(223,177,91,0.045)_1px,transparent_1px),linear-gradient(90deg,rgba(56,189,248,0.035)_1px,transparent_1px)] bg-size-[42px_42px]" />
         <div className="absolute inset-x-0 top-0 h-72 bg-[radial-gradient(ellipse_at_top,rgba(239,68,68,0.16),transparent_68%)]" />
         <div className="absolute inset-x-0 bottom-0 h-80 bg-[radial-gradient(ellipse_at_bottom,rgba(223,177,91,0.16),transparent_72%)]" />
         <motion.div

@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { AlertTriangle, Brain, Clock3, Gauge, Hash, Play, Sparkles } from "lucide-react";
+import { AlertTriangle, ArrowRight, Brain, Clock3, Gauge, Hash, Play, RefreshCw, SlidersHorizontal, Sparkles } from "lucide-react";
 import { startQuizExam } from "@/lib/api";
 import { LoadingButtonLabel } from "@/components/shared/FlashyLoader";
 
@@ -118,7 +118,7 @@ export default function QuizDashboardLanding() {
                                             key={count}
                                             type="button"
                                             onClick={() => setQuestionCount(count.toString())}
-                                            className={`rounded-lg border px-3 py-1.5 text-[10px] font-bold transition-colors ${parsedQuestionCount === count ? "border-[#DFB15B]/40 bg-[#DFB15B]/10 text-[#DFB15B]" : "border-white/6 bg-white/[0.03] text-[#8E8A9F] hover:text-white"}`}
+                                            className={`rounded-lg border px-3 py-1.5 text-[10px] font-bold transition-colors ${parsedQuestionCount === count ? "border-[#DFB15B]/40 bg-[#DFB15B]/10 text-[#DFB15B]" : "border-white/6 bg-white/3 text-[#8E8A9F] hover:text-white"}`}
                                         >
                                             {count}
                                         </button>
@@ -143,7 +143,7 @@ export default function QuizDashboardLanding() {
                                             key={minutes}
                                             type="button"
                                             onClick={() => setDuration(minutes.toString())}
-                                            className={`rounded-lg border px-3 py-1.5 text-[10px] font-bold transition-colors ${parsedDuration === minutes ? "border-[#DFB15B]/40 bg-[#DFB15B]/10 text-[#DFB15B]" : "border-white/6 bg-white/[0.03] text-[#8E8A9F] hover:text-white"}`}
+                                            className={`rounded-lg border px-3 py-1.5 text-[10px] font-bold transition-colors ${parsedDuration === minutes ? "border-[#DFB15B]/40 bg-[#DFB15B]/10 text-[#DFB15B]" : "border-white/6 bg-white/3 text-[#8E8A9F] hover:text-white"}`}
                                         >
                                             {minutes} min
                                         </button>
@@ -171,9 +171,50 @@ export default function QuizDashboardLanding() {
                         </div>
 
                         {error ? (
-                            <div className="flex items-start gap-3 rounded-2xl border border-red-400/20 bg-red-500/10 px-4 py-3">
-                                <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-red-200" />
-                                <span className="text-sm font-semibold text-red-100">{error}</span>
+                            <div className="relative overflow-hidden rounded-3xl border border-red-400/20 bg-[#160F13] p-4 shadow-[0_18px_60px_rgba(239,68,68,0.08)] sm:p-5">
+                                <div className="pointer-events-none absolute inset-0">
+                                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_10%_20%,rgba(248,113,113,0.16),transparent_34%),radial-gradient(circle_at_88%_10%,rgba(223,177,91,0.13),transparent_30%)]" />
+                                    <div className="absolute -bottom-20 right-10 h-44 w-44 rounded-full bg-red-500/10 blur-[70px]" />
+                                </div>
+
+                                <div className="relative z-10 flex flex-col gap-4 sm:flex-row sm:items-start">
+                                    <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-red-300/20 bg-red-500/10 text-red-200 shadow-[0_0_28px_rgba(248,113,113,0.14)]">
+                                        <AlertTriangle className="h-5 w-5" />
+                                    </span>
+
+                                    <div className="min-w-0 flex-1">
+                                        <span className="text-[10px] font-bold uppercase tracking-[0.24em] text-red-300">
+                                            Quiz launch interrupted
+                                        </span>
+                                        <h3 className="mt-1 text-lg font-semibold tracking-wide text-white">
+                                            Quiz could not be prepared
+                                        </h3>
+                                        <p className="mt-2 text-sm font-medium leading-6 text-red-100/75">
+                                            {error || "The quiz generator could not reach the question bank. Your settings are still here, so you can retry in a moment."}
+                                        </p>
+
+                                        <div className="mt-4 flex flex-col gap-2 sm:flex-row">
+                                            <button
+                                                type="button"
+                                                onClick={handleStartQuiz}
+                                                disabled={!canStartQuiz}
+                                                className="inline-flex items-center justify-center gap-2 rounded-xl bg-linear-to-r from-[#E6C687] to-[#AA7C11] px-4 py-2.5 text-[11px] font-bold uppercase tracking-wider text-black transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
+                                            >
+                                                <RefreshCw className="h-3.5 w-3.5" />
+                                                Try Again
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => setError("")}
+                                                className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/8 bg-white/4 px-4 py-2.5 text-[11px] font-bold uppercase tracking-wider text-white transition hover:border-[#DFB15B]/30 hover:text-[#DFB15B]"
+                                            >
+                                                <SlidersHorizontal className="h-3.5 w-3.5" />
+                                                Review Settings
+                                                <ArrowRight className="h-3.5 w-3.5" />
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         ) : null}
                     </div>
