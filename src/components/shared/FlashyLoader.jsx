@@ -13,6 +13,7 @@ import {
   LockKeyhole,
   LogIn,
   Sparkles,
+  Video,
   WandSparkles,
   Zap,
 } from "lucide-react";
@@ -54,6 +55,8 @@ function LoaderIcon({ iconName, className = "" }) {
       return <LockKeyhole className={className} />;
     case "login":
       return <LogIn className={className} />;
+    case "video":
+      return <Video className={className} />;
     case "wand":
       return <WandSparkles className={className} />;
     case "zap":

@@ -215,6 +215,28 @@ export async function updateAdminEnrollmentStatus(paymentId, status, reviewNote 
   });
 }
 
+export async function getCurrentLiveClass() {
+  return request("/api/classes/current");
+}
+
+export async function getAdminLiveClasses() {
+  return request("/api/classes/admin");
+}
+
+export async function createAdminLiveClass(payload) {
+  return request("/api/classes/admin", {
+    method: "POST",
+    body: payload,
+  });
+}
+
+export async function updateAdminLiveClass(classId, payload) {
+  return request(`/api/classes/admin/${classId}`, {
+    method: "PATCH",
+    body: payload,
+  });
+}
+
 export async function getExams() {
   return request("/api/exams");
 }

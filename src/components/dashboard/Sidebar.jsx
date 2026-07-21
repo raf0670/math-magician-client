@@ -40,7 +40,8 @@ export default function DashboardSidebar() {
         { href: "/dashboard/mock-tests", label: "Practice", icon: ClipboardCheck },
         { href: "/dashboard/quiz", label: "Quiz", icon: Brain },
         { href: "/dashboard/analytics", label: "Analytics", icon: BarChart3 },
-        currentUser?.role === "admin" ? { href: "/dashboard/admin/enrollments", label: "Admin", icon: ShieldCheck } : null,
+        currentUser?.role === "admin" ? { href: "/dashboard/admin/enrollments", label: "Enrollments", icon: ShieldCheck } : null,
+        currentUser?.role === "admin" ? { href: "/dashboard/admin/classes", label: "Class Admin", icon: Video } : null,
         { href: "/dashboard/profile", label: "Profile", icon: User },
     ].filter(Boolean);
 
