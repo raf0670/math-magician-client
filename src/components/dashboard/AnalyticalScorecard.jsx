@@ -37,10 +37,6 @@ function getCorrectOptionIndex(question, reviewItem) {
     return labelMatch ? OPTION_LABELS.indexOf(labelMatch[1].toUpperCase()) : null;
 }
 
-function getQuestionNumber(question, index) {
-    return question?.question_no || question?.questionNo || index + 1;
-}
-
 function getEffectivePenalty(value) {
     const penalty = Number(value);
     return Number.isFinite(penalty) && penalty > 0 ? penalty : 0.25;
@@ -145,7 +141,7 @@ export default function AnalyticalScorecard({ answers, examData, submissionResul
                                 <div className="mb-5 flex w-full flex-wrap items-center justify-between gap-3">
                                     <div>
                                         <span className="block text-[10px] font-bold uppercase tracking-widest text-[#DFB15B]">
-                                            Question #{getQuestionNumber(question, idx)}
+                                            Question #{idx + 1}
                                         </span>
                                         <span className="mt-1 block text-[11px] font-semibold text-[#6B667B]">
                                             {question.topic || question.chapter || question.subject || "General"}

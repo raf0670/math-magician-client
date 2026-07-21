@@ -63,6 +63,7 @@ export default function ExamEngine({ examData, onComplete }) {
                 ...question,
                 id: getQuestionId(question, index),
                 questionNo: question.question_no || question.questionNo || index + 1,
+                displayQuestionNo: index + 1,
                 questionText: question.questionText || question.question || "",
                 options: getOptionMap(question.options),
                 subject: question.subject || "General",
@@ -170,7 +171,7 @@ export default function ExamEngine({ examData, onComplete }) {
                                         onClick={() => setCurrentIndex(idx)}
                                         className={`flex h-10 min-w-16 items-center justify-center rounded-xl border px-3 text-xs font-bold transition-colors ${isCurrent ? "border-[#DFB15B] bg-[#DFB15B] text-black shadow-md shadow-[#DFB15B]/10" : isAnswered ? "border-emerald-400/20 bg-emerald-400/10 text-emerald-300" : "border-white/5 bg-[#121017] text-[#8E8A9F] hover:border-white/15 hover:text-white"}`}
                                     >
-                                        #{question.questionNo}
+                                        #{question.displayQuestionNo}
                                     </button>
                                 );
                             })}
@@ -183,7 +184,7 @@ export default function ExamEngine({ examData, onComplete }) {
                                 {currentQuestion.topic ? `${currentQuestion.subject} / ${currentQuestion.topic}` : currentQuestion.subject}
                             </span>
                             <span className="rounded-lg border border-[#DFB15B]/20 bg-[#DFB15B]/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#DFB15B]">
-                                Question #{currentQuestion.questionNo}
+                                Question #{currentQuestion.displayQuestionNo}
                             </span>
                         </div>
 
