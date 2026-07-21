@@ -43,17 +43,17 @@ export default function ProgramsAndTestimonials() {
     }, []);
 
     const testimonialSparks = useMemo(() => (
-        Array.from({ length: 24 }).map((_, idx) => ({
+        Array.from({ length: 42 }).map((_, idx) => ({
             id: idx,
             left: `${Math.random() * 96 + 2}%`,
             top: `${Math.random() * 78 + 12}%`,
-            size: Math.random() * 12 + 10,
-            opacity: Math.random() * 0.28 + 0.16,
-            driftX: [0, Math.random() * 44 - 22, Math.random() * -44 + 22, 0],
-            driftY: [0, Math.random() * -34 - 16, Math.random() * 22 - 11, 0],
+            size: Math.random() * 22 + 18,
+            opacity: Math.random() * 0.36 + 0.3,
+            driftX: [0, Math.random() * 58 - 29, Math.random() * -58 + 29, 0],
+            driftY: [0, Math.random() * -48 - 22, Math.random() * 30 - 15, 0],
             rotate: Math.random() * 140 - 70,
-            speed: Math.random() * 5 + 5,
-            delay: Math.random() * -7,
+            speed: Math.random() * 3.8 + 3.6,
+            delay: Math.random() * -5,
         }))
     ), []);
 
@@ -445,7 +445,7 @@ export default function ProgramsAndTestimonials() {
                         {testimonialSparks.map((spark) => (
                             <motion.span
                                 key={spark.id}
-                                className="absolute text-[#DFB15B]/50 drop-shadow-[0_0_12px_rgba(223,177,91,0.42)]"
+                                className="absolute text-[#DFB15B]/70 drop-shadow-[0_0_18px_rgba(223,177,91,0.58)]"
                                 style={{
                                     left: spark.left,
                                     top: spark.top,
@@ -455,8 +455,8 @@ export default function ProgramsAndTestimonials() {
                                     x: spark.driftX,
                                     y: spark.driftY,
                                     rotate: [spark.rotate, spark.rotate + 90, spark.rotate],
-                                    scale: [0.72, 1.25, 0.82],
-                                    opacity: [0, spark.opacity, spark.opacity * 0.55, 0],
+                                    scale: [0.82, 1.45, 0.95],
+                                    opacity: [0.08, spark.opacity, spark.opacity * 0.7, 0.08],
                                 }}
                                 transition={{
                                     duration: spark.speed,
@@ -470,14 +470,19 @@ export default function ProgramsAndTestimonials() {
                         ))}
 
                         <motion.div
-                            className="absolute left-[-18%] top-[28%] h-px w-[42%] bg-linear-to-r from-transparent via-[#DFB15B]/35 to-transparent"
-                            animate={{ x: ["0%", "330%"], opacity: [0, 0.75, 0] }}
-                            transition={{ duration: 6.8, repeat: Infinity, ease: "easeInOut" }}
+                            className="absolute left-[-22%] top-[24%] h-0.5 w-[54%] bg-linear-to-r from-transparent via-[#DFB15B]/55 to-transparent blur-[1px]"
+                            animate={{ x: ["0%", "300%"], opacity: [0, 0.9, 0] }}
+                            transition={{ duration: 4.2, repeat: Infinity, ease: "easeInOut" }}
                         />
                         <motion.div
-                            className="absolute right-[-18%] bottom-[32%] h-px w-[38%] bg-linear-to-r from-transparent via-[#A78BFA]/30 to-transparent"
-                            animate={{ x: ["0%", "-340%"], opacity: [0, 0.65, 0] }}
-                            transition={{ duration: 7.6, repeat: Infinity, ease: "easeInOut", delay: 1.4 }}
+                            className="absolute right-[-22%] bottom-[30%] h-0.5 w-[50%] bg-linear-to-r from-transparent via-[#A78BFA]/50 to-transparent blur-[1px]"
+                            animate={{ x: ["0%", "-315%"], opacity: [0, 0.82, 0] }}
+                            transition={{ duration: 4.8, repeat: Infinity, ease: "easeInOut", delay: 0.8 }}
+                        />
+                        <motion.div
+                            className="absolute left-[-20%] bottom-[14%] h-px w-[46%] bg-linear-to-r from-transparent via-white/35 to-transparent blur-[1px]"
+                            animate={{ x: ["0%", "320%"], opacity: [0, 0.72, 0] }}
+                            transition={{ duration: 5.2, repeat: Infinity, ease: "easeInOut", delay: 1.7 }}
                         />
                     </div>
                 )}
