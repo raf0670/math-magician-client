@@ -1,16 +1,24 @@
 /* eslint-disable react-hooks/purity */
 "use client";
-import { useEffect, useState, useMemo } from "react";
+import { useCallback, useEffect, useState, useMemo, useRef } from "react";
 import { motion } from "framer-motion";
-import { Clock3, School, Building2, Laptop, MapPin, Plus, Star } from "lucide-react";
+import { ChevronLeft, ChevronRight, Clock3, School, Building2, Laptop, MapPin, Plus, Sparkles, Star } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { getStoredToken, savePendingPaymentPlan } from "@/lib/api";
+
+const REVIEW_CARD_GAP = 32;
 
 export default function ProgramsAndTestimonials() {
     const router = useRouter();
     const [hasMounted, setHasMounted] = useState(false);
     const [selectedPlanId, setSelectedPlanId] = useState("");
+    const [activeReviewIndex, setActiveReviewIndex] = useState(0);
+    const [visibleReviewCount, setVisibleReviewCount] = useState(3);
+    const [reviewSlideOffset, setReviewSlideOffset] = useState(0);
+    const [isReviewPaused, setIsReviewPaused] = useState(false);
+    const [expandedPortraitIndex, setExpandedPortraitIndex] = useState(null);
+    const reviewViewportRef = useRef(null);
 
     useEffect(() => {
         // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -33,6 +41,21 @@ export default function ProgramsAndTestimonials() {
             delay: Math.random() * -8,
         }));
     }, []);
+
+    const testimonialSparks = useMemo(() => (
+        Array.from({ length: 24 }).map((_, idx) => ({
+            id: idx,
+            left: `${Math.random() * 96 + 2}%`,
+            top: `${Math.random() * 78 + 12}%`,
+            size: Math.random() * 12 + 10,
+            opacity: Math.random() * 0.28 + 0.16,
+            driftX: [0, Math.random() * 44 - 22, Math.random() * -44 + 22, 0],
+            driftY: [0, Math.random() * -34 - 16, Math.random() * 22 - 11, 0],
+            rotate: Math.random() * 140 - 70,
+            speed: Math.random() * 5 + 5,
+            delay: Math.random() * -7,
+        }))
+    ), []);
 
     // --- Programs Data ---
     const cardsData = [
@@ -125,45 +148,45 @@ export default function ProgramsAndTestimonials() {
     // --- Testimonials Data ---
     const reviews = [
         {
-            name: "Sakib Al Hasan",
+            name: "Sumaiyl Kader",
             image: "https://i.ibb.co.com/Q4Y1bmW/one.jpg",
-            meta: "IBA 48th Batch — Selected ✓",
+            meta: "IBA 34th Batch",
             text: '"Mehrab Bhai was a pivotal figure in one of the most challenging stages of my life. His constant guidance allowed me to find my weaknesses and fix them. He was an amazing teacher. His advices were very helpful for me in mocks and were crucial in the main exam. Without Mehrab Bhai, I would never have been able to get where I am today. For this, I will always be grateful to him."',
         },
         {
-            name: "Nusrat Jahan",
+            name: "Ekramul Haque Jahin",
             image: "https://i.ibb.co.com/NcyJGJ4/two.jpg",
-            meta: "IBA 47th Batch — Selected ✓",
+            meta: "IBA 34th Batch",
             text: '"I knew IBA maths prep was all about calculation hacks but i knew 0 of them till the last week of my admission prep. After watching Mehrab bhai\'s maths marathon class, i got to know the only math hacks i know to this day and i still use those tricks even after getting into IBA. Besides this, bhai is genuinely someone to look up to because of his work ethic and the way he juggles so many activities efficiently. Definitely one of the top IBA seniors."',
         },
         {
-            name: "Rafiul Islam",
-            image: "https://plus.unsplash.com/premium_photo-1661942126259-fb08e7cce1e2",
-            meta: "IBA 49th Batch — Selected ✓",
+            name: "Romaisa Majid",
+            image: "https://i.ibb.co.com/4R9fxYPs/Whats-App-Image-2026-07-21-at-15-26-18.jpg",
+            meta: "IBA 34th Batch",
             text: '"I think what makes MathMagician different from other platforms is the dedication Bhaiya put in throughout the entire admission season. His consistency, effort, and genuine commitment to helping us succeed made a huge difference. Besides, he covered every topic thoroughly, starting from the basics and gradually moving to the advanced level.Furthermore,the community was one of the best parts of the batch. Everyone was supportive, and motivating. Being surrounded by people working toward the same goal made the journey much less stressful and kept me motivated throughout the admission season"',
         },
         {
-            name: "Rafiul Islam",
+            name: "Aditya Ariyan",
             image: "https://i.ibb.co.com/DPPrV4TC/four.jpg",
-            meta: "IBA 49th Batch — Selected ✓",
+            meta: "IBA 34th Batch",
             text: '"I primarily joined Bhaiya’s batch to get better at solving hard math problems. However, his course offered much more than I expected; along with the advanced math playlist, I also got access to basic math modules and regular mock tests. Bhaiya was always active and supportive throughout our admission preparation phase. He constantly cleared our doubts, and it felt great to have someone reliable to count on."',
         },
         {
-            name: "Rafiul Islam",
+            name: "Radh Chowdhury",
             image: "https://i.ibb.co.com/gZgVR57y/five.jpg",
-            meta: "IBA 49th Batch — Selected ✓",
+            meta: "IBA 34th Batch",
             text: '"It was just a few days before the IBA exam, and I knew that I was struggling a bit in Math. I signed up quickly and haven’t regretted the decision since.  The complete revision of all the math topics was all I needed and the classes were really interactive too. The classes were divided into timings convenient for us to ensure the proper attention. The topics I struggled with were resolved fully by vai’s classes and feedback. The worksheets were the perfect supplement for the last-minute revision I did the night before the exam. My confidence level was better than ever and the entire course played this huge role in acing the exam. I would definitely recommend every aspirant to sign up for Mehrab vai’s course anyday."',
         },
         {
-            name: "Rafiul Islam",
+            name: "Tahmid Taseen",
             image: "https://i.ibb.co.com/842ZHf9w/six.jpg",
-            meta: "IBA 49th Batch — Selected ✓",
+            meta: "IBA 34th Batch",
             text: '"He is obviously one of the most well known IBA tutors out there right now. His classes are full of examples that actually make concepts stick. What really got me though were his exam questions, sitting for those under pressure taught me more about time management and strategy than I expected. That really helped me out on the main exam day."',
         },
         {
-            name: "Rafiul Islam",
-            image: "https://plus.unsplash.com/premium_photo-1661942126259-fb08e7cce1e2",
-            meta: "IBA 49th Batch — Selected ✓",
+            name: "Tasin Ahasan",
+            image: "https://i.ibb.co.com/fYNP2kYc/Whats-App-Image-2026-07-21-at-15-27-04.jpg",
+            meta: "IBA 34th Batch",
             text: '"Mehrab bhai was the guardian angel Allah sent for me. I hated math, but his concise classes made me fall in love with quantitative math, at least during the IBA admission journey, and I\'m genuinely not exaggerating. Most importantly, his constant support, especially his words after my crash-outs in mock exams, was enough to keep me on the right track."',
         },
     ];
@@ -183,6 +206,54 @@ export default function ProgramsAndTestimonials() {
             y: 0,
             transition: { duration: 0.7, ease: [0.25, 1, 0.5, 1] }
         }
+    };
+
+    const maxReviewIndex = Math.max(reviews.length - visibleReviewCount, 0);
+
+    const updateReviewLayout = useCallback(() => {
+        const nextVisibleCount = window.innerWidth >= 1024 ? 3 : window.innerWidth >= 768 ? 2 : 1;
+        const viewportWidth = reviewViewportRef.current?.clientWidth || 0;
+        const totalGapWidth = REVIEW_CARD_GAP * (nextVisibleCount - 1);
+        const cardWidth = viewportWidth > 0 ? (viewportWidth - totalGapWidth) / nextVisibleCount : 0;
+        const nextMaxReviewIndex = Math.max(reviews.length - nextVisibleCount, 0);
+
+        setVisibleReviewCount(nextVisibleCount);
+        setReviewSlideOffset(cardWidth + REVIEW_CARD_GAP);
+        setActiveReviewIndex((currentIndex) => Math.min(currentIndex, nextMaxReviewIndex));
+    }, [reviews.length]);
+
+    useEffect(() => {
+        const animationFrame = window.requestAnimationFrame(updateReviewLayout);
+        window.addEventListener("resize", updateReviewLayout);
+
+        return () => {
+            window.cancelAnimationFrame(animationFrame);
+            window.removeEventListener("resize", updateReviewLayout);
+        };
+    }, [updateReviewLayout]);
+
+    useEffect(() => {
+        if (isReviewPaused || maxReviewIndex === 0) return undefined;
+
+        const slideTimer = window.setInterval(() => {
+            setActiveReviewIndex((currentIndex) => (
+                currentIndex >= maxReviewIndex ? 0 : currentIndex + 1
+            ));
+        }, 4500);
+
+        return () => window.clearInterval(slideTimer);
+    }, [isReviewPaused, maxReviewIndex]);
+
+    const goToPreviousReview = () => {
+        setActiveReviewIndex((currentIndex) => (
+            currentIndex === 0 ? maxReviewIndex : currentIndex - 1
+        ));
+    };
+
+    const goToNextReview = () => {
+        setActiveReviewIndex((currentIndex) => (
+            currentIndex >= maxReviewIndex ? 0 : currentIndex + 1
+        ));
     };
 
     const handleEnroll = (planId) => {
@@ -369,9 +440,50 @@ export default function ProgramsAndTestimonials() {
                                    SECTION 2: TESTIMONIALS LAYER
                ========================================================================= */}
             <div className="container mx-auto max-w-6xl relative z-10">
+                {hasMounted && (
+                    <div className="pointer-events-none absolute inset-x-[-8%] top-10 bottom-0 z-0 overflow-hidden">
+                        {testimonialSparks.map((spark) => (
+                            <motion.span
+                                key={spark.id}
+                                className="absolute text-[#DFB15B]/50 drop-shadow-[0_0_12px_rgba(223,177,91,0.42)]"
+                                style={{
+                                    left: spark.left,
+                                    top: spark.top,
+                                    opacity: spark.opacity,
+                                }}
+                                animate={{
+                                    x: spark.driftX,
+                                    y: spark.driftY,
+                                    rotate: [spark.rotate, spark.rotate + 90, spark.rotate],
+                                    scale: [0.72, 1.25, 0.82],
+                                    opacity: [0, spark.opacity, spark.opacity * 0.55, 0],
+                                }}
+                                transition={{
+                                    duration: spark.speed,
+                                    repeat: Infinity,
+                                    ease: "easeInOut",
+                                    delay: spark.delay,
+                                }}
+                            >
+                                <Sparkles style={{ width: spark.size, height: spark.size }} strokeWidth={1.7} />
+                            </motion.span>
+                        ))}
+
+                        <motion.div
+                            className="absolute left-[-18%] top-[28%] h-px w-[42%] bg-linear-to-r from-transparent via-[#DFB15B]/35 to-transparent"
+                            animate={{ x: ["0%", "330%"], opacity: [0, 0.75, 0] }}
+                            transition={{ duration: 6.8, repeat: Infinity, ease: "easeInOut" }}
+                        />
+                        <motion.div
+                            className="absolute right-[-18%] bottom-[32%] h-px w-[38%] bg-linear-to-r from-transparent via-[#A78BFA]/30 to-transparent"
+                            animate={{ x: ["0%", "-340%"], opacity: [0, 0.65, 0] }}
+                            transition={{ duration: 7.6, repeat: Infinity, ease: "easeInOut", delay: 1.4 }}
+                        />
+                    </div>
+                )}
 
                 {/* Testimonials Header Block */}
-                <div className="w-full flex flex-col items-center text-center mb-16">
+                <div className="w-full flex flex-col items-center text-center mb-16 relative z-10">
                     <div className="inline-block px-3 py-1 rounded-full bg-[#7C3AED]/10 border border-[#7C3AED]/20 text-[10px] tracking-widest text-[#A78BFA] uppercase font-bold mb-4">
                         Testimonials
                     </div>
@@ -383,60 +495,119 @@ export default function ProgramsAndTestimonials() {
                     </p>
                 </div>
 
-                {/* Review Cards Grid Deck */}
+                {/* Review Cards Marquee Deck */}
                 <motion.div
-                    className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch"
                     variants={containerVariants}
                     initial="hidden"
                     whileInView="visible"
                     viewport={{ once: false, amount: 0.15 }}
+                    className="relative z-10"
+                    onMouseEnter={() => setIsReviewPaused(true)}
+                    onMouseLeave={() => setIsReviewPaused(false)}
                 >
-                    {reviews.map((item, index) => (
+                    <div ref={reviewViewportRef} className="overflow-hidden">
                         <motion.div
-                            key={index}
-                            variants={itemVariants}
-                            whileHover={{ y: -6 }}
-                            className="bg-[#121017] border border-white/3 hover:border-white/10 rounded-3xl p-8 flex flex-col justify-between transition-all duration-300 relative group hover:shadow-[0_12px_40px_rgba(0,0,0,0.4)]"
+                            className="flex items-stretch"
+                            style={{
+                                gap: REVIEW_CARD_GAP,
+                            }}
+                            animate={{ x: -activeReviewIndex * reviewSlideOffset }}
+                            transition={{ duration: 0.65, ease: [0.25, 1, 0.5, 1] }}
                         >
-                            <div className="flex flex-col gap-4">
-                                {/* Stars Row Block */}
-                                <div className="flex items-center gap-1">
-                                    {[...Array(5)].map((_, starIdx) => (
-                                        <Star key={starIdx} className="w-3.5 h-3.5 fill-[#DFB15B] text-[#DFB15B]" />
-                                    ))}
-                                </div>
+                            {reviews.map((item, index) => (
+                                <motion.div
+                                    key={index}
+                                    variants={itemVariants}
+                                    whileHover={{ y: -6 }}
+                                    className="min-w-0 shrink-0 bg-[#121017] border border-white/3 hover:border-white/10 rounded-3xl p-8 flex flex-col justify-between transition-all duration-300 relative group hover:shadow-[0_12px_40px_rgba(0,0,0,0.4)]"
+                                    style={{
+                                        width: `calc((100% - ${REVIEW_CARD_GAP * (visibleReviewCount - 1)}px) / ${visibleReviewCount})`,
+                                    }}
+                                >
+                                    <div className="flex flex-col gap-4">
+                                        {/* Stars Row Block */}
+                                        <div className="flex items-center gap-1">
+                                            {[...Array(5)].map((_, starIdx) => (
+                                                <Star key={starIdx} className="w-3.5 h-3.5 fill-[#DFB15B] text-[#DFB15B]" />
+                                            ))}
+                                        </div>
 
-                                {/* Text Quotes Area */}
-                                <p className="text-[#8E8A9F] text-xs leading-relaxed font-medium italic">
-                                    {item.text}
-                                </p>
-                            </div>
+                                        {/* Text Quotes Area */}
+                                        <p className="text-white text-xs leading-relaxed font-medium italic">
+                                            {item.text}
+                                        </p>
+                                    </div>
 
-                            {/* User Profile Footer row */}
-                            <div className="mt-8 pt-5 border-t border-white/3 flex items-center gap-3.5">
-                                <div className="w-11 h-11 rounded-full overflow-hidden bg-[#16131C] border border-white/8 relative shrink-0">
-                                    <Image
-                                        src={item.image}
-                                        alt={item.name}
-                                        width={80}
-                                        height={80}
-                                        unoptimized
-                                        className="w-full h-full object-cover brightness-[0.9] contrast-[1.05] group-hover:scale-105 transition-all duration-500"
-                                    />
-                                </div>
+                                    {/* User Profile Footer row */}
+                                    <div className="mt-8 pt-5 border-t border-white/3 flex items-center gap-4">
+                                        <button
+                                            type="button"
+                                            onClick={() => setExpandedPortraitIndex((currentIndex) => (
+                                                currentIndex === index ? null : index
+                                            ))}
+                                            aria-label={`Enlarge ${item.name}'s photo`}
+                                            className={`w-11 h-11 rounded-full overflow-hidden bg-[#16131C] border relative shrink-0 transition-all duration-500 hover:z-30 hover:scale-[2.15] hover:border-[#DFB15B]/60 hover:shadow-[0_0_34px_rgba(223,177,91,0.3)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#DFB15B]/70 ${expandedPortraitIndex === index
+                                                ? "z-30 scale-[2.35] border-[#DFB15B]/70 shadow-[0_0_38px_rgba(223,177,91,0.34)]"
+                                                : "border-white/8"
+                                                }`}
+                                        >
+                                            <Image
+                                                src={item.image}
+                                                alt={item.name}
+                                                width={80}
+                                                height={80}
+                                                unoptimized
+                                                className="w-full h-full object-cover brightness-[0.9] contrast-[1.05] transition-all duration-500 hover:brightness-105"
+                                            />
+                                        </button>
 
-                                <div className="flex flex-col min-w-0">
-                                    <span className="text-white text-xs font-semibold tracking-wide truncate">
-                                        {item.name}
-                                    </span>
-                                    <span className="text-[#DFB15B] text-[10px] font-bold tracking-wide mt-0.5 truncate">
-                                        {item.meta}
-                                    </span>
-                                </div>
-                            </div>
+                                        <div className="flex flex-col min-w-0">
+                                            <span className="text-white text-sm md:text-[15px] font-semibold tracking-wide truncate">
+                                                {item.name}
+                                            </span>
+                                            <span className="text-[#DFB15B] text-[10px] font-bold tracking-wide mt-0.5 truncate">
+                                                {item.meta}
+                                            </span>
+                                        </div>
+                                    </div>
 
+                                </motion.div>
+                            ))}
                         </motion.div>
-                    ))}
+                    </div>
+
+                    <div className="mt-8 flex items-center justify-center gap-3">
+                        <button
+                            type="button"
+                            onClick={goToPreviousReview}
+                            aria-label="Previous testimonial"
+                            className="flex h-10 w-10 items-center justify-center rounded-full border border-white/8 bg-white/5 text-white/80 transition hover:border-[#DFB15B]/30 hover:bg-[#DFB15B]/10 hover:text-[#DFB15B]"
+                        >
+                            <ChevronLeft className="h-4 w-4" />
+                        </button>
+                        <div className="flex items-center gap-2">
+                            {Array.from({ length: maxReviewIndex + 1 }).map((_, index) => (
+                                <button
+                                    type="button"
+                                    key={index}
+                                    onClick={() => setActiveReviewIndex(index)}
+                                    aria-label={`Show testimonial slide ${index + 1}`}
+                                    className={`h-1.5 rounded-full transition-all duration-300 ${activeReviewIndex === index
+                                        ? "w-7 bg-[#DFB15B]"
+                                        : "w-1.5 bg-white/20 hover:bg-white/40"
+                                        }`}
+                                />
+                            ))}
+                        </div>
+                        <button
+                            type="button"
+                            onClick={goToNextReview}
+                            aria-label="Next testimonial"
+                            className="flex h-10 w-10 items-center justify-center rounded-full border border-white/8 bg-white/5 text-white/80 transition hover:border-[#DFB15B]/30 hover:bg-[#DFB15B]/10 hover:text-[#DFB15B]"
+                        >
+                            <ChevronRight className="h-4 w-4" />
+                        </button>
+                    </div>
                 </motion.div>
             </div>
 
