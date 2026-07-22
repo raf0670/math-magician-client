@@ -42,7 +42,7 @@ function getEffectivePenalty(value) {
     return Number.isFinite(penalty) && penalty > 0 ? penalty : 0.25;
 }
 
-export default function AnalyticalScorecard({ answers, examData, submissionResult }) {
+export default function AnalyticalScorecard({ answers, examData, submissionResult, returnHref = "/dashboard/mock-tests", returnLabel = "Return to Practice" }) {
     const normalizedAnswers = Array.isArray(answers) ? answers : [];
     const questions = examData?.questions || [];
     const penalty = getEffectivePenalty(submissionResult?.negativeMarksPerQuestion ?? examData?.negativeMarksPerQuestion);
@@ -201,10 +201,10 @@ export default function AnalyticalScorecard({ answers, examData, submissionResul
 
             <div className="mt-2 flex items-center gap-4 border-t border-white/5 pt-5">
                 <Link
-                    href="/dashboard/mock-tests"
+                    href={returnHref}
                     className="inline-flex items-center gap-2 rounded-xl bg-linear-to-r from-[#E6C687] to-[#AA7C11] px-5 py-3 text-xs font-bold uppercase tracking-wider text-black shadow-md transition-all duration-150 hover:brightness-110"
                 >
-                    Return to Practice
+                    {returnLabel}
                 </Link>
             </div>
         </div>

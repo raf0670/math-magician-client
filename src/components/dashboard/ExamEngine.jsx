@@ -38,6 +38,13 @@ function getStudentFacingExamTitle(title, fallback = "Live Mock Test") {
 }
 
 function getInitialRemainingSeconds(examData) {
+    if (examData?.isLiveExam && examData?.endTime) {
+        const endTime = new Date(examData.endTime).getTime();
+        if (!Number.isNaN(endTime)) {
+            return Math.max(0, Math.floor((endTime - Date.now()) / 1000));
+        }
+    }
+
     const duration = Number(examData?.duration);
     return Number.isFinite(duration) && duration > 0 ? Math.floor(duration * 60) : null;
 }

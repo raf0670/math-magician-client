@@ -241,6 +241,28 @@ export async function getExams() {
   return request("/api/exams");
 }
 
+export async function getLiveExams() {
+  return request("/api/exams/live");
+}
+
+export async function getAdminLiveExams() {
+  return request("/api/exams/live/admin");
+}
+
+export async function createAdminLiveExam(payload) {
+  return request("/api/exams/live/admin", {
+    method: "POST",
+    body: payload,
+  });
+}
+
+export async function updateAdminLiveExam(examId, payload) {
+  return request(`/api/exams/live/admin/${examId}`, {
+    method: "PATCH",
+    body: payload,
+  });
+}
+
 export async function getPracticeMeta() {
   return request("/api/exams/practice/meta");
 }
