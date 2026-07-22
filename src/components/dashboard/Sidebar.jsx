@@ -109,15 +109,18 @@ export default function DashboardSidebar() {
                 </div>
             </aside>
 
-            <nav className="md:hidden fixed bottom-0 inset-x-0 bg-[#0D0B14]/80 backdrop-blur-xl border-t border-white/5 z-40 px-3 pb-safe pt-2 shadow-[0_-10px_30px_rgba(0,0,0,0.5)] select-none">
-                <div className="flex items-center justify-around max-w-lg mx-auto">
+            <nav className="md:hidden fixed bottom-0 inset-x-0 bg-[#0D0B14]/80 backdrop-blur-xl border-t border-white/5 z-40 pb-safe pt-2 shadow-[0_-10px_30px_rgba(0,0,0,0.5)] select-none">
+                <div className="pointer-events-none absolute inset-y-0 left-0 w-8 bg-linear-to-r from-[#0D0B14] to-transparent z-10" />
+                <div className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-linear-to-l from-[#0D0B14] to-transparent z-10" />
+
+                <div className="flex items-center gap-1.5 overflow-x-auto overscroll-x-contain px-3 pb-1 scrollbar-none [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
                     {navItems.map((item) => {
                         const isActive = pathname === item.href;
                         return (
                             <Link
                                 key={item.href}
                                 href={item.href}
-                                className="relative flex flex-col items-center justify-center py-2 px-3 rounded-xl min-w-16"
+                                className="relative flex h-16 w-20 shrink-0 flex-col items-center justify-center rounded-xl px-2 py-2"
                                 style={{ WebkitTapHighlightColor: "transparent" }}
                             >
                                 {isActive && (
@@ -130,7 +133,7 @@ export default function DashboardSidebar() {
 
                                 <item.icon className={`w-4 h-4 transition-transform duration-200 ${isActive ? "text-[#DFB15B] scale-110" : "text-[#6B667B]"}`} />
 
-                                <span className={`text-center text-[9px] font-bold mt-1 tracking-wide transition-colors duration-200 ${isActive ? "text-white" : "text-[#6B667B]"}`}>
+                                <span className={`mt-1 max-w-full text-center text-[9px] font-bold leading-tight tracking-wide transition-colors duration-200 ${isActive ? "text-white" : "text-[#6B667B]"}`}>
                                     {item.label}
                                 </span>
                             </Link>
