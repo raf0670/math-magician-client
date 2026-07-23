@@ -69,13 +69,15 @@ export default function ActiveMockExamArena() {
     const handleEvaluationTrigger = async (finalAnswers, examPayload) => {
         try {
             const data = await submitExam(examId, finalAnswers);
-            setUserSelections(finalAnswers);
+            setUserSelections(Array.isArray(data?.answers) ? data.answers : finalAnswers);
             setExamDataPayload(examPayload);
             setSubmissionResult(data);
             setExamFinished(true);
             setSubmissionError("");
+            return data;
         } catch (err) {
             setSubmissionError("We could not submit your answers right now. Please check your connection and try again.");
+            throw err;
         }
     };
 

@@ -100,6 +100,14 @@ async function request(path, options = {}) {
   }
 }
 
+function wait(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function shouldRetryRequest(error) {
+  return !error?.status || error.status >= 500;
+}
+
 export function saveAuthSession(token, user) {
   if (typeof window === "undefined") return;
   window.localStorage.setItem("exam_archive_token", token);
@@ -294,8 +302,20 @@ export async function getExamById(examId) {
 }
 
 export async function submitExam(examId, answers) {
-  return request(`/api/exams/${examId}/submit`, {
-    method: "POST",
-    body: { answers },
-  });
+  const maxAttempts = 3;
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    try {
+      return await request(`/api/exams/${examId}/submit`, {
+        method: "POST",
+        body: { answers },
+      });
+    } catch (error) {
+      if (attempt === maxAttempts || !shouldRetryRequest(error)) {
+        throw error;
+      }
+
+      await wait(500 * attempt);
+    }
+  }
 }

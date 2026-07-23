@@ -105,12 +105,14 @@ export default function LiveExamArenaPage() {
   const handleEvaluationTrigger = async (finalAnswers, examPayload) => {
     try {
       const payload = await submitExam(examId, finalAnswers);
-      setUserSelections(finalAnswers);
+      setUserSelections(Array.isArray(payload?.answers) ? payload.answers : finalAnswers);
       setExamData(examPayload);
       setSubmissionResult(payload);
       setSubmissionError("");
+      return payload;
     } catch (err) {
       setSubmissionError(err.message || "We could not submit your answers right now. Please check your connection and try again.");
+      throw err;
     }
   };
 
@@ -230,8 +232,9 @@ function ReadOnlyLiveExamReview({ examData }) {
         </p>
       </div>
 
-      <div className="grid gap-4">
-        {questions.map((question, index) => {
+      {questions.length ? (
+        <div className="grid gap-4">
+          {questions.map((question, index) => {
           const optionList = getOptionList(question.options);
           const correctOptionIndex = getCorrectOptionIndex(question);
 
@@ -279,8 +282,18 @@ function ReadOnlyLiveExamReview({ examData }) {
               </div>
             </section>
           );
-        })}
-      </div>
+          })}
+        </div>
+      ) : (
+        <div className="rounded-3xl border border-red-400/20 bg-red-500/10 px-6 py-10 text-center">
+          <AlertTriangle className="mx-auto h-10 w-10 text-red-300" />
+          <h2 className="mt-4 font-serif text-2xl font-medium text-white">Solution data is missing</h2>
+          <p className="mx-auto mt-2 max-w-2xl text-sm leading-6 text-red-100/75">
+            This exam record is still available, but its linked question documents are not in the question bank anymore.
+            Please ask an admin to recreate or republish this live exam.
+          </p>
+        </div>
+      )}
 
       <Link
         href="/dashboard/live-exams"

@@ -60,7 +60,10 @@ export default function ExamEngine({ examData, onComplete }) {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [answers, setAnswers] = useState({});
     const [remainingSeconds, setRemainingSeconds] = useState(() => getInitialRemainingSeconds(examData));
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const timerSubmittedRef = useRef(false);
+    const autoSubmitAttemptedRef = useRef(false);
+    const hasHydratedAnswersRef = useRef(false);
 
     const normalizedQuestions = useMemo(() => {
         if (!examData?.questions?.length) return [];
@@ -85,24 +88,77 @@ export default function ExamEngine({ examData, onComplete }) {
     const penalty = getEffectivePenalty(examData?.negativeMarksPerQuestion);
     const examTitle = getStudentFacingExamTitle(examData?.title);
     const hasTimedExam = remainingSeconds !== null;
+    const answerStorageKey = examData?._id ? `exam_archive_answers_${examData._id}` : "";
+
+    useEffect(() => {
+        if (!answerStorageKey || !normalizedQuestions.length || hasHydratedAnswersRef.current) return;
+
+        hasHydratedAnswersRef.current = true;
+
+        try {
+            const storedAnswers = window.localStorage.getItem(answerStorageKey);
+            if (!storedAnswers) return;
+
+            const parsedAnswers = JSON.parse(storedAnswers);
+            if (!parsedAnswers || typeof parsedAnswers !== "object" || Array.isArray(parsedAnswers)) return;
+
+            const validQuestionIds = new Set(normalizedQuestions.map((question) => question.id));
+            const hydratedAnswers = Object.fromEntries(
+                Object.entries(parsedAnswers).filter(([questionId, answer]) => (
+                    validQuestionIds.has(questionId)
+                    && Number.isInteger(answer)
+                    && answer >= 0
+                    && answer < OPTION_LABELS.length
+                ))
+            );
+
+            if (Object.keys(hydratedAnswers).length) {
+                window.queueMicrotask(() => setAnswers(hydratedAnswers));
+            }
+        } catch {
+            window.localStorage.removeItem(answerStorageKey);
+        }
+    }, [answerStorageKey, normalizedQuestions]);
+
+    useEffect(() => {
+        if (!answerStorageKey || !hasHydratedAnswersRef.current) return;
+
+        try {
+            if (Object.keys(answers).length) {
+                window.localStorage.setItem(answerStorageKey, JSON.stringify(answers));
+            } else {
+                window.localStorage.removeItem(answerStorageKey);
+            }
+        } catch {
+            // A full or blocked localStorage should not interrupt the exam.
+        }
+    }, [answerStorageKey, answers]);
 
     const handleSelectOption = (optionIndex) => {
-        if (!currentQuestion) return;
+        if (!currentQuestion || isSubmitting) return;
         setAnswers({ ...answers, [currentQuestion.id]: optionIndex });
     };
 
     const handleClearSelection = () => {
-        if (!currentQuestion) return;
+        if (!currentQuestion || isSubmitting) return;
         const updatedAnswers = { ...answers };
         delete updatedAnswers[currentQuestion.id];
         setAnswers(updatedAnswers);
     };
 
-    const handleSubmit = useCallback(() => {
-        if (!normalizedQuestions.length) return;
+    const handleSubmit = useCallback(async () => {
+        if (!normalizedQuestions.length || isSubmitting || timerSubmittedRef.current) return;
+        timerSubmittedRef.current = true;
+        setIsSubmitting(true);
         const submissionAnswers = normalizedQuestions.map((question) => answers[question.id] ?? -1);
-        if (onComplete) onComplete(submissionAnswers, examData);
-    }, [answers, examData, normalizedQuestions, onComplete]);
+        try {
+            if (onComplete) await onComplete(submissionAnswers, examData);
+            if (answerStorageKey) window.localStorage.removeItem(answerStorageKey);
+        } catch {
+            timerSubmittedRef.current = false;
+            setIsSubmitting(false);
+        }
+    }, [answerStorageKey, answers, examData, isSubmitting, normalizedQuestions, onComplete]);
 
     useEffect(() => {
         if (!hasTimedExam) return undefined;
@@ -118,9 +174,9 @@ export default function ExamEngine({ examData, onComplete }) {
     }, [hasTimedExam]);
 
     useEffect(() => {
-        if (!hasTimedExam || remainingSeconds !== 0 || timerSubmittedRef.current) return undefined;
+        if (!hasTimedExam || remainingSeconds !== 0 || autoSubmitAttemptedRef.current) return undefined;
 
-        timerSubmittedRef.current = true;
+        autoSubmitAttemptedRef.current = true;
         const submitTimer = window.setTimeout(() => {
             handleSubmit();
         }, 0);
@@ -175,8 +231,9 @@ export default function ExamEngine({ examData, onComplete }) {
                                 return (
                                     <button
                                         key={question.id}
+                                        disabled={isSubmitting}
                                         onClick={() => setCurrentIndex(idx)}
-                                        className={`flex h-10 min-w-16 items-center justify-center rounded-xl border px-3 text-xs font-bold transition-colors ${isCurrent ? "border-[#DFB15B] bg-[#DFB15B] text-black shadow-md shadow-[#DFB15B]/10" : isAnswered ? "border-emerald-400/20 bg-emerald-400/10 text-emerald-300" : "border-white/5 bg-[#121017] text-[#8E8A9F] hover:border-white/15 hover:text-white"}`}
+                                        className={`flex h-10 min-w-16 items-center justify-center rounded-xl border px-3 text-xs font-bold transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${isCurrent ? "border-[#DFB15B] bg-[#DFB15B] text-black shadow-md shadow-[#DFB15B]/10" : isAnswered ? "border-emerald-400/20 bg-emerald-400/10 text-emerald-300" : "border-white/5 bg-[#121017] text-[#8E8A9F] hover:border-white/15 hover:text-white"}`}
                                     >
                                         #{question.displayQuestionNo}
                                     </button>
@@ -206,8 +263,9 @@ export default function ExamEngine({ examData, onComplete }) {
                                 return (
                                     <button
                                         key={key}
+                                        disabled={isSubmitting}
                                         onClick={() => handleSelectOption(optionIndex)}
-                                        className={`group flex min-h-16 w-full items-center gap-3 rounded-2xl border p-4 text-left transition-all ${isSelected ? "border-[#DFB15B] bg-[#DFB15B]/10 shadow-md shadow-[#DFB15B]/5" : "border-white/5 bg-[#121017]/80 hover:border-[#DFB15B]/25 hover:bg-[#1A1722]"}`}
+                                        className={`group flex min-h-16 w-full items-center gap-3 rounded-2xl border p-4 text-left transition-all disabled:cursor-not-allowed disabled:opacity-70 ${isSelected ? "border-[#DFB15B] bg-[#DFB15B]/10 shadow-md shadow-[#DFB15B]/5" : "border-white/5 bg-[#121017]/80 hover:border-[#DFB15B]/25 hover:bg-[#1A1722]"}`}
                                     >
                                         <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border text-sm font-black ${isSelected ? "border-[#DFB15B] bg-[#DFB15B] text-black" : "border-white/5 bg-[#1A1722] text-[#8E8A9F] group-hover:border-[#DFB15B]/25 group-hover:text-[#DFB15B]"}`}>
                                             {key}
@@ -224,16 +282,16 @@ export default function ExamEngine({ examData, onComplete }) {
 
                     <div className="flex items-center justify-between rounded-2xl border border-white/5 bg-[#1A1722]/45 p-3">
                         <button
-                            disabled={currentIndex === 0}
+                            disabled={currentIndex === 0 || isSubmitting}
                             onClick={() => setCurrentIndex((prev) => prev - 1)}
-                            className="flex items-center gap-1 rounded-xl border border-white/5 bg-[#121017] px-3 py-2 text-xs font-bold uppercase tracking-wide text-[#8E8A9F] transition-colors hover:text-white disabled:opacity-20"
+                            className="flex items-center gap-1 rounded-xl border border-white/5 bg-[#121017] px-3 py-2 text-xs font-bold uppercase tracking-wide text-[#8E8A9F] transition-colors hover:text-white disabled:cursor-not-allowed disabled:opacity-20"
                         >
                             <ChevronLeft className="h-4 w-4" /> Prev
                         </button>
                         <button
-                            disabled={currentIndex === normalizedQuestions.length - 1}
+                            disabled={currentIndex === normalizedQuestions.length - 1 || isSubmitting}
                             onClick={() => setCurrentIndex((prev) => prev + 1)}
-                            className="flex items-center gap-1 rounded-xl border border-white/5 bg-[#121017] px-3 py-2 text-xs font-bold uppercase tracking-wide text-[#8E8A9F] transition-colors hover:text-white disabled:opacity-20"
+                            className="flex items-center gap-1 rounded-xl border border-white/5 bg-[#121017] px-3 py-2 text-xs font-bold uppercase tracking-wide text-[#8E8A9F] transition-colors hover:text-white disabled:cursor-not-allowed disabled:opacity-20"
                         >
                             Next <ChevronRight className="h-4 w-4" />
                         </button>
@@ -255,7 +313,7 @@ export default function ExamEngine({ examData, onComplete }) {
                     <div className="flex items-center justify-between border-b border-white/5 pb-3">
                         <span className="text-xs font-bold uppercase tracking-wider text-[#8E8A9F]">Current answer</span>
                         {answers[currentQuestion.id] !== undefined && (
-                            <button onClick={handleClearSelection} className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-red-400 hover:underline">
+                            <button disabled={isSubmitting} onClick={handleClearSelection} className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-red-400 hover:underline disabled:cursor-not-allowed disabled:opacity-50">
                                 <Eraser className="h-3.5 w-3.5" /> Clear
                             </button>
                         )}
@@ -272,10 +330,11 @@ export default function ExamEngine({ examData, onComplete }) {
                     </div>
 
                     <button
+                        disabled={isSubmitting}
                         onClick={handleSubmit}
-                        className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-linear-to-r from-emerald-500 to-teal-600 py-3.5 text-xs font-bold uppercase tracking-wider text-white shadow-md transition-all hover:brightness-110"
+                        className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-linear-to-r from-emerald-500 to-teal-600 py-3.5 text-xs font-bold uppercase tracking-wider text-white shadow-md transition-all hover:brightness-110 disabled:cursor-wait disabled:opacity-70"
                     >
-                        <Send className="h-4 w-4" /> Submit Final Answer Sheet
+                        <Send className="h-4 w-4" /> {isSubmitting ? "Submitting Answer Sheet..." : "Submit Final Answer Sheet"}
                     </button>
                 </div>
             </div>
