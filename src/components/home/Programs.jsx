@@ -287,7 +287,7 @@ export default function ProgramsAndTestimonials() {
                         Programs
                     </div>
                     <h2 className="font-serif text-3xl md:text-5xl font-medium tracking-wide text-white mb-4">
-                        Choose Your Battlefield
+                        Choose Your Potion
                     </h2>
                     <p className="text-[#6B667B] text-xs md:text-sm font-medium">
                         Tailored program tracks engineered explicitly to convert preparation into admission results.
