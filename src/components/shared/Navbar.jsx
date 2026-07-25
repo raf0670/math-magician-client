@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { getStoredUser } from "@/lib/api";
+import BrandMark from "@/components/shared/BrandMark";
 
 export default function Navbar() {
     const pathname = usePathname();
@@ -48,8 +49,8 @@ export default function Navbar() {
     return (
         <nav className="w-full bg-[#111015] border-b border-white/4 px-4 md:px-6 py-4 flex items-center justify-between relative z-50">
             <Link href="/" className="flex items-center gap-3 select-none z-50">
-                <div className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-linear-to-br from-[#4C1D95] via-[#6947cc] to-[#D4AF37] flex items-center justify-center font-serif text-lg md:text-xl font-bold text-white shadow-[0_0_15px_rgba(124,58,237,0.3)]">
-                    M
+                <div className="flex w-9 h-9 md:w-10 md:h-10 shrink-0 items-center justify-center">
+                    <BrandMark className="h-7 w-7 md:h-8 md:w-8" />
                 </div>
                 <span className="font-serif text-lg md:text-2xl tracking-wide text-[#DFB15B] drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)]">
                     MathMagician&apos;s School

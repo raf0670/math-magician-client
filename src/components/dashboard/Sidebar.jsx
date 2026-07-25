@@ -3,8 +3,9 @@ import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { LayoutDashboard, Video, ClipboardCheck, BarChart3, User, LogOut, ShieldCheck, Sparkles, Brain, Archive, Radio, FileQuestion } from "lucide-react";
+import { LayoutDashboard, Video, ClipboardCheck, BarChart3, User, LogOut, ShieldCheck, Brain, Archive, Radio, FileQuestion } from "lucide-react";
 import { clearAuthSession, getProfile, getStoredUser, saveAuthSession } from "@/lib/api";
+import BrandMark from "@/components/shared/BrandMark";
 
 export default function DashboardSidebar() {
     const pathname = usePathname();
@@ -59,8 +60,8 @@ export default function DashboardSidebar() {
         <>
             <aside className="hidden md:flex flex-col fixed inset-y-0 left-0 w-64 bg-[#0D0B14] border-r border-white/5 z-30 px-5 py-8 select-none">
                 <div className="flex items-center gap-2 px-3 mb-6">
-                    <div className="w-8 h-8 rounded-lg bg-linear-to-br from-[#E6C687] to-[#AA7C11] flex items-center justify-center shadow-[0_0_15px_rgba(212,175,55,0.2)]">
-                        <Sparkles className="w-4 h-4 text-black stroke-[2.5]" />
+                    <div className="flex w-8 h-8 shrink-0 items-center justify-center">
+                        <BrandMark className="h-6 w-6" />
                     </div>
                     <div className="flex flex-col">
                         <span className="font-serif text-sm font-bold text-white tracking-wide">MathMagician</span>

@@ -2,6 +2,7 @@
 import { Mail, MapPin, Phone } from "lucide-react";
 import Link from "next/link";
 import { FaFacebook, FaInstagram, FaLinkedin, FaYoutube } from "react-icons/fa";
+import BrandMark from "@/components/shared/BrandMark";
 
 export default function Footer() {
   const currentYear = 2026; // Static synchronization point matching deployment cycle
@@ -36,8 +37,8 @@ export default function Footer() {
         {/* COLUMN 1: BRAND LOGO & PLATFORM BIO (Spans 4 columns on large views) */}
         <div className="flex flex-col gap-6 lg:col-span-4">
           <Link href="/" className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-full bg-linear-to-br from-[#4C1D95] via-[#6947cc] to-[#D4AF37] flex items-center justify-center font-serif text-lg font-bold text-white shadow-[0_0_15px_rgba(124,58,237,0.2)]">
-              M
+            <div className="flex w-9 h-9 shrink-0 items-center justify-center">
+              <BrandMark className="h-7 w-7" />
             </div>
             <div className="flex flex-col font-serif tracking-wide text-[#DFB15B]">
               <span className="text-xl font-bold leading-tight">MathMagician&apos;s</span>

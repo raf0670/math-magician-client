@@ -2,6 +2,7 @@
 
 import { motion, useReducedMotion } from "framer-motion";
 import { BookOpenCheck, Sparkles, WandSparkles } from "lucide-react";
+import BrandMark from "@/components/shared/BrandMark";
 
 const GLYPHS = [
   { text: "pi", left: "9%", top: "18%", delay: 0, size: "text-xl sm:text-2xl" },
@@ -182,10 +183,10 @@ export default function Loading() {
             <WandSparkles className="h-5 w-5" />
           </motion.div>
 
-          <div className="relative flex h-24 w-24 items-center justify-center rounded-full bg-linear-to-br from-[#4C1D95] via-[#6947cc] to-[#D4AF37] p-px shadow-[0_0_46px_rgba(223,177,91,0.28)]">
+          <div className="relative flex h-24 w-24 items-center justify-center">
             <MagicalOrbitSpinner shouldReduceMotion={shouldReduceMotion} />
-            <div className="flex h-full w-full items-center justify-center rounded-full bg-[#111015]">
-              <span className="font-serif text-5xl font-bold text-[#DFB15B]">M</span>
+            <div className="flex h-full w-full items-center justify-center">
+              <BrandMark className="h-16 w-16" />
             </div>
           </div>
 
