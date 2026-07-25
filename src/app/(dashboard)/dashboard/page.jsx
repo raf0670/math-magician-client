@@ -13,7 +13,7 @@ export default function DashboardOverview() {
             <PerformanceMetrics />
 
             {/* 🪄 Phase 2 Step 2.3: Live Timed Schedule Agenda Feed Timeline */}
-            <ScheduleTimeline />
+            {/* <ScheduleTimeline /> */}
 
         </div>
     );
