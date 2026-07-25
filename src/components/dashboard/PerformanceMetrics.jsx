@@ -1,8 +1,12 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { ClipboardCheck, Target, Brain, TrendingUp } from "lucide-react";
+import { BarChart3, Brain, ClipboardCheck, Target, TrendingUp } from "lucide-react";
 import { getMyStats } from "@/lib/api";
+
+function clampPercent(value) {
+    return Math.max(0, Math.min(Number(value) || 0, 100));
+}
 
 export default function PerformanceMetrics() {
     const [stats, setStats] = useState(null);
@@ -25,6 +29,9 @@ export default function PerformanceMetrics() {
     const availableExamCount = Number(stats?.availableExamCount || 0);
     const questionBankCount = Number(stats?.questionBankCount || 0);
     const totalPossibleMarks = Number(stats?.totalPossibleMarks || 0);
+    const coveragePercent = availableExamCount ? clampPercent((totalExams / availableExamCount) * 100) : 0;
+    const accuracyPercent = clampPercent(accuracy);
+    const bankSignal = questionBankCount ? 100 : 0;
 
     const metrics = [
         {
@@ -32,88 +39,108 @@ export default function PerformanceMetrics() {
             value: `${totalExams}`,
             subtext: `${availableExamCount} official exam${availableExamCount === 1 ? "" : "s"} available`,
             icon: ClipboardCheck,
-            colorClass: "text-[#A78BFA]",
-            bgIconClass: "bg-[#7C3AED]/10 border-[#7C3AED]/20",
-            renderFooter: () => (
-                <div className="w-full mt-4">
-                    <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-wider text-[#6B667B] mb-1.5">
-                        <span>Progress coverage</span>
-                        <span className="text-white">{availableExamCount}</span>
-                    </div>
-                    <div className="w-full h-1.5 bg-[#1A1722] rounded-full overflow-hidden border border-white/5">
-                        <motion.div
-                            initial={{ width: 0 }}
-                            animate={{ width: availableExamCount ? `${Math.min((totalExams / availableExamCount) * 100, 100)}%` : "0%" }}
-                            transition={{ duration: 1, ease: "easeOut" }}
-                            className="h-full bg-linear-to-r from-indigo-500 to-[#A78BFA] rounded-full"
-                        />
-                    </div>
-                </div>
-            )
+            accent: "from-[#7C3AED] to-[#A78BFA]",
+            glow: "bg-[#7C3AED]/12",
+            progress: coveragePercent,
+            footerLabel: "Coverage",
+            footerValue: `${coveragePercent.toFixed(0)}%`,
         },
         {
             title: "Overall Accuracy",
             value: `${accuracy}%`,
             subtext: `Based on ${totalPossibleMarks} possible point${totalPossibleMarks === 1 ? "" : "s"}`,
             icon: Target,
-            colorClass: "text-[#E6C687]",
-            bgIconClass: "bg-[#E6C687]/10 border-[#E6C687]/20",
-            renderFooter: () => (
-                <div className="w-full mt-4 flex items-center gap-2 text-[11px] font-semibold text-emerald-400 bg-emerald-500/5 border border-emerald-500/10 rounded-xl px-3 py-1.5">
-                    <TrendingUp className="w-3.5 h-3.5" />
-                    <span>Performance is pulled from your submission history</span>
-                </div>
-            )
+            accent: "from-[#DFB15B] to-[#F6D98B]",
+            glow: "bg-[#DFB15B]/12",
+            progress: accuracyPercent,
+            footerLabel: "Accuracy",
+            footerValue: `${accuracy}%`,
         },
         {
             title: "Questions in Bank",
-            value: `${questionBankCount}`,
-            subtext: "Live question data from the database",
+            value: `1000+`,
+            subtext: "Live questions made by experts",
             icon: Brain,
-            colorClass: "text-[#DFB15B]",
-            bgIconClass: "bg-[#DFB15B]/10 border-[#DFB15B]/20",
-            renderFooter: () => (
-                <div className="w-full mt-4 flex gap-1.5 items-center">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#6B667B]">Data source:</span>
-                    <span className="px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
-                        Your Well Wishers
-                    </span>
-                </div>
-            )
-        }
+            accent: "from-emerald-400 to-[#DFB15B]",
+            glow: "bg-emerald-400/10",
+            progress: bankSignal,
+            footerLabel: "Potential",
+            footerValue: "Live",
+        },
     ];
 
     const containerVariants = {
         hidden: { opacity: 0 },
-        visible: { opacity: 1, transition: { staggerChildren: 0.08 } }
+        visible: { opacity: 1, transition: { staggerChildren: 0.09 } },
     };
 
     const cardVariants = {
         hidden: { opacity: 0, y: 20 },
-        visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.25, 1, 0.5, 1] } }
+        visible: { opacity: 1, y: 0, transition: { duration: 0.58, ease: [0.22, 1, 0.36, 1] } },
     };
 
     return (
-        <motion.div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full select-none" variants={containerVariants} initial="hidden" animate="visible">
-            {metrics.map((item, idx) => (
-                <motion.div
-                    key={idx}
-                    variants={cardVariants}
-                    whileHover={{ y: -4 }}
-                    className="bg-[#121017] border border-white/5 rounded-2xl p-6 flex flex-col items-start relative overflow-hidden shadow-[0_4px_25px_rgba(0,0,0,0.25)] group"
-                >
-                    <div className="absolute inset-0 bg-linear-to-b from-white/1 to-transparent pointer-events-none" />
-                    <div className="flex items-center justify-between w-full mb-4">
-                        <span className="text-xs font-semibold text-[#8E8A9F] group-hover:text-white transition-colors duration-200">{item.title}</span>
-                        <div className={`w-9 h-9 rounded-xl flex items-center justify-center border transition-all duration-300 ${item.bgIconClass} ${item.colorClass}`}>
-                            <item.icon className="w-4 h-4 stroke-2" />
+        <section className="select-none">
+            <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+                <div>
+                    <p className="text-[10px] font-bold uppercase tracking-[0.26em] text-[#DFB15B]">Performance Ledger</p>
+                    <h2 className="mt-2 font-serif text-2xl font-semibold tracking-wide text-white">Your Practice Signal</h2>
+                </div>
+                <div className="inline-flex w-fit items-center gap-2 rounded-full border border-white/8 bg-white/5 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-[#9D96B3]">
+                    <TrendingUp className="h-3.5 w-3.5 text-emerald-300" />
+                    Synced from submissions
+                </div>
+            </div>
+
+            <motion.div
+                className="grid w-full grid-cols-1 gap-5 md:grid-cols-3"
+                variants={containerVariants}
+                initial="hidden"
+                animate="visible"
+            >
+                {metrics.map((item) => (
+                    <motion.div
+                        key={item.title}
+                        variants={cardVariants}
+                        whileHover={{ y: -5 }}
+                        className="group relative min-h-56 overflow-hidden rounded-3xl border border-white/6 bg-[#121017]/92 p-5 shadow-[0_18px_55px_rgba(0,0,0,0.30)]"
+                    >
+                        <div className={`pointer-events-none absolute -right-14 -top-16 h-44 w-44 rounded-full ${item.glow} blur-3xl transition-opacity duration-300 group-hover:opacity-90`} />
+                        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-white/25 to-transparent" />
+                        <div className="pointer-events-none absolute inset-0 bg-linear-to-b from-white/3 to-transparent" />
+
+                        <div className="relative z-10 flex h-full flex-col">
+                            <div className="flex items-start justify-between gap-4">
+                                <div>
+                                    <p className="text-xs font-semibold text-[#9D96B3] transition-colors group-hover:text-white">{item.title}</p>
+                                    <p className="mt-3 font-serif text-4xl font-bold tracking-tight text-white">{item.value}</p>
+                                </div>
+                                <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-white/8 bg-white/5">
+                                    <div className={`absolute inset-0 rounded-2xl bg-linear-to-br ${item.accent} opacity-14`} />
+                                    <item.icon className="relative h-5 w-5 text-[#DFB15B]" />
+                                </div>
+                            </div>
+
+                            <p className="mt-3 min-h-10 text-sm font-medium leading-5 text-[#6B667B]">{item.subtext}</p>
+
+                            <div className="mt-auto pt-6">
+                                <div className="mb-2 flex items-center justify-between gap-3 text-[10px] font-bold uppercase tracking-wider text-[#6B667B]">
+                                    <span>{item.footerLabel}</span>
+                                    <span className="text-white">{item.footerValue}</span>
+                                </div>
+                                <div className="h-2 overflow-hidden rounded-full border border-white/6 bg-[#0B0A10]">
+                                    <motion.div
+                                        initial={{ width: 0 }}
+                                        animate={{ width: `${item.progress}%` }}
+                                        transition={{ duration: 1.05, ease: "easeOut" }}
+                                        className={`h-full rounded-full bg-linear-to-r ${item.accent} shadow-[0_0_24px_rgba(223,177,91,0.22)]`}
+                                    />
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                    <div className="font-serif text-2xl sm:text-3xl font-bold tracking-tight text-white mb-1">{item.value}</div>
-                    <div className="text-[11px] font-medium text-[#6B667B]">{item.subtext}</div>
-                    {item.renderFooter()}
-                </motion.div>
-            ))}
-        </motion.div>
+                    </motion.div>
+                ))}
+            </motion.div>
+        </section>
     );
 }
