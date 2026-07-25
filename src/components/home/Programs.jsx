@@ -62,8 +62,8 @@ export default function ProgramsAndTestimonials() {
         {
             id: "offline",
             badge: "Offline - Farmgate",
-            title: "IBA Offline Batch",
-            desc: "Full comprehensive offline preparation at our physical center with face-to-face mentorship and real-time exam simulations.",
+            title: "Gryffindor",
+            desc: "An offline batch taken at our Farmgate center, built for face-to-face mentorship and real-time exam simulations.",
             icon: School,
             location: {
                 text: "RH Home Center, Farmgate",
@@ -90,8 +90,8 @@ export default function ProgramsAndTestimonials() {
         {
             id: "premium",
             badge: "Online Batch",
-            title: "IBA Online Batch",
-            desc: "Take your preparation sitting in you cozy study room. Best suited for those who are living far from offline batch locations",
+            title: "Ravenclaw",
+            desc: "An online batch taken live from your study room, built for students who want the full program without traveling to a physical center.",
             icon: Laptop,
             location: {
                 text: "Your Cozy Study Room"
@@ -117,9 +117,9 @@ export default function ProgramsAndTestimonials() {
         },
         {
             id: "online",
-            badge: "Offline - Bailey road",
-            title: "IBA Offline Batch",
-            desc: "Full comprehensive offline preparation at our physical center with face-to-face mentorship and real-time exam simulations.",
+            badge: "Offline - Bailey Road",
+            title: "Hufflepuff",
+            desc: "An offline batch taken at our Bailey Road center, built for face-to-face mentorship and real-time exam simulations.",
             icon: Building2,
             location: {
                 text: "Siddheswari Road, Bailey Road",

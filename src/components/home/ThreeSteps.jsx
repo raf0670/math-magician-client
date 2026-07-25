@@ -18,7 +18,7 @@ export default function ThreeSteps() {
         {
             num: "01",
             title: "Enroll",
-            description: "Pick your preferred program : offline or online, wherever you are more comfortable. Complete a quick registration. Your IBA journey begins.",
+            description: "Pick your preferred house program, wherever you are most comfortable. Complete a quick registration. Your IBA journey begins.",
             icon: Sparkles,
         },
         {

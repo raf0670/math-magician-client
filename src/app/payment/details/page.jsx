@@ -10,9 +10,9 @@ import { getStoredToken, getStoredUser, savePendingPaymentPlan, submitManualEnro
 import FlashyLoader, { LoadingButtonLabel } from "@/components/shared/FlashyLoader";
 
 const PLANS = {
-  offline: { title: "IBA Offline Batch - Farmgate", amount: "BDT 18,000" },
-  premium: { title: "IBA Online Batch", amount: "BDT 17,500" },
-  online: { title: "IBA Offline Batch - Bailey Road", amount: "BDT 18,000" },
+  offline: { title: "Gryffindor", amount: "BDT 18,000" },
+  premium: { title: "Ravenclaw", amount: "BDT 17,500" },
+  online: { title: "Hufflepuff", amount: "BDT 18,000" },
 };
 
 const BATCH_PLAN_IDS = {
@@ -20,6 +20,12 @@ const BATCH_PLAN_IDS = {
   "Bailey Road": "online",
   Online: "premium",
 };
+
+const BATCH_OPTIONS = [
+  { label: "Gryffindor", value: "Farmgate" },
+  { label: "Hufflepuff", value: "Bailey Road" },
+  { label: "Ravenclaw", value: "Online" },
+];
 
 const INITIAL_FORM = {
   email: "",
@@ -384,7 +390,7 @@ function PaymentDetailsContent() {
             </FormSection>
 
             <FormSection title="Batch Information" description="Description (required)" index={4}>
-              <RadioField label="Which batch do you want to be enrolled?" field="preferredBatch" required value={form.preferredBatch} error={fieldErrors.preferredBatch} options={["Farmgate", "Bailey Road", "Online"]} onChange={updateField} />
+              <RadioField label="Which batch do you want to be enrolled?" field="preferredBatch" required value={form.preferredBatch} error={fieldErrors.preferredBatch} options={BATCH_OPTIONS} onChange={updateField} />
             </FormSection>
 
             <FormSection title="bKash Payment" description="Scan the QR code, complete payment, then enter the transaction ID from bKash." index={5}>
@@ -525,26 +531,31 @@ function RadioField({ label, field, value, options, onChange, required = false, 
         {required ? <span className={error ? "text-[#F2A7A7]" : "text-[#DFB15B]"}> *</span> : null}
       </legend>
       <div className={`mt-4 grid gap-3 rounded-2xl border p-3 sm:grid-cols-2 ${error ? "border-[#F2A7A7]/45 bg-[#2A171B]/45" : complete ? "border-[#74D99F]/30 bg-[#102019]/50" : "border-white/5 bg-[#0F0D15]/70"}`}>
-        {options.map((option) => (
+        {options.map((option) => {
+          const optionValue = typeof option === "string" ? option : option.value;
+          const optionLabel = typeof option === "string" ? option : option.label;
+
+          return (
           <motion.label
-            key={option}
+            key={optionValue}
             whileHover={{ y: -2 }}
-            className={`flex cursor-pointer items-center gap-3 rounded-2xl border px-4 py-3 text-sm font-medium transition ${value === option ? "border-[#74D99F]/50 bg-[#74D99F]/15 text-white shadow-[0_0_24px_rgba(116,217,159,0.08)]" : "border-white/5 bg-[#17131F]/70 text-[#D8D4E5] hover:border-white/12 hover:bg-[#1E1928]"}`}
+            className={`flex cursor-pointer items-center gap-3 rounded-2xl border px-4 py-3 text-sm font-medium transition ${value === optionValue ? "border-[#74D99F]/50 bg-[#74D99F]/15 text-white shadow-[0_0_24px_rgba(116,217,159,0.08)]" : "border-white/5 bg-[#17131F]/70 text-[#D8D4E5] hover:border-white/12 hover:bg-[#1E1928]"}`}
           >
             <input
               type="radio"
               name={field}
-              value={option}
-              checked={value === option}
+              value={optionValue}
+              checked={value === optionValue}
               onChange={(event) => onChange(field, event.target.value)}
               className="sr-only"
             />
-            <span className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border ${value === option ? "border-[#74D99F] bg-[#74D99F]" : "border-[#8E8A9F]"}`}>
-              {value === option ? <Check className="h-3 w-3 text-black" /> : null}
+            <span className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border ${value === optionValue ? "border-[#74D99F] bg-[#74D99F]" : "border-[#8E8A9F]"}`}>
+              {value === optionValue ? <Check className="h-3 w-3 text-black" /> : null}
             </span>
-            <span>{option}</span>
+            <span>{optionLabel}</span>
           </motion.label>
-        ))}
+          );
+        })}
       </div>
     </fieldset>
   );

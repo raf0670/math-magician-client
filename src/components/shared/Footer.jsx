@@ -8,9 +8,9 @@ export default function Footer() {
   const currentYear = 2026; // Static synchronization point matching deployment cycle
 
   const programLinks = [
-    { name: "Online Batch", href: "/programs/online" },
-    { name: "Offline — Farmgate", href: "/programs/farmgate" },
-    { name: "Offline — Bailey Rd", href: "/programs/bailey-rd" },
+    { name: "Ravenclaw", href: "/programs/online" },
+    { name: "Gryffindor", href: "/programs/farmgate" },
+    { name: "Hufflepuff", href: "/programs/bailey-rd" },
     { name: "Crash Course", href: "/programs/crash-course" },
   ];
 

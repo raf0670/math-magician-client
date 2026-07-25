@@ -23,6 +23,33 @@ const STATUS_STYLES = {
   rejected: "border-red-400/25 bg-red-400/10 text-red-200",
 };
 
+const PLAN_DISPLAY_NAMES = {
+  offline: "Gryffindor",
+  premium: "Ravenclaw",
+  online: "Hufflepuff",
+  "IBA Offline Batch - Farmgate": "Gryffindor",
+  "IBA Online Batch": "Ravenclaw",
+  "IBA Offline Batch - Bailey Road": "Hufflepuff",
+  "Farmgate - Gryffindor": "Gryffindor",
+  "Online - Ravenclaw": "Ravenclaw",
+  "Bailey Road - Hufflepuff": "Hufflepuff",
+  Gryffindor: "Gryffindor",
+  Ravenclaw: "Ravenclaw",
+  Hufflepuff: "Hufflepuff",
+};
+
+const BATCH_DISPLAY_NAMES = {
+  Farmgate: "Gryffindor",
+  "Bailey Road": "Hufflepuff",
+  Online: "Ravenclaw",
+  "Farmgate - Gryffindor": "Gryffindor",
+  "Bailey Road - Hufflepuff": "Hufflepuff",
+  "Online - Ravenclaw": "Ravenclaw",
+  Gryffindor: "Gryffindor",
+  Hufflepuff: "Hufflepuff",
+  Ravenclaw: "Ravenclaw",
+};
+
 function formatDate(value) {
   if (!value) return "Not reviewed";
   return new Intl.DateTimeFormat("en-US", {
@@ -38,6 +65,19 @@ function getEnrollmentName(item) {
 function formatInfoValue(value) {
   if (Array.isArray(value)) return value.length ? value.join(", ") : "";
   return value;
+}
+
+function getPlanDisplayName(item) {
+  return PLAN_DISPLAY_NAMES[item.planId] || PLAN_DISPLAY_NAMES[item.planTitle] || item.planTitle;
+}
+
+function formatPlanValue(item) {
+  const planName = getPlanDisplayName(item) || "Not selected";
+  return item.amount ? `${planName} - BDT ${item.amount}` : planName;
+}
+
+function formatPreferredBatch(value) {
+  return BATCH_DISPLAY_NAMES[value] || value;
 }
 
 export default function AdminEnrollmentReviewsPage() {
@@ -288,10 +328,10 @@ export default function AdminEnrollmentReviewsPage() {
                 </div>
 
                 <div className="mt-5 grid gap-3 text-sm sm:grid-cols-2 lg:grid-cols-4">
-                  <Info label="Plan" value={`${item.planTitle} - BDT ${item.amount}`} />
+                  <Info label="Plan" value={formatPlanValue(item)} />
                   <Info label="Phone" value={item.enrollment?.phoneNumber} />
                   <Info label="College" value={item.enrollment?.college} />
-                  <Info label="Preferred Batch" value={item.enrollment?.preferredBatch || "Not selected"} />
+                  <Info label="Preferred Batch" value={formatPreferredBatch(item.enrollment?.preferredBatch) || "Not selected"} />
                   <Info label="Group" value={item.enrollment?.group} />
                   <Info label="HSC Batch" value={item.enrollment?.hscBatch} />
                   <Info label="Backup Choice" value={item.enrollment?.backupChoice} />

@@ -10,8 +10,8 @@ const programs = [
   {
     id: "farmgate",
     badge: "Offline - Farmgate",
-    title: "IBA Offline Batch",
-    detail: "RH Home Center",
+    title: "Gryffindor",
+    detail: "Offline at RH Home Center, Farmgate",
     schedule: "1:30 - 3:30 pm",
     price: "BDT 18,000",
     icon: School,
@@ -19,8 +19,8 @@ const programs = [
   {
     id: "online",
     badge: "Online Batch",
-    title: "IBA Online Batch",
-    detail: "Live from your study room",
+    title: "Ravenclaw",
+    detail: "Online live class from your study room",
     schedule: "7:30 - 9:30 pm",
     price: "BDT 17,500",
     icon: Laptop,
@@ -29,8 +29,8 @@ const programs = [
   {
     id: "bailey-road",
     badge: "Offline - Bailey Road",
-    title: "IBA Offline Batch",
-    detail: "Siddheswari Road",
+    title: "Hufflepuff",
+    detail: "Offline at Siddheswari Road, Bailey Road",
     schedule: "4:00 - 6:00 pm",
     price: "BDT 18,000",
     icon: Building2,

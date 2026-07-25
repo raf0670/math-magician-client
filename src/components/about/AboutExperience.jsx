@@ -261,7 +261,7 @@ export default function AboutExperience() {
             <p className="text-xs font-bold uppercase tracking-[0.24em] text-[#DFB15B]">Ready When You Are</p>
             <h2 className="mt-3 font-serif text-3xl font-medium text-white">Start with the program that matches your life.</h2>
             <p className="mt-3 text-sm font-medium leading-6 text-[#8E8A9F]">
-              Choose online or offline batches, then use mocks and guided practice to build the pace IBA demands.
+              Choose your house program, then use mocks and guided practice to build the pace IBA demands.
             </p>
           </div>
           <Link
