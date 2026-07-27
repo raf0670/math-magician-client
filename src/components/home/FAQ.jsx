@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Minus } from "lucide-react";
 
@@ -370,6 +371,15 @@ export default function FAQ() {
                             </div>
                         );
                     })}
+                </div>
+
+                <div className="mt-10 flex justify-center">
+                    <Link
+                        href="/more-faqs"
+                        className="rounded-full bg-linear-to-r from-[#E6C687] via-[#D4AF37] to-[#AA7C11] px-7 py-3 text-sm font-semibold tracking-wide text-black shadow-[0_4px_18px_rgba(212,175,55,0.18)] transition-all duration-200 hover:brightness-110"
+                    >
+                        More FAQs
+                    </Link>
                 </div>
             </div>
         </section>
