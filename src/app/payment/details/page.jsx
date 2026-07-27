@@ -424,10 +424,12 @@ function PaymentDetailsContent() {
                   </div>
                   <div className="space-y-3">
                     <div className="rounded-2xl border border-white/8 bg-[#100E16]/70 px-4 py-3">
+                      <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#DFB15B]">Send Money</p>
                       <p className="text-xs font-semibold text-[#A9A3BA]">Bkash ( personal )</p>
                       <p className="mt-1 font-mono text-lg font-bold text-white">01894688018</p>
                     </div>
                     <div className="rounded-2xl border border-white/8 bg-[#100E16]/70 px-4 py-3">
+                      <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#DFB15B]">Make Payment</p>
                       <p className="text-xs font-semibold text-[#A9A3BA]">Bkash ( retail )</p>
                       <p className="mt-1 font-mono text-lg font-bold text-white">01968803335</p>
                     </div>
