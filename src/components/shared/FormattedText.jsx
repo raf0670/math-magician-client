@@ -1,5 +1,6 @@
 const INLINE_TAGS = new Set(["u", "b", "strong", "i", "em", "sub", "sup"]);
 const TOKEN_PATTERN = /(<\/?[a-z][a-z0-9]*(?:\s+[^<>]*)?\s*\/?>)/gi;
+const NEWLINE_PATTERN = /(\r\n|\r|\n)/g;
 
 function classifyToken(token) {
   const breakMatch = token.match(/^<br\s*\/?>$/i);
@@ -67,11 +68,18 @@ function parseRange(tokens, startIndex = 0, endIndex = tokens.length) {
       }
     }
 
-    nodes.push(rawToken);
+    nodes.push(...parseTextToken(rawToken));
     index += 1;
   }
 
   return nodes;
+}
+
+function parseTextToken(value) {
+  return value
+    .split(NEWLINE_PATTERN)
+    .filter(Boolean)
+    .map((part) => (part === "\r\n" || part === "\r" || part === "\n" ? { kind: "break" } : part));
 }
 
 function parseFormattedText(value) {
