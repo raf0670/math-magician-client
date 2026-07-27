@@ -73,14 +73,14 @@ export default function ClassAccessGate({ children, section = "classes" }) {
                 message={copy.loadingMessage}
                 iconName="lock"
                 skeleton="cards"
-                className="min-h-[360px]"
+                className="min-h-90"
             />
         );
     }
 
     if (!hasAccess) {
         return (
-            <div className="flex min-h-[420px] items-center justify-center rounded-3xl border border-[#DFB15B]/15 bg-[#121017] px-6 py-12 text-center">
+            <div className="flex min-h-105 items-center justify-center rounded-3xl border border-[#DFB15B]/15 bg-[#121017] px-6 py-12 text-center">
                 <div className="max-w-lg">
                     <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl border border-[#DFB15B]/20 bg-[#DFB15B]/10 text-[#DFB15B]">
                         <LockKeyhole className="h-5 w-5" />
