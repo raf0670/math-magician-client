@@ -1,6 +1,7 @@
 "use client";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { CheckCircle, ChevronLeft, ChevronRight, Clock3, Eraser, Infinity, Send, Sparkles } from "lucide-react";
+import FormattedText from "@/components/shared/FormattedText";
 
 const OPTION_LABELS = ["A", "B", "C", "D", "E"];
 
@@ -252,9 +253,11 @@ export default function ExamEngine({ examData, onComplete }) {
                             </span>
                         </div>
 
-                        <p className="mt-5 text-base font-semibold leading-relaxed tracking-wide text-white sm:text-lg">
-                            {currentQuestion.questionText}
-                        </p>
+                        <FormattedText
+                            as="p"
+                            value={currentQuestion.questionText}
+                            className="mt-5 text-base font-semibold leading-relaxed tracking-wide text-white sm:text-lg"
+                        />
 
                         <div className="mt-6 flex flex-col gap-3">
                             {Object.entries(currentQuestion.options).map(([key, value]) => {
@@ -270,9 +273,10 @@ export default function ExamEngine({ examData, onComplete }) {
                                         <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border text-sm font-black ${isSelected ? "border-[#DFB15B] bg-[#DFB15B] text-black" : "border-white/5 bg-[#1A1722] text-[#8E8A9F] group-hover:border-[#DFB15B]/25 group-hover:text-[#DFB15B]"}`}>
                                             {key}
                                         </div>
-                                        <span className={`text-sm font-semibold leading-relaxed ${isSelected ? "text-white" : "text-[#C9C2D8]"}`}>
-                                            {value}
-                                        </span>
+                                        <FormattedText
+                                            value={value}
+                                            className={`text-sm font-semibold leading-relaxed ${isSelected ? "text-white" : "text-[#C9C2D8]"}`}
+                                        />
                                         {isSelected ? <CheckCircle className="ml-auto h-4 w-4 shrink-0 text-[#DFB15B]" /> : null}
                                     </button>
                                 );

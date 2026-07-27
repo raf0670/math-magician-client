@@ -1,6 +1,7 @@
 "use client";
 import { AlertTriangle, BookOpen, CheckCircle, XCircle } from "lucide-react";
 import Link from "next/link";
+import FormattedText from "@/components/shared/FormattedText";
 
 const OPTION_LABELS = ["A", "B", "C", "D", "E"];
 
@@ -157,9 +158,11 @@ export default function AnalyticalScorecard({ answers, examData, submissionResul
                                     )}
                                 </div>
 
-                                <p className="text-sm font-semibold leading-relaxed tracking-wide text-white sm:text-base">
-                                    {question.questionText || question.question}
-                                </p>
+                                <FormattedText
+                                    as="p"
+                                    value={question.questionText || question.question}
+                                    className="text-sm font-semibold leading-relaxed tracking-wide text-white sm:text-base"
+                                />
 
                                 <div className="mt-5 grid grid-cols-1 gap-2">
                                     {optionList.map((option, optionIndex) => {
@@ -177,7 +180,10 @@ export default function AnalyticalScorecard({ answers, examData, submissionResul
                                                     {OPTION_LABELS[optionIndex]}
                                                 </span>
                                                 <div className="min-w-0 flex-1">
-                                                    <span className="block text-sm font-semibold leading-relaxed">{option}</span>
+                                                    <FormattedText
+                                                        value={option}
+                                                        className="block text-sm font-semibold leading-relaxed"
+                                                    />
                                                     <span className="mt-1 block text-[10px] font-bold uppercase tracking-wider opacity-80">
                                                         {isCorrectOption && isUserSelected ? "Your answer and correct answer" : isCorrectOption ? "Correct answer" : isUserSelected ? "Your answer" : ""}
                                                     </span>
@@ -189,9 +195,10 @@ export default function AnalyticalScorecard({ answers, examData, submissionResul
 
                                 <div className="mt-5 rounded-2xl border border-[#DFB15B]/10 bg-[#DFB15B]/5 p-4">
                                     <span className="mb-1 block text-[10px] font-bold uppercase tracking-widest text-[#DFB15B]">Explanation</span>
-                                    <span className="block text-sm font-medium leading-relaxed text-[#D8D3C7]">
-                                        {explanation || "No explanation has been added for this question yet."}
-                                    </span>
+                                    <FormattedText
+                                        value={explanation || "No explanation has been added for this question yet."}
+                                        className="block text-sm font-medium leading-relaxed text-[#D8D3C7]"
+                                    />
                                 </div>
                             </div>
                         );

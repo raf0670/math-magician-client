@@ -8,6 +8,7 @@ import AnalyticalScorecard from "@/components/dashboard/AnalyticalScorecard";
 import ClassAccessGate from "@/components/dashboard/ClassAccessGate";
 import ExamEngine from "@/components/dashboard/ExamEngine";
 import FlashyLoader from "@/components/shared/FlashyLoader";
+import FormattedText from "@/components/shared/FormattedText";
 import { getExamById, submitExam } from "@/lib/api";
 
 const MONGO_OBJECT_ID_PATTERN = /^[a-f\d]{24}$/i;
@@ -261,9 +262,11 @@ function ReadOnlyLiveExamReview({ examData }) {
                 </span>
               </div>
 
-              <p className="text-sm font-semibold leading-relaxed tracking-wide text-white sm:text-base">
-                {question.questionText || question.question}
-              </p>
+              <FormattedText
+                as="p"
+                value={question.questionText || question.question}
+                className="text-sm font-semibold leading-relaxed tracking-wide text-white sm:text-base"
+              />
 
               <div className="mt-5 grid gap-2">
                 {optionList.map((option, optionIndex) => {
@@ -276,7 +279,10 @@ function ReadOnlyLiveExamReview({ examData }) {
                       <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border text-xs font-black ${isCorrect ? "border-emerald-400 bg-emerald-400 text-black" : "border-white/5 bg-[#121017] text-[#8E8A9F]"}`}>
                         {OPTION_LABELS[optionIndex]}
                       </span>
-                      <span className="min-w-0 flex-1 text-sm font-semibold leading-relaxed">{option}</span>
+                      <FormattedText
+                        value={option}
+                        className="min-w-0 flex-1 text-sm font-semibold leading-relaxed"
+                      />
                       {isCorrect ? <CheckCircle className="h-4 w-4 shrink-0 text-emerald-300" /> : <XCircle className="h-4 w-4 shrink-0 text-[#6B667B]" />}
                     </div>
                   );
@@ -285,9 +291,10 @@ function ReadOnlyLiveExamReview({ examData }) {
 
               <div className="mt-5 rounded-2xl border border-[#DFB15B]/10 bg-[#DFB15B]/5 p-4">
                 <span className="mb-1 block text-[10px] font-bold uppercase tracking-widest text-[#DFB15B]">Explanation</span>
-                <span className="block text-sm font-medium leading-relaxed text-[#D8D3C7]">
-                  {question.explanation || "No explanation has been added for this question yet."}
-                </span>
+                <FormattedText
+                  value={question.explanation || "No explanation has been added for this question yet."}
+                  className="block text-sm font-medium leading-relaxed text-[#D8D3C7]"
+                />
               </div>
             </section>
           );
