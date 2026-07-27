@@ -28,6 +28,23 @@ const BATCH_OPTIONS = [
   { label: "Ravenclaw", value: "Online" },
 ];
 
+const BANK_ACCOUNTS = [
+  {
+    bank: "Prime Bank",
+    accountNumber: "3108211033174",
+    branch: "Dilkusha Branch",
+    accountName: "Mehrabur Rahaman",
+    routingNumber: "170272892",
+  },
+  {
+    bank: "City Bank",
+    accountNumber: "1781920008224",
+    branch: "Karwan Bazar Branch",
+    accountName: "Md. Mehrabur Rahaman",
+    routingNumber: "225272868",
+  },
+];
+
 const INITIAL_FORM = {
   email: "",
   yourName: "",
@@ -140,6 +157,7 @@ function PaymentDetailsContent() {
   const plan = PLANS[planId];
   const [form, setForm] = useState(INITIAL_FORM);
   const [paymentChoice, setPaymentChoice] = useState("full");
+  const [paymentMethod, setPaymentMethod] = useState("bkash");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const selectedPlanId = BATCH_PLAN_IDS[form.preferredBatch] || planId;
@@ -357,7 +375,7 @@ function PaymentDetailsContent() {
                   Open the Portal
                 </h1>
                 <p className="mt-3 max-w-xl text-sm leading-6 text-[#A9A3BA]">
-                  Complete your student profile, send the bKash payment, and submit your transaction ID for admin approval.
+                  Complete your student profile, send the payment, and submit your transaction ID for admin approval.
                 </p>
               </div>
               {/* <motion.div
@@ -415,43 +433,93 @@ function PaymentDetailsContent() {
               />
             </FormSection>
 
-            <FormSection title="bKash Payment" description="Send payment to either bKash number, then enter the transaction ID from bKash." index={6}>
-              <div className="grid gap-5 lg:grid-cols-[280px_1fr] lg:items-center">
-                <div className="space-y-3 rounded-3xl border border-[#DFB15B]/20 bg-[#DFB15B]/8 p-5">
-                  <div className="flex items-center gap-3 text-[#DFB15B]">
-                    <CreditCard className="h-5 w-5" />
-                    <p className="text-xs font-bold uppercase tracking-[0.2em]">bKash Numbers</p>
-                  </div>
-                  <div className="space-y-3">
-                    <div className="rounded-2xl border border-white/8 bg-[#100E16]/70 px-4 py-3">
-                      <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#DFB15B]">Send Money</p>
-                      <p className="text-xs font-semibold text-[#A9A3BA]">Bkash ( personal )</p>
-                      <p className="mt-1 font-mono text-lg font-bold text-white">01894688018</p>
-                    </div>
-                    <div className="rounded-2xl border border-white/8 bg-[#100E16]/70 px-4 py-3">
-                      <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#DFB15B]">Make Payment</p>
-                      <p className="text-xs font-semibold text-[#A9A3BA]">Bkash ( retail )</p>
-                      <p className="mt-1 font-mono text-lg font-bold text-white">01968803335</p>
-                    </div>
-                  </div>
+            <FormSection title="Payment Details" description="Choose bKash or bank transfer, then enter the transaction ID or reference for admin approval." index={6}>
+              <div className="space-y-5">
+                <div className="grid grid-cols-2 rounded-2xl border border-white/8 bg-[#0A090F]/70 p-1">
+                  {[
+                    { value: "bkash", label: "Bkash" },
+                    { value: "bank", label: "Bank" },
+                  ].map((method) => {
+                    const selected = paymentMethod === method.value;
+
+                    return (
+                      <button
+                        key={method.value}
+                        type="button"
+                        onClick={() => setPaymentMethod(method.value)}
+                        className={`rounded-xl px-4 py-3 text-sm font-bold transition ${
+                          selected
+                            ? "bg-[#DFB15B] text-black shadow-[0_10px_28px_rgba(223,177,91,0.2)]"
+                            : "text-[#A9A3BA] hover:bg-white/5 hover:text-white"
+                        }`}
+                        aria-pressed={selected}
+                      >
+                        {method.label}
+                      </button>
+                    );
+                  })}
                 </div>
-                <div className="space-y-4">
-                  <div className="flex items-center gap-3 rounded-2xl border border-[#DFB15B]/15 bg-[#DFB15B]/8 px-4 py-4 text-sm text-[#EBD39B]">
-                    <CreditCard className="h-5 w-5 shrink-0 text-[#DFB15B]" />
-                    <span className="font-medium">
-                      {selectedPlan.title} - pay {formatBDT(amountDueNow)} now
-                      {remainingAmount ? `, ${formatBDT(remainingAmount)} later` : ""}
-                    </span>
+
+                <div className="grid gap-5 lg:grid-cols-[minmax(320px,1.05fr)_minmax(0,1fr)] lg:items-start">
+                  {paymentMethod === "bkash" ? (
+                    <div className="space-y-3 rounded-3xl border border-[#DFB15B]/20 bg-[#DFB15B]/8 p-5">
+                      <div className="flex items-center gap-3 text-[#DFB15B]">
+                        <CreditCard className="h-5 w-5" />
+                        <p className="text-xs font-bold uppercase tracking-[0.2em]">bKash Numbers</p>
+                      </div>
+                      <div className="space-y-3">
+                        <div className="rounded-2xl border border-white/8 bg-[#100E16]/70 px-4 py-3">
+                          <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#DFB15B]">Send Money</p>
+                          <p className="text-xs font-semibold text-[#A9A3BA]">Bkash ( personal )</p>
+                          <p className="mt-1 font-mono text-lg font-bold text-white">01894688018</p>
+                        </div>
+                        <div className="rounded-2xl border border-white/8 bg-[#100E16]/70 px-4 py-3">
+                          <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#DFB15B]">Make Payment</p>
+                          <p className="text-xs font-semibold text-[#A9A3BA]">Bkash ( retail )</p>
+                          <p className="mt-1 font-mono text-lg font-bold text-white">01968803335</p>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="space-y-3 rounded-3xl border border-[#DFB15B]/20 bg-[#DFB15B]/8 p-5">
+                      <div className="flex items-center gap-3 text-[#DFB15B]">
+                        <CreditCard className="h-5 w-5" />
+                        <p className="text-xs font-bold uppercase tracking-[0.2em]">Bank Accounts</p>
+                      </div>
+                      <div className="space-y-3">
+                        {BANK_ACCOUNTS.map((account) => (
+                          <div key={account.accountNumber} className="rounded-2xl border border-white/8 bg-[#100E16]/70 px-4 py-3">
+                            <p className="text-sm font-bold text-white">{account.bank}</p>
+                            <p className="mt-2 font-mono text-lg font-bold text-white">{account.accountNumber}</p>
+                            <div className="mt-3 space-y-1 text-xs font-semibold text-[#A9A3BA]">
+                              <p>{account.branch}</p>
+                              <p>{account.accountName}</p>
+                              <p>Routing Number: {account.routingNumber}</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-3 rounded-2xl border border-[#DFB15B]/15 bg-[#DFB15B]/8 px-4 py-4 text-sm text-[#EBD39B]">
+                      <CreditCard className="h-5 w-5 shrink-0 text-[#DFB15B]" />
+                      <span className="font-medium">
+                        {selectedPlan.title} - pay {formatBDT(amountDueNow)} now
+                        {remainingAmount ? `, ${formatBDT(remainingAmount)} later` : ""}
+                      </span>
+                    </div>
+                    <TextField
+                      label={paymentMethod === "bank" ? "Transaction ID / Reference" : "BkashTrxID"}
+                      field="bkashTrxID"
+                      required
+                      value={form.bkashTrxID}
+                      error={fieldErrors.bkashTrxID}
+                      onChange={updateField}
+                      placeholder={paymentMethod === "bank" ? "Bank transaction ID or reference" : "Example: A1B2C3D4E5"}
+                    />
                   </div>
-                  <TextField
-                    label="BkashTrxID"
-                    field="bkashTrxID"
-                    required
-                    value={form.bkashTrxID}
-                    error={fieldErrors.bkashTrxID}
-                    onChange={updateField}
-                    placeholder="Example: A1B2C3D4E5"
-                  />
                 </div>
               </div>
             </FormSection>
@@ -561,10 +629,17 @@ function PaymentChoiceField({ selectedPlan, value, onChange }) {
                 : "border-white/8 bg-[#0F0D15]/75 hover:border-[#DFB15B]/25"
             }`}
           >
-            <span className={`flex h-9 w-9 items-center justify-center rounded-xl border ${
-              checked ? "border-[#74D99F] bg-[#74D99F] text-black" : "border-[#DFB15B]/25 bg-[#DFB15B]/10 text-[#DFB15B]"
-            }`}>
-              {checked ? <Check className="h-4 w-4" /> : <CreditCard className="h-4 w-4" />}
+            <span className="flex w-full items-center justify-between gap-3">
+              <span className={`flex h-9 w-9 items-center justify-center rounded-xl border ${
+                checked ? "border-[#74D99F] bg-[#74D99F] text-black" : "border-[#DFB15B]/25 bg-[#DFB15B]/10 text-[#DFB15B]"
+              }`}>
+                {checked ? <Check className="h-4 w-4" /> : <CreditCard className="h-4 w-4" />}
+              </span>
+              {option.id === "full" ? (
+                <span className="rounded-full border border-[#DFB15B]/30 bg-[#DFB15B]/12 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-[#DFB15B]">
+                  Preferable
+                </span>
+              ) : null}
             </span>
             <span className="mt-4 text-sm font-bold text-white">{option.title}</span>
             <span className="mt-2 font-serif text-2xl font-semibold text-white">{formatBDT(option.amount)}</span>
