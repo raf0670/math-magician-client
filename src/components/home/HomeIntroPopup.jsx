@@ -1,11 +1,20 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ArrowRight, Sparkles, X } from "lucide-react";
 import Image from "next/image";
 
 const SESSION_KEY = "mathmagician_home_intro_seen";
+
+const preludeWords = [
+  "Perspicacity",
+  "Tenacity",
+  "Aptitude",
+  "Discipline",
+  "Acumen",
+  "Precision",
+];
 
 const programs = [
   {
@@ -42,10 +51,15 @@ const programs = [
 ];
 
 export default function HomeIntroPopup() {
-  const [isOpen, setIsOpen] = useState(false);
+  const prefersReducedMotion = useReducedMotion();
+  const [introPhase, setIntroPhase] = useState("idle");
+
+  const isPrelude = introPhase === "prelude";
+  const isOpen = introPhase === "popup";
 
   useEffect(() => {
     let hasSeenIntro = false;
+    let preludeTimerId;
 
     try {
       hasSeenIntro = window.sessionStorage.getItem(SESSION_KEY) === "true";
@@ -62,18 +76,25 @@ export default function HomeIntroPopup() {
         // The pop-up should still work if browser storage is unavailable.
       }
 
-      setIsOpen(true);
-    }, 500);
+      setIntroPhase("prelude");
+      preludeTimerId = window.setTimeout(
+        () => setIntroPhase("popup"),
+        prefersReducedMotion ? 900 : 4100
+      );
+    }, prefersReducedMotion ? 150 : 350);
 
-    return () => window.clearTimeout(timerId);
-  }, []);
+    return () => {
+      window.clearTimeout(timerId);
+      window.clearTimeout(preludeTimerId);
+    };
+  }, [prefersReducedMotion]);
 
   useEffect(() => {
-    if (!isOpen) return undefined;
+    if (introPhase === "idle") return undefined;
 
     const handleKeyDown = (event) => {
-      if (event.key === "Escape") {
-        setIsOpen(false);
+      if (event.key === "Escape" && isOpen) {
+        setIntroPhase("idle");
       }
     };
 
@@ -85,10 +106,10 @@ export default function HomeIntroPopup() {
       document.body.style.overflow = previousOverflow;
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [isOpen]);
+  }, [introPhase, isOpen]);
 
   const closePopup = () => {
-    setIsOpen(false);
+    setIntroPhase("idle");
   };
 
   const scrollToPrograms = () => {
@@ -108,6 +129,82 @@ export default function HomeIntroPopup() {
 
   return (
     <AnimatePresence>
+      {isPrelude ? (
+        <motion.div
+          className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden bg-[#050409] px-4 text-center"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: prefersReducedMotion ? 0.12 : 0.22 }}
+        >
+          <motion.div
+            className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(223,177,91,0.16),transparent_34%),radial-gradient(circle_at_30%_64%,rgba(124,58,237,0.18),transparent_28%)]"
+            initial={{ scale: 0.92, opacity: 0.35 }}
+            animate={{ scale: prefersReducedMotion ? 1 : 1.12, opacity: 0.9 }}
+            exit={{ scale: 1.18, opacity: 0 }}
+            transition={{ duration: prefersReducedMotion ? 0.3 : 3.2, ease: "easeOut" }}
+          />
+
+          <motion.div
+            className="absolute h-[1px] w-[84vw] max-w-4xl bg-linear-to-r from-transparent via-[#DFB15B] to-transparent shadow-[0_0_42px_rgba(223,177,91,0.95)]"
+            initial={{ x: "-90vw", rotate: -12, opacity: 0 }}
+            animate={{ x: prefersReducedMotion ? 0 : "90vw", rotate: -12, opacity: [0, 1, 1, 0] }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: prefersReducedMotion ? 0.4 : 3.1, ease: [0.22, 1, 0.36, 1] }}
+          />
+
+          <div className="relative z-10 flex w-full max-w-4xl flex-col items-center">
+            <motion.div
+              className="mb-5 inline-flex h-12 w-12 items-center justify-center rounded-full border border-[#DFB15B]/30 bg-[#DFB15B]/10 text-[#DFB15B] shadow-[0_0_38px_rgba(223,177,91,0.22)]"
+              initial={{ opacity: 0, scale: 0.7, rotate: -18 }}
+              animate={{ opacity: 1, scale: 1, rotate: 0 }}
+              exit={{ opacity: 0, scale: 1.25 }}
+              transition={{ duration: prefersReducedMotion ? 0.2 : 0.5, ease: "easeOut" }}
+            >
+              <Sparkles className="h-5 w-5" />
+            </motion.div>
+
+            <motion.p
+              className="font-serif text-2xl font-medium tracking-wide text-white sm:text-4xl"
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -14 }}
+              transition={{ delay: prefersReducedMotion ? 0 : 0.12, duration: 0.38 }}
+            >
+              Summoning your edge
+            </motion.p>
+
+            <div className="mt-7 flex min-h-24 w-full flex-wrap items-center justify-center gap-2.5 sm:gap-3">
+              {preludeWords.map((word, index) => (
+                <motion.span
+                  key={word}
+                  className="rounded-full border border-[#DFB15B]/20 bg-white/7 px-3.5 py-2 text-[11px] font-bold uppercase tracking-widest text-[#F4DFA6] shadow-[0_10px_30px_rgba(0,0,0,0.2)] sm:px-4 sm:text-xs"
+                  initial={{
+                    opacity: 0,
+                    x: prefersReducedMotion ? 0 : index % 2 === 0 ? -90 : 90,
+                    y: prefersReducedMotion ? 0 : 22 + index * 4,
+                    scale: 0.88,
+                  }}
+                  animate={{
+                    opacity: [0, 1, 1, 0],
+                    x: 0,
+                    y: 0,
+                    scale: [0.88, 1, 1, 0.96],
+                  }}
+                  transition={{
+                    delay: prefersReducedMotion ? 0 : 0.26 + index * 0.08,
+                    duration: prefersReducedMotion ? 0.38 : 2.95,
+                    ease: [0.22, 1, 0.36, 1],
+                  }}
+                >
+                  {word}
+                </motion.span>
+              ))}
+            </div>
+          </div>
+        </motion.div>
+      ) : null}
+
       {isOpen ? (
         <motion.div
           className="fixed inset-0 z-50 flex items-center justify-center bg-[#06050A]/82 px-4 py-6 backdrop-blur-xl sm:px-6"
