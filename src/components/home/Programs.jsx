@@ -2,7 +2,7 @@
 "use client";
 import { useCallback, useEffect, useState, useMemo, useRef } from "react";
 import { motion } from "framer-motion";
-import { ChevronLeft, ChevronRight, Clock3, School, Building2, Laptop, MapPin, Plus, Sparkles, Star } from "lucide-react";
+import { ChevronLeft, ChevronRight, Clock3, MapPin, Plus, Sparkles, Star } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { getStoredToken, savePendingPaymentPlan } from "@/lib/api";
@@ -64,7 +64,8 @@ export default function ProgramsAndTestimonials() {
             badge: "Offline - Farmgate",
             title: "Gryffindor",
             desc: "An offline batch taken at our Farmgate center, built for face-to-face mentorship and real-time exam simulations.",
-            icon: School,
+            imageSrc: "/gryffindor.jpeg",
+            imageAlt: "Gryffindor house crest",
             location: {
                 text: "RH Home Center, Farmgate",
                 href: "https://maps.app.goo.gl/G6Qhf3stvisrsjXr6?g_st=ac"
@@ -92,7 +93,8 @@ export default function ProgramsAndTestimonials() {
             badge: "Online Batch",
             title: "Ravenclaw",
             desc: "An online batch taken live from your study room, built for students who want the full program without traveling to a physical center.",
-            icon: Laptop,
+            imageSrc: "/ravenclaw.jpeg",
+            imageAlt: "Ravenclaw house crest",
             location: {
                 text: "Your Cozy Study Room"
             },
@@ -120,7 +122,8 @@ export default function ProgramsAndTestimonials() {
             badge: "Offline - Bailey Road",
             title: "Hufflepuff",
             desc: "An offline batch taken at our Bailey Road center, built for face-to-face mentorship and real-time exam simulations.",
-            icon: Building2,
+            imageSrc: "/hufflepuff.jpeg",
+            imageAlt: "Hufflepuff house crest",
             location: {
                 text: "Siddheswari Road, Bailey Road",
                 href: "https://maps.app.goo.gl/aoFZ4eWXtpVx1RzEA?g_st=ac"
@@ -346,8 +349,14 @@ export default function ProgramsAndTestimonials() {
 
                                     {/* Title Header Structure */}
                                     <div className="flex items-center gap-4 mb-4">
-                                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center border ${card.iconStyle}`}>
-                                            <card.icon className="w-4 h-4 stroke-[1.8]" />
+                                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center overflow-hidden border ${card.iconStyle}`}>
+                                            <Image
+                                                src={card.imageSrc}
+                                                alt={card.imageAlt}
+                                                width={40}
+                                                height={40}
+                                                className="h-full w-full object-cover"
+                                            />
                                         </div>
                                         <h3 className="font-serif text-xl font-semibold text-white tracking-wide">
                                             {card.title}

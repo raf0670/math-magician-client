@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowRight, Building2, Laptop, School, Sparkles, X } from "lucide-react";
+import { ArrowRight, Sparkles, X } from "lucide-react";
+import Image from "next/image";
 
 const SESSION_KEY = "mathmagician_home_intro_seen";
 
@@ -14,7 +15,8 @@ const programs = [
     detail: "Offline at RH Home Center, Farmgate",
     schedule: "1:30 - 3:30 pm",
     price: "BDT 18,000",
-    icon: School,
+    imageSrc: "/gryffindor.jpeg",
+    imageAlt: "Gryffindor house crest",
   },
   {
     id: "online",
@@ -23,7 +25,8 @@ const programs = [
     detail: "Online live class from your study room",
     schedule: "7:30 - 9:30 pm",
     price: "BDT 17,500",
-    icon: Laptop,
+    imageSrc: "/ravenclaw.jpeg",
+    imageAlt: "Ravenclaw house crest",
     featured: true,
   },
   {
@@ -33,7 +36,8 @@ const programs = [
     detail: "Offline at Siddheswari Road, Bailey Road",
     schedule: "4:00 - 6:00 pm",
     price: "BDT 18,000",
-    icon: Building2,
+    imageSrc: "/hufflepuff.jpeg",
+    imageAlt: "Hufflepuff house crest",
   },
 ];
 
@@ -187,8 +191,14 @@ export default function HomeIntroPopup() {
                     <span className="rounded-md border border-white/10 bg-black/15 px-2.5 py-1 text-[9px] font-bold uppercase tracking-wider text-[#DFB15B]">
                       {program.badge}
                     </span>
-                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[#DFB15B]/20 bg-[#DFB15B]/10 text-[#DFB15B]">
-                      <program.icon className="h-4 w-4" />
+                    <span className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-[#DFB15B]/20 bg-[#DFB15B]/10 text-[#DFB15B]">
+                      <Image
+                        src={program.imageSrc}
+                        alt={program.imageAlt}
+                        width={40}
+                        height={40}
+                        className="h-full w-full object-cover"
+                      />
                     </span>
                   </span>
 

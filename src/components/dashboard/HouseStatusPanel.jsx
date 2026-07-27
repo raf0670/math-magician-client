@@ -1,7 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { CheckCircle2, Clock3, Crown, Flame, GraduationCap, Sparkles } from "lucide-react";
+import { CheckCircle2, Clock3, Crown, Sparkles } from "lucide-react";
+import Image from "next/image";
 import { getProfile, getStoredUser, saveAuthSession } from "@/lib/api";
 
 const houses = [
@@ -11,6 +12,8 @@ const houses = [
         location: "Farmgate",
         tone: "from-[#8B1E2D]/35 via-[#DFB15B]/10 to-transparent",
         iconClass: "border-[#DFB15B]/25 bg-[#8B1E2D]/20 text-[#F2C879]",
+        imageSrc: "/gryffindor.jpeg",
+        imageAlt: "Gryffindor house crest",
     },
     {
         name: "Hufflepuff",
@@ -18,6 +21,8 @@ const houses = [
         location: "Bailey Road",
         tone: "from-[#DFB15B]/24 via-[#F6E7A5]/8 to-transparent",
         iconClass: "border-[#DFB15B]/25 bg-[#DFB15B]/12 text-[#F6D98B]",
+        imageSrc: "/hufflepuff.jpeg",
+        imageAlt: "Hufflepuff house crest",
     },
     {
         name: "Ravenclaw",
@@ -25,6 +30,8 @@ const houses = [
         location: "Live Room",
         tone: "from-[#3156D4]/30 via-[#7C3AED]/10 to-transparent",
         iconClass: "border-[#7C9DFF]/25 bg-[#3156D4]/16 text-[#AFC5FF]",
+        imageSrc: "/ravenclaw.jpeg",
+        imageAlt: "Ravenclaw house crest",
     },
 ];
 
@@ -113,8 +120,14 @@ export default function HouseStatusPanel() {
                         <div className={`pointer-events-none absolute inset-0 bg-linear-to-br ${house.tone}`} />
                         <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-white/24 to-transparent opacity-70" />
                         <div className="relative z-10 flex h-full flex-col">
-                            <div className={`flex h-10 w-10 items-center justify-center rounded-2xl border ${house.iconClass}`}>
-                                {house.name === "Ravenclaw" ? <GraduationCap className="h-4 w-4" /> : <Flame className="h-4 w-4" />}
+                            <div className={`flex h-10 w-10 items-center justify-center overflow-hidden rounded-2xl border ${house.iconClass}`}>
+                                <Image
+                                    src={house.imageSrc}
+                                    alt={house.imageAlt}
+                                    width={40}
+                                    height={40}
+                                    className="h-full w-full object-cover"
+                                />
                             </div>
                             <h3 className="mt-5 font-serif text-xl font-semibold tracking-wide text-white">{house.name}</h3>
                             <p className="mt-2 text-xs font-semibold uppercase tracking-[0.18em] text-[#DFB15B]">{house.mode}</p>
