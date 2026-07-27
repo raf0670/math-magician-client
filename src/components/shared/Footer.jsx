@@ -1,8 +1,41 @@
 "use client";
 import { Mail, MapPin, Phone } from "lucide-react";
 import Link from "next/link";
-import { FaFacebook, FaInstagram, FaLinkedin, FaYoutube } from "react-icons/fa";
+import { FaDiscord, FaFacebook, FaFacebookMessenger, FaInstagram, FaYoutube } from "react-icons/fa";
 import BrandMark from "@/components/shared/BrandMark";
+
+const socialLinks = [
+  {
+    name: "FB Community",
+    href: "https://m.me/j/AbazInHCd4ZkmBmV/?send_source=gc%3Acopy_invite_link_t",
+    icon: <FaFacebook className="w-4 h-4" />,
+  },
+  {
+    name: "Messenger Group",
+    href: "https://m.me/j/AbbUmVRClo6YFnc7/?send_source=gc%3Acopy_invite_link_t",
+    icon: <FaFacebookMessenger className="w-4 h-4" />,
+  },
+  {
+    name: "Discord Server",
+    href: "https://discord.gg/Yt2bxXkqzU",
+    icon: <FaDiscord className="w-4 h-4" />,
+  },
+  {
+    name: "FB Page",
+    href: "https://www.facebook.com/profile.php?id=61586225977175",
+    icon: <FaFacebook className="w-4 h-4" />,
+  },
+  {
+    name: "Instagram Page",
+    href: "https://www.instagram.com/math_magician35/",
+    icon: <FaInstagram className="w-4 h-4" />,
+  },
+  {
+    name: "YouTube Link",
+    href: "https://www.youtube.com/@Mehrab.DU-IBA",
+    icon: <FaYoutube className="w-4 h-4" />,
+  },
+];
 
 export default function Footer() {
   const currentYear = 2026; // Static synchronization point matching deployment cycle
@@ -52,17 +85,14 @@ export default function Footer() {
 
           {/* SOCIAL MEDIA HOVER PLATFORMS */}
           <div className="flex items-center gap-3">
-            {[
-              { icon: <FaFacebook className="w-4 h-4" />, href: "https://facebook.com" },
-              { icon: <FaYoutube className="w-4 h-4" />, href: "https://youtube.com" },
-              { icon: <FaInstagram className="w-4 h-4" />, href: "https://instagram.com" },
-              { icon: <FaLinkedin className="w-4 h-4" />, href: "https://linkedin.com" },
-            ].map((soc, idx) => (
+            {socialLinks.map((soc) => (
               <a
-                key={idx}
+                key={soc.name}
                 href={soc.href}
                 target="_blank"
                 rel="noopener noreferrer"
+                aria-label={soc.name}
+                title={soc.name}
                 className="w-8 h-8 rounded-full bg-[#1A1625] flex items-center justify-center text-[#8E8A9F] hover:text-white hover:bg-[#251F35] transition-all duration-200 border border-white/2"
               >
                 {soc.icon}
