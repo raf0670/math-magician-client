@@ -7,15 +7,6 @@ import Image from "next/image";
 
 const SESSION_KEY = "mathmagician_home_intro_seen";
 
-const preludeWords = [
-  "Perspicacity",
-  "Tenacity",
-  "Aptitude",
-  "Discipline",
-  "Acumen",
-  "Precision",
-];
-
 const programs = [
   {
     id: "farmgate",
@@ -79,7 +70,7 @@ export default function HomeIntroPopup() {
       setIntroPhase("prelude");
       preludeTimerId = window.setTimeout(
         () => setIntroPhase("popup"),
-        prefersReducedMotion ? 900 : 4100
+        prefersReducedMotion ? 1200 : 5200
       );
     }, prefersReducedMotion ? 150 : 350);
 
@@ -131,76 +122,107 @@ export default function HomeIntroPopup() {
     <AnimatePresence>
       {isPrelude ? (
         <motion.div
-          className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden bg-[#050409] px-4 text-center"
+          className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden bg-[#030207] px-4 text-center"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: prefersReducedMotion ? 0.12 : 0.22 }}
         >
           <motion.div
-            className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(223,177,91,0.16),transparent_34%),radial-gradient(circle_at_30%_64%,rgba(124,58,237,0.18),transparent_28%)]"
-            initial={{ scale: 0.92, opacity: 0.35 }}
-            animate={{ scale: prefersReducedMotion ? 1 : 1.12, opacity: 0.9 }}
-            exit={{ scale: 1.18, opacity: 0 }}
-            transition={{ duration: prefersReducedMotion ? 0.3 : 3.2, ease: "easeOut" }}
+            className="absolute inset-0 bg-[radial-gradient(circle_at_50%_42%,rgba(244,205,126,0.2),transparent_27%),radial-gradient(circle_at_50%_72%,rgba(85,43,168,0.22),transparent_31%),linear-gradient(180deg,rgba(3,2,7,0),rgba(3,2,7,0.86))]"
+            initial={{ scale: 1.12, opacity: 0.25 }}
+            animate={{ scale: prefersReducedMotion ? 1 : 0.98, opacity: 1 }}
+            exit={{ scale: 1.05, opacity: 0 }}
+            transition={{ duration: prefersReducedMotion ? 0.4 : 4.2, ease: "easeOut" }}
           />
 
           <motion.div
-            className="absolute h-[1px] w-[84vw] max-w-4xl bg-linear-to-r from-transparent via-[#DFB15B] to-transparent shadow-[0_0_42px_rgba(223,177,91,0.95)]"
-            initial={{ x: "-90vw", rotate: -12, opacity: 0 }}
-            animate={{ x: prefersReducedMotion ? 0 : "90vw", rotate: -12, opacity: [0, 1, 1, 0] }}
+            className="absolute inset-x-0 top-0 h-24 bg-linear-to-b from-black to-transparent"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.95 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: prefersReducedMotion ? 0.4 : 3.1, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 0.55 }}
+          />
+
+          <motion.div
+            className="absolute inset-x-0 bottom-0 h-24 bg-linear-to-t from-black to-transparent"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.95 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.55 }}
+          />
+
+          <motion.div
+            className="absolute h-[44rem] w-[44rem] max-w-[120vw] rounded-full border border-[#DFB15B]/10 shadow-[0_0_90px_rgba(223,177,91,0.16),inset_0_0_80px_rgba(223,177,91,0.08)]"
+            initial={{ opacity: 0, scale: 0.58, rotate: -14 }}
+            animate={{
+              opacity: prefersReducedMotion ? 0.35 : [0, 0.5, 0.34],
+              scale: prefersReducedMotion ? 0.82 : [0.58, 0.9, 0.82],
+              rotate: prefersReducedMotion ? 0 : 0,
+            }}
+            exit={{ opacity: 0, scale: 0.98 }}
+            transition={{ duration: prefersReducedMotion ? 0.45 : 2.2, ease: [0.22, 1, 0.36, 1] }}
+          />
+
+          <motion.div
+            className="absolute h-[1px] w-[92vw] max-w-5xl bg-linear-to-r from-transparent via-[#E8C56F] to-transparent shadow-[0_0_46px_rgba(232,197,111,0.9)]"
+            initial={{ scaleX: 0, opacity: 0 }}
+            animate={{ scaleX: prefersReducedMotion ? 0.82 : [0, 1, 0.72], opacity: prefersReducedMotion ? 0.45 : [0, 1, 0.48] }}
+            exit={{ opacity: 0 }}
+            transition={{ delay: prefersReducedMotion ? 0 : 0.75, duration: prefersReducedMotion ? 0.35 : 2.65, ease: [0.22, 1, 0.36, 1] }}
           />
 
           <div className="relative z-10 flex w-full max-w-4xl flex-col items-center">
             <motion.div
-              className="mb-5 inline-flex h-12 w-12 items-center justify-center rounded-full border border-[#DFB15B]/30 bg-[#DFB15B]/10 text-[#DFB15B] shadow-[0_0_38px_rgba(223,177,91,0.22)]"
-              initial={{ opacity: 0, scale: 0.7, rotate: -18 }}
-              animate={{ opacity: 1, scale: 1, rotate: 0 }}
-              exit={{ opacity: 0, scale: 1.25 }}
-              transition={{ duration: prefersReducedMotion ? 0.2 : 0.5, ease: "easeOut" }}
+              className="relative mb-7 flex h-28 w-28 items-center justify-center rounded-full border border-[#DFB15B]/25 bg-[#100B17]/80 shadow-[0_0_50px_rgba(223,177,91,0.3)] sm:h-36 sm:w-36"
+              initial={{ opacity: 0, scale: prefersReducedMotion ? 0.88 : 2.15, filter: "blur(12px)" }}
+              animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+              exit={{ opacity: 0, scale: 0.84, filter: "blur(8px)" }}
+              transition={{ duration: prefersReducedMotion ? 0.35 : 1.8, ease: [0.16, 1, 0.3, 1] }}
             >
-              <Sparkles className="h-5 w-5" />
+              <motion.span
+                className="absolute inset-[-12px] rounded-full border border-[#DFB15B]/15"
+                initial={{ opacity: 0, scale: 0.76 }}
+                animate={{ opacity: prefersReducedMotion ? 0.35 : [0, 0.7, 0.18], scale: prefersReducedMotion ? 1 : [0.76, 1.35, 1.62] }}
+                transition={{ delay: prefersReducedMotion ? 0 : 0.4, duration: prefersReducedMotion ? 0.3 : 2.2, ease: "easeOut" }}
+              />
+              <Image
+                src="/favicon.ico"
+                alt="Magician's School logo"
+                width={96}
+                height={96}
+                unoptimized
+                className="h-20 w-20 rounded-full object-cover sm:h-24 sm:w-24"
+              />
             </motion.div>
 
-            <motion.p
-              className="font-serif text-2xl font-medium tracking-wide text-white sm:text-4xl"
-              initial={{ opacity: 0, y: 14 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -14 }}
-              transition={{ delay: prefersReducedMotion ? 0 : 0.12, duration: 0.38 }}
+            <motion.h2
+              className="font-serif text-3xl font-semibold leading-tight tracking-wide text-white drop-shadow-[0_0_20px_rgba(232,197,111,0.22)] sm:text-5xl"
+              initial={{ opacity: 0, y: 22, filter: "blur(10px)" }}
+              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              exit={{ opacity: 0, y: -10, filter: "blur(8px)" }}
+              transition={{ delay: prefersReducedMotion ? 0.1 : 1.7, duration: prefersReducedMotion ? 0.35 : 0.95, ease: [0.22, 1, 0.36, 1] }}
             >
-              Summoning your edge
+              Magician&apos;s School
+            </motion.h2>
+
+            <motion.p
+              className="mt-4 max-w-3xl font-serif text-xl font-medium leading-tight tracking-wide text-[#F4DFA6] drop-shadow-[0_0_24px_rgba(223,177,91,0.22)] sm:text-3xl"
+              initial={{ opacity: 0, y: 18, scale: 0.96, filter: "blur(8px)" }}
+              animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
+              exit={{ opacity: 0, y: -8, filter: "blur(6px)" }}
+              transition={{ delay: prefersReducedMotion ? 0.25 : 2.75, duration: prefersReducedMotion ? 0.35 : 0.9, ease: [0.22, 1, 0.36, 1] }}
+            >
+              Crack IBA like a Magician
             </motion.p>
 
-            <div className="mt-7 flex min-h-24 w-full flex-wrap items-center justify-center gap-2.5 sm:gap-3">
-              {preludeWords.map((word, index) => (
-                <motion.span
-                  key={word}
-                  className="rounded-full border border-[#DFB15B]/20 bg-white/7 px-3.5 py-2 text-[11px] font-bold uppercase tracking-widest text-[#F4DFA6] shadow-[0_10px_30px_rgba(0,0,0,0.2)] sm:px-4 sm:text-xs"
-                  initial={{
-                    opacity: 0,
-                    x: prefersReducedMotion ? 0 : index % 2 === 0 ? -90 : 90,
-                    y: prefersReducedMotion ? 0 : 22 + index * 4,
-                    scale: 0.88,
-                  }}
-                  animate={{
-                    opacity: [0, 1, 1, 0],
-                    x: 0,
-                    y: 0,
-                    scale: [0.88, 1, 1, 0.96],
-                  }}
-                  transition={{
-                    delay: prefersReducedMotion ? 0 : 0.26 + index * 0.08,
-                    duration: prefersReducedMotion ? 0.38 : 2.95,
-                    ease: [0.22, 1, 0.36, 1],
-                  }}
-                >
-                  {word}
-                </motion.span>
-              ))}
-            </div>
+            <motion.div
+              className="mt-8 h-px w-44 bg-linear-to-r from-transparent via-[#DFB15B]/70 to-transparent sm:w-64"
+              initial={{ scaleX: 0, opacity: 0 }}
+              animate={{ scaleX: 1, opacity: 1 }}
+              exit={{ scaleX: 0.45, opacity: 0 }}
+              transition={{ delay: prefersReducedMotion ? 0.35 : 3.45, duration: prefersReducedMotion ? 0.25 : 0.8, ease: "easeOut" }}
+            />
           </div>
         </motion.div>
       ) : null}
