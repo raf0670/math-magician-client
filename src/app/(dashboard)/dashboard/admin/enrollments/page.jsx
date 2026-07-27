@@ -1,10 +1,11 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { CheckCircle2, Clock3, RefreshCw, ShieldAlert, XCircle } from "lucide-react";
+import { Banknote, CheckCircle2, Clock3, RefreshCw, ShieldAlert, XCircle } from "lucide-react";
 import {
   getAdminEnrollmentReviews,
   getProfile,
+  markAdminEnrollmentFullyPaid,
   saveAuthSession,
   updateAdminEnrollmentStatus,
 } from "@/lib/api";
@@ -21,6 +22,11 @@ const STATUS_STYLES = {
   pending: "border-amber-400/25 bg-amber-400/10 text-amber-200",
   approved: "border-emerald-400/25 bg-emerald-400/10 text-emerald-200",
   rejected: "border-red-400/25 bg-red-400/10 text-red-200",
+};
+
+const PAYMENT_CHOICE_STYLES = {
+  full: "border-emerald-400/25 bg-emerald-400/10 text-emerald-200",
+  partial: "border-sky-400/25 bg-sky-400/10 text-sky-200",
 };
 
 const PLAN_DISPLAY_NAMES = {
@@ -67,6 +73,20 @@ function formatInfoValue(value) {
   return value;
 }
 
+function formatBDT(value) {
+  if (typeof value !== "number") return "";
+  return `BDT ${value.toLocaleString("en-US")}`;
+}
+
+function formatPaymentChoice(value) {
+  return value === "partial" ? "Partial" : "Full";
+}
+
+function formatDeliveryMode(value) {
+  if (!value) return "";
+  return value.charAt(0).toUpperCase() + value.slice(1);
+}
+
 function getPlanDisplayName(item) {
   return PLAN_DISPLAY_NAMES[item.planId] || PLAN_DISPLAY_NAMES[item.planTitle] || item.planTitle;
 }
@@ -84,6 +104,7 @@ export default function AdminEnrollmentReviewsPage() {
   const [status, setStatus] = useState("pending");
   const [items, setItems] = useState([]);
   const [reviewNotes, setReviewNotes] = useState({});
+  const [finalTrxIDs, setFinalTrxIDs] = useState({});
   const [activeAction, setActiveAction] = useState("");
   const [loading, setLoading] = useState(true);
   const [profileLoading, setProfileLoading] = useState(true);
@@ -183,6 +204,10 @@ export default function AdminEnrollmentReviewsPage() {
     setReviewNotes((current) => ({ ...current, [paymentId]: value }));
   };
 
+  const handleFinalTrxIDChange = (paymentId, value) => {
+    setFinalTrxIDs((current) => ({ ...current, [paymentId]: value }));
+  };
+
   const handleStatusUpdate = async (paymentId, nextStatus) => {
     const actionKey = `${paymentId}:${nextStatus}`;
     setActiveAction(actionKey);
@@ -205,6 +230,34 @@ export default function AdminEnrollmentReviewsPage() {
       await loadReviews(status, { silent: true });
     } catch (err) {
       setError(err.message || `Unable to mark enrollment as ${nextStatus}.`);
+    } finally {
+      setActiveAction("");
+    }
+  };
+
+  const handleFullyPaidUpdate = async (paymentId) => {
+    const finalTrxID = finalTrxIDs[paymentId]?.trim() || "";
+    if (!finalTrxID) {
+      setError("Final bKash transaction ID is required.");
+      return;
+    }
+
+    const actionKey = `${paymentId}:fully-paid`;
+    setActiveAction(actionKey);
+    setError("");
+
+    try {
+      const payload = await markAdminEnrollmentFullyPaid(paymentId, finalTrxID);
+      const updated = payload?.data;
+
+      if (updated) {
+        setItems((current) => current.map((item) => (item.paymentId === paymentId ? updated : item)));
+        setFinalTrxIDs((current) => ({ ...current, [paymentId]: "" }));
+      }
+
+      await loadReviews(status, { silent: true });
+    } catch (err) {
+      setError(err.message || "Unable to mark enrollment fully paid.");
     } finally {
       setActiveAction("");
     }
@@ -307,7 +360,12 @@ export default function AdminEnrollmentReviewsPage() {
             const note = reviewNotes[paymentId] ?? item.reviewNote ?? "";
             const approveKey = `${paymentId}:approved`;
             const rejectKey = `${paymentId}:rejected`;
+            const fullyPaidKey = `${paymentId}:fully-paid`;
             const isPending = item.status === "pending";
+            const isPartial = item.paymentChoice === "partial";
+            const hasRemainingDue = Number(item.remainingAmount || 0) > 0;
+            const canMarkFullyPaid = item.status === "approved" && isPartial && hasRemainingDue && !item.finalTrxID;
+            const finalTrxID = finalTrxIDs[paymentId] || "";
 
             return (
               <section key={paymentId} className="rounded-3xl border border-white/6 bg-[#121017] p-5">
@@ -317,6 +375,9 @@ export default function AdminEnrollmentReviewsPage() {
                       <h2 className="font-serif text-2xl font-medium text-white">{getEnrollmentName(item)}</h2>
                       <span className={`rounded-full border px-3 py-1 text-xs font-bold uppercase tracking-wider ${STATUS_STYLES[item.status] || STATUS_STYLES.pending}`}>
                         {item.status}
+                      </span>
+                      <span className={`rounded-full border px-3 py-1 text-xs font-bold uppercase tracking-wider ${PAYMENT_CHOICE_STYLES[item.paymentChoice] || PAYMENT_CHOICE_STYLES.full}`}>
+                        {formatPaymentChoice(item.paymentChoice)}
                       </span>
                     </div>
                     <p className="mt-2 text-sm text-[#8E8A9F]">{item.user?.email || item.enrollment?.emailAddress || "No email"}</p>
@@ -329,6 +390,11 @@ export default function AdminEnrollmentReviewsPage() {
 
                 <div className="mt-5 grid gap-3 text-sm sm:grid-cols-2 lg:grid-cols-4">
                   <Info label="Plan" value={formatPlanValue(item)} />
+                  <Info label="Payment Type" value={formatPaymentChoice(item.paymentChoice)} />
+                  <Info label="Delivery Mode" value={formatDeliveryMode(item.deliveryMode)} />
+                  <Info label="Paid Now" value={formatBDT(item.paidAmount)} />
+                  <Info label="Remaining Due" value={formatBDT(item.remainingAmount)} />
+                  <Info label="Final TrxID" value={item.finalTrxID} />
                   <Info label="Phone" value={item.enrollment?.phoneNumber} />
                   <Info label="College" value={item.enrollment?.college} />
                   <Info label="Preferred Batch" value={formatPreferredBatch(item.enrollment?.preferredBatch) || "Not selected"} />
@@ -388,6 +454,39 @@ export default function AdminEnrollmentReviewsPage() {
                     </div>
                   )}
                 </div>
+
+                {canMarkFullyPaid ? (
+                  <div className="mt-5 rounded-2xl border border-sky-400/20 bg-sky-400/8 px-4 py-4">
+                    <div className="flex flex-col gap-4 lg:flex-row lg:items-end">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 text-sm font-semibold text-sky-100">
+                          <Banknote className="h-4 w-4 text-sky-200" />
+                          Final installment due: {formatBDT(item.remainingAmount)}
+                        </div>
+                        <input
+                          type="text"
+                          value={finalTrxID}
+                          onChange={(event) => handleFinalTrxIDChange(paymentId, event.target.value)}
+                          placeholder="Final bKash transaction ID"
+                          className="mt-3 w-full rounded-2xl border border-white/8 bg-[#0F0D15] px-4 py-3 text-sm text-white outline-none transition placeholder:text-[#6B667B] focus:border-sky-300/45"
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        disabled={Boolean(activeAction)}
+                        onClick={() => handleFullyPaidUpdate(paymentId)}
+                        className="inline-flex items-center justify-center gap-2 rounded-2xl bg-sky-300 px-4 py-3 text-sm font-bold uppercase tracking-wider text-black transition hover:brightness-110 disabled:cursor-wait disabled:opacity-70"
+                      >
+                        <LoadingButtonLabel
+                          loading={activeAction === fullyPaidKey}
+                          idleText="Mark Fully Paid"
+                          loadingText="Saving..."
+                          iconName="check"
+                        />
+                      </button>
+                    </div>
+                  </div>
+                ) : null}
 
                 <div className="mt-4 flex flex-wrap items-center gap-2 text-xs text-[#6B667B]">
                   <CheckCircle2 className="h-4 w-4 text-[#DFB15B]" />

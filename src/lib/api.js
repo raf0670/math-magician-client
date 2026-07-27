@@ -200,10 +200,10 @@ export async function getCourses() {
   return request("/api/courses");
 }
 
-export async function submitManualEnrollment(planId, formData) {
+export async function submitManualEnrollment(planId, formData, paymentChoice = "full") {
   return request("/api/payments/manual-enrollment", {
     method: "POST",
-    body: { planId, formData },
+    body: { planId, formData, paymentChoice },
   });
 }
 
@@ -220,6 +220,13 @@ export async function updateAdminEnrollmentStatus(paymentId, status, reviewNote 
   return request(`/api/payments/admin/enrollments/${paymentId}/status`, {
     method: "PATCH",
     body: { status, reviewNote },
+  });
+}
+
+export async function markAdminEnrollmentFullyPaid(paymentId, finalTrxID) {
+  return request(`/api/payments/admin/enrollments/${paymentId}/final-payment`, {
+    method: "PATCH",
+    body: { finalTrxID },
   });
 }
 

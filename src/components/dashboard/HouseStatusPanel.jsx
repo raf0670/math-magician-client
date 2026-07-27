@@ -63,9 +63,12 @@ export default function HouseStatusPanel() {
     }, []);
 
     const hasClassAccess = Boolean(currentUser?.hasClassAccess);
+    const isPartiallyPaid = currentUser?.paymentStatus === "partiallyPaid";
     const statusTitle = hasClassAccess ? "Portal Access Granted" : "Enrollment Review Pending";
     const statusCopy = hasClassAccess
-        ? "Your class vault is open. Choose your practice route and keep your preparation streak alive."
+        ? isPartiallyPaid
+            ? "Your class vault is open after partial payment approval. The final installment is still due later."
+            : "Your class vault is open. Choose your practice route and keep your preparation streak alive."
         : "Your academy access will unlock after admin approval. The available houses are shown below without assigning you to one.";
     const StatusIcon = hasClassAccess ? CheckCircle2 : Clock3;
 
@@ -98,7 +101,7 @@ export default function HouseStatusPanel() {
                 <div className="relative z-10 mt-5 flex flex-wrap gap-2">
                     <span className="inline-flex items-center gap-1.5 rounded-full border border-white/8 bg-white/5 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-[#D8D4E5]">
                         <Crown className="h-3.5 w-3.5 text-[#DFB15B]" />
-                        Premium Academy
+                        {isPartiallyPaid ? "Partial Payment" : "Premium Academy"}
                     </span>
                     <span className="inline-flex items-center gap-1.5 rounded-full border border-white/8 bg-white/5 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-[#D8D4E5]">
                         <Sparkles className="h-3.5 w-3.5 text-[#A78BFA]" />

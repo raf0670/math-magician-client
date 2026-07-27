@@ -12,21 +12,21 @@ const ACCESS_COPY = {
         loadingTitle: "Checking class access",
         loadingMessage: "Your payment access and student profile are being verified.",
         lockedTitle: "Classes unlock after admin approval",
-        lockedMessage: "Submit the enrollment form with your bKash transaction ID. Once an admin approves it, live classes and archived materials will open here.",
+        lockedMessage: "Submit the enrollment form with your full or partial bKash transaction ID. Once an admin approves it, live classes and archived materials will open here.",
     },
     liveExams: {
         loadingEyebrow: "Live Exams",
         loadingTitle: "Checking exam access",
         loadingMessage: "Your payment access and student profile are being verified before the exam room opens.",
         lockedTitle: "Live exams unlock after admin approval",
-        lockedMessage: "Submit the enrollment form with your bKash transaction ID. Once an admin approves it, scheduled live exams will open here.",
+        lockedMessage: "Submit the enrollment form with your full or partial bKash transaction ID. Once an admin approves it, scheduled live exams will open here.",
     },
     mockTests: {
         loadingEyebrow: "Mock Tests",
         loadingTitle: "Checking practice access",
         loadingMessage: "Your payment access and student profile are being verified before the practice arena opens.",
         lockedTitle: "Mock tests unlock after admin approval",
-        lockedMessage: "Submit the enrollment form with your bKash transaction ID. Once an admin approves it, mock tests and generated practice papers will open here.",
+        lockedMessage: "Submit the enrollment form with your full or partial bKash transaction ID. Once an admin approves it, mock tests and generated practice papers will open here.",
     },
 };
 

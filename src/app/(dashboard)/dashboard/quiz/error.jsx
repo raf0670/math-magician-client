@@ -21,7 +21,7 @@ export default function QuizError({ error, reset }) {
   return (
     <section className="relative min-h-130 overflow-hidden rounded-3xl border border-red-400/15 bg-[#121017] px-5 py-8 shadow-[0_24px_70px_rgba(0,0,0,0.32)] sm:px-8 lg:px-10">
       <div className="pointer-events-none absolute inset-0">
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(223,177,91,0.045)_1px,transparent_1px),linear-gradient(90deg,rgba(124,58,237,0.045)_1px,transparent_1px)] bg-[size:38px_38px]" />
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(223,177,91,0.045)_1px,transparent_1px),linear-gradient(90deg,rgba(124,58,237,0.045)_1px,transparent_1px)] bg-size-[38px_38px]" />
         <div className="absolute -top-24 right-10 h-80 w-80 rounded-full bg-red-500/12 blur-[95px]" />
         <div className="absolute -bottom-28 left-1/3 h-96 w-96 rounded-full bg-[#DFB15B]/12 blur-[110px]" />
         <motion.div

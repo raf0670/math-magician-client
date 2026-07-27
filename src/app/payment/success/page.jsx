@@ -17,6 +17,9 @@ export default function PaymentSuccessPage() {
 function PaymentReviewSubmitted() {
   const searchParams = useSearchParams();
   const paymentId = searchParams.get("paymentId") || "";
+  const paymentChoice = searchParams.get("paymentChoice") || "full";
+  const remainingAmount = Number(searchParams.get("remainingAmount") || 0);
+  const isPartial = paymentChoice === "partial" && remainingAmount > 0;
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-[#0A090F] px-4 text-white">
@@ -27,7 +30,9 @@ function PaymentReviewSubmitted() {
         <p className="mt-6 text-xs font-bold uppercase tracking-[0.3em] text-[#DFB15B]">Review Pending</p>
         <h1 className="mt-3 font-serif text-3xl font-medium">Enrollment submitted</h1>
         <p className="mt-3 text-sm leading-6 text-[#8E8A9F]">
-          Your bKash transaction ID and enrollment form are waiting for admin approval. Class access will unlock after approval.
+          {isPartial
+            ? `Your BDT 10,000 partial payment is waiting for admin approval. Class access will unlock after approval, with BDT ${remainingAmount.toLocaleString("en-US")} due later.`
+            : "Your bKash transaction ID and enrollment form are waiting for admin approval. Class access will unlock after approval."}
         </p>
         {paymentId ? (
           <div className="mt-5 rounded-2xl border border-white/5 bg-[#1A1722] px-4 py-3 text-xs text-[#8E8A9F]">

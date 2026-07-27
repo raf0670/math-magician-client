@@ -5,15 +5,17 @@ import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowLeft, Check, LockKeyhole, QrCode, WandSparkles } from "lucide-react";
+import { ArrowLeft, Check, CreditCard, LockKeyhole, QrCode, WandSparkles } from "lucide-react";
 import { getStoredToken, getStoredUser, savePendingPaymentPlan, submitManualEnrollment } from "@/lib/api";
 import FlashyLoader, { LoadingButtonLabel } from "@/components/shared/FlashyLoader";
 
 const PLANS = {
-  offline: { title: "Gryffindor", amount: "BDT 18,000" },
-  premium: { title: "Ravenclaw", amount: "BDT 17,500" },
-  online: { title: "Hufflepuff", amount: "BDT 18,000" },
+  offline: { title: "Gryffindor", amount: 18000, deliveryMode: "offline" },
+  premium: { title: "Ravenclaw", amount: 17500, deliveryMode: "online" },
+  online: { title: "Hufflepuff", amount: 18000, deliveryMode: "offline" },
 };
+
+const PARTIAL_PAYMENT_AMOUNT = 10000;
 
 const BATCH_PLAN_IDS = {
   Farmgate: "offline",
@@ -46,6 +48,10 @@ const INITIAL_FORM = {
   preferredBatch: "",
   bkashTrxID: "",
 };
+
+function formatBDT(amount) {
+  return `BDT ${Number(amount || 0).toLocaleString("en-US")}`;
+}
 
 const REQUIRED_FIELDS = [
   "email",
@@ -134,10 +140,13 @@ function PaymentDetailsContent() {
   const planId = searchParams.get("plan") || "";
   const plan = PLANS[planId];
   const [form, setForm] = useState(INITIAL_FORM);
+  const [paymentChoice, setPaymentChoice] = useState("full");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const selectedPlanId = BATCH_PLAN_IDS[form.preferredBatch] || planId;
   const selectedPlan = PLANS[selectedPlanId] || plan;
+  const amountDueNow = paymentChoice === "partial" ? PARTIAL_PAYMENT_AMOUNT : selectedPlan?.amount || 0;
+  const remainingAmount = Math.max((selectedPlan?.amount || 0) - amountDueNow, 0);
 
   useEffect(() => {
     if (!plan) return;
@@ -196,14 +205,20 @@ function PaymentDetailsContent() {
 
     try {
       setLoading(true);
-      const payload = await submitManualEnrollment(selectedPlanId, form);
+      const payload = await submitManualEnrollment(selectedPlanId, form, paymentChoice);
       const paymentId = payload?.data?.paymentId;
 
       if (!paymentId) {
         throw new Error("Unable to submit enrollment for review.");
       }
 
-      router.push(`/payment/success?paymentId=${encodeURIComponent(paymentId)}&status=pending`);
+      const successParams = new URLSearchParams({
+        paymentId,
+        status: "pending",
+        paymentChoice,
+        remainingAmount: String(remainingAmount),
+      });
+      router.push(`/payment/success?${successParams.toString()}`);
     } catch (err) {
       setError(err.message || "Unable to submit enrollment for review.");
       setLoading(false);
@@ -393,7 +408,15 @@ function PaymentDetailsContent() {
               <RadioField label="Which batch do you want to be enrolled?" field="preferredBatch" required value={form.preferredBatch} error={fieldErrors.preferredBatch} options={BATCH_OPTIONS} onChange={updateField} />
             </FormSection>
 
-            <FormSection title="bKash Payment" description="Scan the QR code, complete payment, then enter the transaction ID from bKash." index={5}>
+            <FormSection title="Payment Option" description="Choose how much you are paying before submitting this enrollment for review." index={5}>
+              <PaymentChoiceField
+                selectedPlan={selectedPlan}
+                value={paymentChoice}
+                onChange={setPaymentChoice}
+              />
+            </FormSection>
+
+            <FormSection title="bKash Payment" description="Scan the QR code, complete payment, then enter the transaction ID from bKash." index={6}>
               <div className="grid gap-5 lg:grid-cols-[280px_1fr] lg:items-center">
                 <div className="rounded-3xl border border-[#DFB15B]/20 bg-white p-4">
                   <Image
@@ -407,7 +430,10 @@ function PaymentDetailsContent() {
                 <div className="space-y-4">
                   <div className="flex items-center gap-3 rounded-2xl border border-[#DFB15B]/15 bg-[#DFB15B]/8 px-4 py-4 text-sm text-[#EBD39B]">
                     <QrCode className="h-5 w-5 shrink-0 text-[#DFB15B]" />
-                    <span className="font-medium">Selected plan: {selectedPlan.title} - {selectedPlan.amount}</span>
+                    <span className="font-medium">
+                      {selectedPlan.title} - pay {formatBDT(amountDueNow)} now
+                      {remainingAmount ? `, ${formatBDT(remainingAmount)} later` : ""}
+                    </span>
                   </div>
                   <TextField
                     label="BkashTrxID"
@@ -491,6 +517,54 @@ function FormSection({ title, description, children, index }) {
       </div>
       <div className="space-y-6">{children}</div>
     </motion.section>
+  );
+}
+
+function PaymentChoiceField({ selectedPlan, value, onChange }) {
+  const options = [
+    {
+      id: "full",
+      title: "Pay full amount now",
+      amount: selectedPlan?.amount || 0,
+      note: "No remaining balance after admin approval.",
+    },
+    {
+      id: "partial",
+      title: "Pay BDT 10,000 now",
+      amount: PARTIAL_PAYMENT_AMOUNT,
+      note: `${formatBDT(Math.max((selectedPlan?.amount || 0) - PARTIAL_PAYMENT_AMOUNT, 0))} remains for the final installment.`,
+    },
+  ];
+
+  return (
+    <div className="grid gap-3 sm:grid-cols-2">
+      {options.map((option) => {
+        const checked = value === option.id;
+
+        return (
+          <motion.button
+            key={option.id}
+            type="button"
+            onClick={() => onChange(option.id)}
+            whileHover={{ y: -2 }}
+            className={`flex min-h-36 flex-col items-start rounded-2xl border px-4 py-4 text-left transition ${
+              checked
+                ? "border-[#74D99F]/55 bg-[#102019]/70 shadow-[0_0_28px_rgba(116,217,159,0.08)]"
+                : "border-white/8 bg-[#0F0D15]/75 hover:border-[#DFB15B]/25"
+            }`}
+          >
+            <span className={`flex h-9 w-9 items-center justify-center rounded-xl border ${
+              checked ? "border-[#74D99F] bg-[#74D99F] text-black" : "border-[#DFB15B]/25 bg-[#DFB15B]/10 text-[#DFB15B]"
+            }`}>
+              {checked ? <Check className="h-4 w-4" /> : <CreditCard className="h-4 w-4" />}
+            </span>
+            <span className="mt-4 text-sm font-bold text-white">{option.title}</span>
+            <span className="mt-2 font-serif text-2xl font-semibold text-white">{formatBDT(option.amount)}</span>
+            <span className="mt-2 text-xs font-medium leading-5 text-[#8E8A9F]">{option.note}</span>
+          </motion.button>
+        );
+      })}
+    </div>
   );
 }
 
