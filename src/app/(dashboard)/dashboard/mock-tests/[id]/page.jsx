@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import ExamEngine from "@/components/dashboard/ExamEngine";
 import AnalyticalScorecard from "@/components/dashboard/AnalyticalScorecard";
+import ClassAccessGate from "@/components/dashboard/ClassAccessGate";
 import FlashyLoader from "@/components/shared/FlashyLoader";
 import { getExamById, submitExam } from "@/lib/api";
 import ExamNotFound from "./not-found";
@@ -10,6 +11,14 @@ import ExamNotFound from "./not-found";
 const MONGO_OBJECT_ID_PATTERN = /^[a-f\d]{24}$/i;
 
 export default function ActiveMockExamArena() {
+    return (
+        <ClassAccessGate section="mockTests">
+            <ActiveMockExamContent />
+        </ClassAccessGate>
+    );
+}
+
+function ActiveMockExamContent() {
     const params = useParams();
     const examId = params?.id;
     const [examFinished, setExamFinished] = useState(false);

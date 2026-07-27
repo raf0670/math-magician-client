@@ -3,7 +3,7 @@ import LiveArena from "@/components/dashboard/LiveArena";
 
 export default function DashboardClassesWorkspace() {
     return (
-        <ClassAccessGate>
+        <ClassAccessGate section="classes">
             <div className="flex flex-col gap-8 w-full">
                 <div className="flex flex-col items-start text-left gap-1">
                     <h1 className="font-serif text-3xl font-medium tracking-wide text-white">

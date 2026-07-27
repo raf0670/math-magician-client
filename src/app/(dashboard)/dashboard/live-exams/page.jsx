@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { CalendarClock, CheckCircle2, Clock3, Eye, LockKeyhole, Play, RefreshCw, Radio } from "lucide-react";
 import { getLiveExams } from "@/lib/api";
+import ClassAccessGate from "@/components/dashboard/ClassAccessGate";
 import FlashyLoader from "@/components/shared/FlashyLoader";
 
 const STATUS_STYLES = {
@@ -37,6 +38,14 @@ function getStatus(exam) {
 }
 
 export default function LiveExamsPage() {
+  return (
+    <ClassAccessGate section="liveExams">
+      <LiveExamsContent />
+    </ClassAccessGate>
+  );
+}
+
+function LiveExamsContent() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [fatalError, setFatalError] = useState(null);

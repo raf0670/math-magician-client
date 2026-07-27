@@ -3,7 +3,7 @@ import ClassVault from "@/components/dashboard/ClassVault";
 
 export default function DashboardArchivedClassesPage() {
     return (
-        <ClassAccessGate>
+        <ClassAccessGate section="classes">
             <div className="flex w-full flex-col gap-8">
                 <div className="flex flex-col items-start gap-1 text-left">
                     <h1 className="font-serif text-3xl font-medium tracking-wide text-white">

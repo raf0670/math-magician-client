@@ -6,9 +6,34 @@ import { LockKeyhole, Sparkles } from "lucide-react";
 import { getPaymentAccess, getProfile, saveAuthSession } from "@/lib/api";
 import FlashyLoader from "@/components/shared/FlashyLoader";
 
-export default function ClassAccessGate({ children }) {
+const ACCESS_COPY = {
+    classes: {
+        loadingEyebrow: "Class Vault",
+        loadingTitle: "Checking class access",
+        loadingMessage: "Your payment access and student profile are being verified.",
+        lockedTitle: "Classes unlock after admin approval",
+        lockedMessage: "Submit the enrollment form with your bKash transaction ID. Once an admin approves it, live classes and archived materials will open here.",
+    },
+    liveExams: {
+        loadingEyebrow: "Live Exams",
+        loadingTitle: "Checking exam access",
+        loadingMessage: "Your payment access and student profile are being verified before the exam room opens.",
+        lockedTitle: "Live exams unlock after admin approval",
+        lockedMessage: "Submit the enrollment form with your bKash transaction ID. Once an admin approves it, scheduled live exams will open here.",
+    },
+    mockTests: {
+        loadingEyebrow: "Mock Tests",
+        loadingTitle: "Checking practice access",
+        loadingMessage: "Your payment access and student profile are being verified before the practice arena opens.",
+        lockedTitle: "Mock tests unlock after admin approval",
+        lockedMessage: "Submit the enrollment form with your bKash transaction ID. Once an admin approves it, mock tests and generated practice papers will open here.",
+    },
+};
+
+export default function ClassAccessGate({ children, section = "classes" }) {
     const [loading, setLoading] = useState(true);
     const [hasAccess, setHasAccess] = useState(false);
+    const copy = ACCESS_COPY[section] || ACCESS_COPY.classes;
 
     useEffect(() => {
         let isMounted = true;
@@ -43,9 +68,9 @@ export default function ClassAccessGate({ children }) {
     if (loading) {
         return (
             <FlashyLoader
-                eyebrow="Class Vault"
-                title="Checking class access"
-                message="Your payment access and student profile are being verified."
+                eyebrow={copy.loadingEyebrow}
+                title={copy.loadingTitle}
+                message={copy.loadingMessage}
                 iconName="lock"
                 skeleton="cards"
                 className="min-h-[360px]"
@@ -61,9 +86,9 @@ export default function ClassAccessGate({ children }) {
                         <LockKeyhole className="h-5 w-5" />
                     </div>
                     <p className="mt-6 text-xs font-bold uppercase tracking-[0.3em] text-[#DFB15B]">Approval Required</p>
-                    <h2 className="mt-3 font-serif text-3xl font-medium text-white">Classes unlock after admin approval</h2>
+                    <h2 className="mt-3 font-serif text-3xl font-medium text-white">{copy.lockedTitle}</h2>
                     <p className="mt-3 text-sm leading-6 text-[#8E8A9F]">
-                        Submit the enrollment form with your bKash transaction ID. Once an admin approves it, live classes and archived materials will open here.
+                        {copy.lockedMessage}
                     </p>
                     <Link
                         href="/#programs-section"

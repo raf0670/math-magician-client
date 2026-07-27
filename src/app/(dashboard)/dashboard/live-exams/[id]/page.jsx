@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { AlertTriangle, BookOpen, CalendarClock, CheckCircle, LockKeyhole, XCircle } from "lucide-react";
 import AnalyticalScorecard from "@/components/dashboard/AnalyticalScorecard";
+import ClassAccessGate from "@/components/dashboard/ClassAccessGate";
 import ExamEngine from "@/components/dashboard/ExamEngine";
 import FlashyLoader from "@/components/shared/FlashyLoader";
 import { getExamById, submitExam } from "@/lib/api";
@@ -47,6 +48,14 @@ function getCorrectOptionIndex(question) {
 }
 
 export default function LiveExamArenaPage() {
+  return (
+    <ClassAccessGate section="liveExams">
+      <LiveExamArenaContent />
+    </ClassAccessGate>
+  );
+}
+
+function LiveExamArenaContent() {
   const params = useParams();
   const examId = params?.id;
   const [examData, setExamData] = useState(null);
