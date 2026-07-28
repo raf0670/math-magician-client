@@ -4,8 +4,15 @@ import { useEffect, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ArrowRight, Sparkles, X } from "lucide-react";
 import Image from "next/image";
+import { Cinzel_Decorative } from "next/font/google";
 
 const SESSION_KEY = "mathmagician_home_intro_seen";
+
+const cinzelDecorative = Cinzel_Decorative({
+  subsets: ["latin"],
+  weight: ["400", "700", "900"],
+  display: "swap",
+});
 
 const programs = [
   {
@@ -197,7 +204,7 @@ export default function HomeIntroPopup() {
             </motion.div>
 
             <motion.h2
-              className="font-serif text-3xl font-semibold leading-tight tracking-wide text-white drop-shadow-[0_0_20px_rgba(232,197,111,0.22)] sm:text-5xl"
+              className={`${cinzelDecorative.className} text-3xl font-bold leading-tight tracking-wide text-white drop-shadow-[0_0_20px_rgba(232,197,111,0.22)] sm:text-5xl`}
               initial={{ opacity: 0, y: 22, filter: "blur(10px)" }}
               animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
               exit={{ opacity: 0, y: -10, filter: "blur(8px)" }}
