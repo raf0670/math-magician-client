@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Bell, Flame, Search, ChevronDown, Sparkles, ShieldCheck } from "lucide-react";
+import { Bell, Flame, ChevronDown, Sparkles, ShieldCheck } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { clearAuthSession, getMyStats, getStoredUser } from "@/lib/api";
 
@@ -72,16 +72,14 @@ export default function DashboardTopbar() {
     }, [history]);
 
     const handleSignOut = () => {
+        setShowProfileMenu(false);
         clearAuthSession();
         router.push("/");
     };
 
     return (
         <header className="w-full h-20 border-b border-white/5 bg-[#0A090F]/40 backdrop-blur-md px-4 sm:px-8 flex items-center justify-between sticky top-0 z-20 select-none">
-            <div className="hidden sm:flex items-center gap-3 w-72 bg-[#121017] border border-white/3 focus-within:border-[#DFB15B]/30 rounded-xl px-3.5 py-2 transition-all duration-200 group">
-                <Search className="w-4 h-4 text-[#6B667B] group-focus-within:text-[#DFB15B] transition-colors duration-200" />
-                <input type="text" placeholder="Search shortcuts, formulas..." className="bg-transparent text-xs text-white placeholder-[#6B667B] focus:outline-none w-full font-medium" />
-            </div>
+            <div className="hidden sm:block" />
             <div className="sm:hidden flex items-center gap-1.5">
                 <Sparkles className="w-4 h-4 text-[#DFB15B]" />
                 <span className="font-serif text-sm font-semibold text-white">Workspace</span>
@@ -139,9 +137,7 @@ export default function DashboardTopbar() {
                                     <p className="text-[10px] font-bold text-[#6B667B] uppercase tracking-wider">Signed in as</p>
                                     <p className="text-xs font-semibold text-white truncate mt-0.5">{email}</p>
                                 </div>
-                                <button className="w-full text-left px-3 py-2 rounded-xl text-xs font-medium text-[#8E8A9F] hover:text-white hover:bg-white/2 transition-colors duration-150">Account Settings</button>
-                                <button className="w-full text-left px-3 py-2 rounded-xl text-xs font-medium text-[#8E8A9F] hover:text-white hover:bg-white/2 transition-colors duration-150">Billing Profiles</button>
-                                <button onClick={handleSignOut} className="w-full text-left px-3 py-2 rounded-xl text-xs font-medium text-red-400 hover:bg-red-500/5 transition-colors duration-150 mt-1 pt-2 border-t border-white/3">Log Out</button>
+                                <button onClick={handleSignOut} className="w-full text-left px-3 py-2 rounded-xl text-xs font-medium text-red-400 hover:bg-red-500/5 transition-colors duration-150">Log Out</button>
                             </motion.div>
                         )}
                     </AnimatePresence>
