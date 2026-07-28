@@ -50,7 +50,7 @@ function getCorrectOptionIndex(question) {
 
 export default function LiveExamArenaPage() {
   return (
-    <ClassAccessGate section="liveExams">
+    <ClassAccessGate section="liveExams" presentation="screen">
       <LiveExamArenaContent />
     </ClassAccessGate>
   );

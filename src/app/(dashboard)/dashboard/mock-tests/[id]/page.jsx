@@ -12,7 +12,7 @@ const MONGO_OBJECT_ID_PATTERN = /^[a-f\d]{24}$/i;
 
 export default function ActiveMockExamArena() {
     return (
-        <ClassAccessGate section="mockTests">
+        <ClassAccessGate section="mockTests" presentation="screen">
             <ActiveMockExamContent />
         </ClassAccessGate>
     );

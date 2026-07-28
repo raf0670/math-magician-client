@@ -30,10 +30,11 @@ const ACCESS_COPY = {
     },
 };
 
-export default function ClassAccessGate({ children, section = "classes" }) {
+export default function ClassAccessGate({ children, section = "classes", presentation = "panel" }) {
     const [loading, setLoading] = useState(true);
     const [hasAccess, setHasAccess] = useState(false);
     const copy = ACCESS_COPY[section] || ACCESS_COPY.classes;
+    const isScreenPresentation = presentation === "screen";
 
     useEffect(() => {
         let isMounted = true;
@@ -73,14 +74,15 @@ export default function ClassAccessGate({ children, section = "classes" }) {
                 message={copy.loadingMessage}
                 iconName="lock"
                 skeleton="cards"
-                className="min-h-90"
+                surface={isScreenPresentation ? "screen" : "panel"}
+                className={isScreenPresentation ? "" : "min-h-90"}
             />
         );
     }
 
     if (!hasAccess) {
         return (
-            <div className="flex min-h-105 items-center justify-center rounded-3xl border border-[#DFB15B]/15 bg-[#121017] px-6 py-12 text-center">
+            <div className={`flex items-center justify-center bg-[#121017] px-6 py-12 text-center ${isScreenPresentation ? "min-h-screen rounded-none border-0" : "min-h-105 rounded-3xl border border-[#DFB15B]/15"}`}>
                 <div className="max-w-lg">
                     <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl border border-[#DFB15B]/20 bg-[#DFB15B]/10 text-[#DFB15B]">
                         <LockKeyhole className="h-5 w-5" />
