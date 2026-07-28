@@ -1,8 +1,9 @@
 "use client";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { CheckCircle2, Clock3, Crown, Sparkles } from "lucide-react";
+import { CheckCircle2, Clock3, CreditCard, Crown, Sparkles } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { getProfile, getStoredUser, saveAuthSession } from "@/lib/api";
 
 const houses = [
@@ -63,13 +64,17 @@ export default function HouseStatusPanel() {
     }, []);
 
     const hasClassAccess = Boolean(currentUser?.hasClassAccess);
+    const hasBooked = Boolean(currentUser?.hasBooked);
     const isPartiallyPaid = currentUser?.paymentStatus === "partiallyPaid";
-    const statusTitle = hasClassAccess ? "Portal Access Granted" : "Enrollment Review Pending";
+    const canCheckout = hasBooked && !hasClassAccess;
+    const statusTitle = hasClassAccess ? "Portal Access Granted" : canCheckout ? "Seat Booked" : "Enrollment Review Pending";
     const statusCopy = hasClassAccess
         ? isPartiallyPaid
             ? "Your class vault is open after partial payment approval. The final installment is still due later."
             : "Your class vault is open. Choose your practice route and keep your preparation streak alive."
-        : "Your academy access will unlock after admin approval. The available houses are shown below without assigning you to one.";
+        : canCheckout
+            ? "Your seat is reserved. Submit your payment reference when you are ready, then class access will unlock after admin approval."
+            : "Your academy access will unlock after admin approval. The available houses are shown below without assigning you to one.";
     const StatusIcon = hasClassAccess ? CheckCircle2 : Clock3;
 
     return (
@@ -101,13 +106,23 @@ export default function HouseStatusPanel() {
                 <div className="relative z-10 mt-5 flex flex-wrap gap-2">
                     <span className="inline-flex items-center gap-1.5 rounded-full border border-white/8 bg-white/5 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-[#D8D4E5]">
                         <Crown className="h-3.5 w-3.5 text-[#DFB15B]" />
-                        {isPartiallyPaid ? "Partial Payment" : "Premium Academy"}
+                        {canCheckout ? "Seat Reserved" : isPartiallyPaid ? "Partial Payment" : "Premium Academy"}
                     </span>
                     <span className="inline-flex items-center gap-1.5 rounded-full border border-white/8 bg-white/5 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-[#D8D4E5]">
                         <Sparkles className="h-3.5 w-3.5 text-[#A78BFA]" />
                         Three Houses
                     </span>
                 </div>
+
+                {canCheckout ? (
+                    <Link
+                        href="/payment/checkout"
+                        className="relative z-10 mt-5 inline-flex items-center justify-center gap-2 rounded-2xl bg-[#DFB15B] px-5 py-3 text-sm font-bold uppercase tracking-wider text-black transition hover:brightness-110"
+                    >
+                        <CreditCard className="h-4 w-4" />
+                        Proceed to Checkout
+                    </Link>
+                ) : null}
             </div>
 
             <div className="grid gap-4 sm:grid-cols-3">

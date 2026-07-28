@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { ArrowLeft, Check, CreditCard, LockKeyhole, WandSparkles } from "lucide-react";
-import { getStoredToken, getStoredUser, savePendingPaymentPlan, submitManualEnrollment } from "@/lib/api";
+import { getStoredToken, getStoredUser, saveAuthSession, savePendingPaymentPlan, savePendingProgramAction, submitManualEnrollment, submitSeatBooking } from "@/lib/api";
 import FlashyLoader, { LoadingButtonLabel } from "@/components/shared/FlashyLoader";
 
 const PLANS = {
@@ -85,6 +85,8 @@ const REQUIRED_FIELDS = [
   "bkashTrxID",
 ];
 
+const BOOKING_REQUIRED_FIELDS = REQUIRED_FIELDS.filter((field) => field !== "bkashTrxID");
+
 function isFieldComplete(value) {
   return Array.isArray(value) ? value.length > 0 : Boolean(value?.trim());
 }
@@ -154,6 +156,7 @@ function PaymentDetailsContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const planId = searchParams.get("plan") || "";
+  const isBookingMode = searchParams.get("mode") === "book";
   const plan = PLANS[planId];
   const [form, setForm] = useState(INITIAL_FORM);
   const [paymentChoice, setPaymentChoice] = useState("full");
@@ -170,6 +173,7 @@ function PaymentDetailsContent() {
 
     if (!getStoredToken()) {
       savePendingPaymentPlan(planId);
+      savePendingProgramAction(isBookingMode ? "book" : "enroll");
       router.replace("/signup");
       return;
     }
@@ -185,15 +189,17 @@ function PaymentDetailsContent() {
     }, 0);
 
     return () => window.clearTimeout(prefillTimer);
-  }, [plan, planId, router]);
+  }, [isBookingMode, plan, planId, router]);
+
+  const requiredFields = isBookingMode ? BOOKING_REQUIRED_FIELDS : REQUIRED_FIELDS;
 
   const fieldErrors = useMemo(() => {
     const missing = {};
-    REQUIRED_FIELDS.forEach((field) => {
+    requiredFields.forEach((field) => {
       if (!isFieldComplete(form[field])) missing[field] = true;
     });
     return missing;
-  }, [form]);
+  }, [form, requiredFields]);
 
   const updateField = (field, value) => {
     setForm((current) => ({ ...current, [field]: value }));
@@ -214,7 +220,7 @@ function PaymentDetailsContent() {
     event.preventDefault();
     setError("");
 
-    const hasMissingRequired = REQUIRED_FIELDS.some((field) => !isFieldComplete(form[field]));
+    const hasMissingRequired = requiredFields.some((field) => !isFieldComplete(form[field]));
     if (hasMissingRequired) {
       setError("Please complete all required fields before continuing.");
       return;
@@ -222,7 +228,22 @@ function PaymentDetailsContent() {
 
     try {
       setLoading(true);
-      const payload = await submitManualEnrollment(selectedPlanId, form, paymentChoice);
+      if (isBookingMode) {
+        const payload = await submitSeatBooking(selectedPlanId, form);
+        const token = window.localStorage.getItem("exam_archive_token");
+        if (token && payload?.data?.user) {
+          saveAuthSession(token, payload.data.user);
+        }
+
+        const successParams = new URLSearchParams({
+          booking: "1",
+          plan: selectedPlanId,
+        });
+        router.push(`/payment/success?${successParams.toString()}`);
+        return;
+      }
+
+      const payload = await submitManualEnrollment(selectedPlanId, form, paymentChoice, paymentMethod);
       const paymentId = payload?.data?.paymentId;
 
       if (!paymentId) {
@@ -369,13 +390,15 @@ function PaymentDetailsContent() {
               <div className="max-w-2xl">
                 <div className="inline-flex items-center gap-2 rounded-full border border-[#DFB15B]/20 bg-[#DFB15B]/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.24em] text-[#DFB15B]">
                   <WandSparkles className="h-3.5 w-3.5" />
-                  Enrollment Form
+                  {isBookingMode ? "Seat Booking Form" : "Enrollment Form"}
                 </div>
                 <h1 className="mt-4 font-serif text-4xl font-medium leading-tight text-white sm:text-5xl">
-                  Open the Portal
+                  {isBookingMode ? "Reserve Your Seat" : "Open the Portal"}
                 </h1>
                 <p className="mt-3 max-w-xl text-sm leading-6 text-[#A9A3BA]">
-                  Complete your student profile, send the payment, and submit your transaction ID for admin approval.
+                  {isBookingMode
+                    ? "Complete your student profile now. Payment can be submitted later from your dashboard."
+                    : "Complete your student profile, send the payment, and submit your transaction ID for admin approval."}
                 </p>
               </div>
               {/* <motion.div
@@ -425,104 +448,28 @@ function PaymentDetailsContent() {
               <RadioField label="Which batch do you want to be enrolled?" field="preferredBatch" required value={form.preferredBatch} error={fieldErrors.preferredBatch} options={BATCH_OPTIONS} onChange={updateField} />
             </FormSection>
 
-            <FormSection title="Payment Option" description="Choose how much you are paying before submitting this enrollment for review." index={5}>
-              <PaymentChoiceField
-                selectedPlan={selectedPlan}
-                value={paymentChoice}
-                onChange={setPaymentChoice}
-              />
-            </FormSection>
+            {!isBookingMode ? (
+              <>
+                <FormSection title="Payment Option" description="Choose how much you are paying before submitting this enrollment for review." index={5}>
+                  <PaymentChoiceField
+                    selectedPlan={selectedPlan}
+                    value={paymentChoice}
+                    onChange={setPaymentChoice}
+                  />
+                </FormSection>
 
-            <FormSection title="Payment Details" description="Choose bKash or bank transfer, then enter the transaction ID or reference for admin approval." index={6}>
-              <div className="space-y-5">
-                <div className="grid grid-cols-2 rounded-2xl border border-white/8 bg-[#0A090F]/70 p-1">
-                  {[
-                    { value: "bkash", label: "Bkash" },
-                    { value: "bank", label: "Bank" },
-                  ].map((method) => {
-                    const selected = paymentMethod === method.value;
-
-                    return (
-                      <button
-                        key={method.value}
-                        type="button"
-                        onClick={() => setPaymentMethod(method.value)}
-                        className={`rounded-xl px-4 py-3 text-sm font-bold transition ${
-                          selected
-                            ? "bg-[#DFB15B] text-black shadow-[0_10px_28px_rgba(223,177,91,0.2)]"
-                            : "text-[#A9A3BA] hover:bg-white/5 hover:text-white"
-                        }`}
-                        aria-pressed={selected}
-                      >
-                        {method.label}
-                      </button>
-                    );
-                  })}
-                </div>
-
-                <div className="grid gap-5 lg:grid-cols-[minmax(320px,1.05fr)_minmax(0,1fr)] lg:items-start">
-                  {paymentMethod === "bkash" ? (
-                    <div className="space-y-3 rounded-3xl border border-[#DFB15B]/20 bg-[#DFB15B]/8 p-5">
-                      <div className="flex items-center gap-3 text-[#DFB15B]">
-                        <CreditCard className="h-5 w-5" />
-                        <p className="text-xs font-bold uppercase tracking-[0.2em]">bKash Numbers</p>
-                      </div>
-                      <div className="space-y-3">
-                        <div className="rounded-2xl border border-white/8 bg-[#100E16]/70 px-4 py-3">
-                          <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#DFB15B]">Send Money</p>
-                          <p className="text-xs font-semibold text-[#A9A3BA]">Bkash ( personal )</p>
-                          <p className="mt-1 font-mono text-lg font-bold text-white">01894688018</p>
-                        </div>
-                        <div className="rounded-2xl border border-white/8 bg-[#100E16]/70 px-4 py-3">
-                          <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#DFB15B]">Make Payment</p>
-                          <p className="text-xs font-semibold text-[#A9A3BA]">Bkash ( retail )</p>
-                          <p className="mt-1 font-mono text-lg font-bold text-white">01968803335</p>
-                        </div>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="space-y-3 rounded-3xl border border-[#DFB15B]/20 bg-[#DFB15B]/8 p-5">
-                      <div className="flex items-center gap-3 text-[#DFB15B]">
-                        <CreditCard className="h-5 w-5" />
-                        <p className="text-xs font-bold uppercase tracking-[0.2em]">Bank Accounts</p>
-                      </div>
-                      <div className="space-y-3">
-                        {BANK_ACCOUNTS.map((account) => (
-                          <div key={account.accountNumber} className="rounded-2xl border border-white/8 bg-[#100E16]/70 px-4 py-3">
-                            <p className="text-sm font-bold text-white">{account.bank}</p>
-                            <p className="mt-2 font-mono text-lg font-bold text-white">{account.accountNumber}</p>
-                            <div className="mt-3 space-y-1 text-xs font-semibold text-[#A9A3BA]">
-                              <p>{account.branch}</p>
-                              <p>{account.accountName}</p>
-                              <p>Routing Number: {account.routingNumber}</p>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-3 rounded-2xl border border-[#DFB15B]/15 bg-[#DFB15B]/8 px-4 py-4 text-sm text-[#EBD39B]">
-                      <CreditCard className="h-5 w-5 shrink-0 text-[#DFB15B]" />
-                      <span className="font-medium">
-                        {selectedPlan.title} - pay {formatBDT(amountDueNow)} now
-                        {remainingAmount ? `, ${formatBDT(remainingAmount)} later` : ""}
-                      </span>
-                    </div>
-                    <TextField
-                      label={paymentMethod === "bank" ? "Transaction ID / Reference" : "BkashTrxID"}
-                      field="bkashTrxID"
-                      required
-                      value={form.bkashTrxID}
-                      error={fieldErrors.bkashTrxID}
-                      onChange={updateField}
-                      placeholder={paymentMethod === "bank" ? "Bank transaction ID or reference" : "Example: A1B2C3D4E5"}
-                    />
-                  </div>
-                </div>
-              </div>
-            </FormSection>
+                <PaymentDetailsSection
+                  index={6}
+                  selectedPlan={selectedPlan}
+                  paymentChoice={paymentChoice}
+                  paymentMethod={paymentMethod}
+                  setPaymentMethod={setPaymentMethod}
+                  trxValue={form.bkashTrxID}
+                  trxError={fieldErrors.bkashTrxID}
+                  onChange={updateField}
+                />
+              </>
+            ) : null}
 
             {error ? <p className="rounded-2xl border border-[#F2A7A7]/30 bg-[#F2A7A7]/10 px-4 py-3 text-sm font-medium text-[#F8C7C0]">{error}</p> : null}
 
@@ -534,7 +481,9 @@ function PaymentDetailsContent() {
             >
               <div className="flex items-center gap-2 text-xs font-medium text-[#8E8A9F]">
                 <LockKeyhole className="h-4 w-4 text-[#DFB15B]" />
-                Your enrollment will stay pending until an admin approves the transaction ID.
+                {isBookingMode
+                  ? "Your seat will be booked now. Class access stays locked until payment is approved."
+                  : "Your enrollment will stay pending until an admin approves the transaction ID."}
               </div>
               <motion.button
                 type="submit"
@@ -546,9 +495,9 @@ function PaymentDetailsContent() {
                 <span className="absolute inset-y-0 -left-10 w-8 rotate-12 bg-white/40 blur-sm transition group-hover:left-full" />
                 <LoadingButtonLabel
                   loading={loading}
-                  idleText="Submit for Review"
-                  loadingText="Submitting..."
-                  iconName="credit"
+                  idleText={isBookingMode ? "Book Seat" : "Submit for Review"}
+                  loadingText={isBookingMode ? "Booking..." : "Submitting..."}
+                  iconName={isBookingMode ? "check" : "credit"}
                 />
               </motion.button>
             </motion.div>
@@ -593,6 +542,113 @@ function FormSection({ title, description, children, index }) {
       </div>
       <div className="space-y-6">{children}</div>
     </motion.section>
+  );
+}
+
+function PaymentDetailsSection({
+  index = 2,
+  selectedPlan,
+  paymentChoice,
+  paymentMethod,
+  setPaymentMethod,
+  trxValue,
+  trxError,
+  onChange,
+}) {
+  const amountDueNow = paymentChoice === "partial" ? PARTIAL_PAYMENT_AMOUNT : selectedPlan?.amount || 0;
+  const remainingAmount = Math.max((selectedPlan?.amount || 0) - amountDueNow, 0);
+
+  return (
+    <FormSection title="Payment Details" description="Choose bKash or bank transfer, then enter the transaction ID or reference for admin approval." index={index}>
+      <div className="space-y-5">
+        <div className="grid grid-cols-2 rounded-2xl border border-white/8 bg-[#0A090F]/70 p-1">
+          {[
+            { value: "bkash", label: "Bkash" },
+            { value: "bank", label: "Bank" },
+          ].map((method) => {
+            const selected = paymentMethod === method.value;
+
+            return (
+              <button
+                key={method.value}
+                type="button"
+                onClick={() => setPaymentMethod(method.value)}
+                className={`rounded-xl px-4 py-3 text-sm font-bold transition ${
+                  selected
+                    ? "bg-[#DFB15B] text-black shadow-[0_10px_28px_rgba(223,177,91,0.2)]"
+                    : "text-[#A9A3BA] hover:bg-white/5 hover:text-white"
+                }`}
+                aria-pressed={selected}
+              >
+                {method.label}
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="grid gap-5 lg:grid-cols-[minmax(320px,1.05fr)_minmax(0,1fr)] lg:items-start">
+          {paymentMethod === "bkash" ? (
+            <div className="space-y-3 rounded-3xl border border-[#DFB15B]/20 bg-[#DFB15B]/8 p-5">
+              <div className="flex items-center gap-3 text-[#DFB15B]">
+                <CreditCard className="h-5 w-5" />
+                <p className="text-xs font-bold uppercase tracking-[0.2em]">bKash Numbers</p>
+              </div>
+              <div className="space-y-3">
+                <div className="rounded-2xl border border-white/8 bg-[#100E16]/70 px-4 py-3">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#DFB15B]">Send Money</p>
+                  <p className="text-xs font-semibold text-[#A9A3BA]">Bkash ( personal )</p>
+                  <p className="mt-1 font-mono text-lg font-bold text-white">01894688018</p>
+                </div>
+                <div className="rounded-2xl border border-white/8 bg-[#100E16]/70 px-4 py-3">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#DFB15B]">Make Payment</p>
+                  <p className="text-xs font-semibold text-[#A9A3BA]">Bkash ( retail )</p>
+                  <p className="mt-1 font-mono text-lg font-bold text-white">01968803335</p>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-3 rounded-3xl border border-[#DFB15B]/20 bg-[#DFB15B]/8 p-5">
+              <div className="flex items-center gap-3 text-[#DFB15B]">
+                <CreditCard className="h-5 w-5" />
+                <p className="text-xs font-bold uppercase tracking-[0.2em]">Bank Accounts</p>
+              </div>
+              <div className="space-y-3">
+                {BANK_ACCOUNTS.map((account) => (
+                  <div key={account.accountNumber} className="rounded-2xl border border-white/8 bg-[#100E16]/70 px-4 py-3">
+                    <p className="text-sm font-bold text-white">{account.bank}</p>
+                    <p className="mt-2 font-mono text-lg font-bold text-white">{account.accountNumber}</p>
+                    <div className="mt-3 space-y-1 text-xs font-semibold text-[#A9A3BA]">
+                      <p>{account.branch}</p>
+                      <p>{account.accountName}</p>
+                      <p>Routing Number: {account.routingNumber}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className="space-y-4">
+            <div className="flex items-center gap-3 rounded-2xl border border-[#DFB15B]/15 bg-[#DFB15B]/8 px-4 py-4 text-sm text-[#EBD39B]">
+              <CreditCard className="h-5 w-5 shrink-0 text-[#DFB15B]" />
+              <span className="font-medium">
+                {selectedPlan?.title || "Selected program"} - pay {formatBDT(amountDueNow)} now
+                {remainingAmount ? `, ${formatBDT(remainingAmount)} later` : ""}
+              </span>
+            </div>
+            <TextField
+              label={paymentMethod === "bank" ? "Transaction ID / Reference" : "BkashTrxID"}
+              field="bkashTrxID"
+              required
+              value={trxValue}
+              error={trxError}
+              onChange={onChange}
+              placeholder={paymentMethod === "bank" ? "Bank transaction ID or reference" : "Example: A1B2C3D4E5"}
+            />
+          </div>
+        </div>
+      </div>
+    </FormSection>
   );
 }
 

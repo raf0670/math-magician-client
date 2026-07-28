@@ -2,10 +2,10 @@
 "use client";
 import { useCallback, useEffect, useState, useMemo, useRef } from "react";
 import { motion } from "framer-motion";
-import { ChevronLeft, ChevronRight, Clock3, MapPin, Plus, Sparkles, Star } from "lucide-react";
+import { BookmarkCheck, ChevronLeft, ChevronRight, Clock3, MapPin, Plus, Sparkles, Star } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { getStoredToken, savePendingPaymentPlan } from "@/lib/api";
+import { getStoredToken, savePendingPaymentPlan, savePendingProgramAction } from "@/lib/api";
 
 const REVIEW_CARD_GAP = 32;
 
@@ -13,6 +13,7 @@ export default function ProgramsAndTestimonials() {
     const router = useRouter();
     const [hasMounted, setHasMounted] = useState(false);
     const [selectedPlanId, setSelectedPlanId] = useState("");
+    const [selectedProgramAction, setSelectedProgramAction] = useState("");
     const [activeReviewIndex, setActiveReviewIndex] = useState(0);
     const [visibleReviewCount, setVisibleReviewCount] = useState(3);
     const [reviewSlideOffset, setReviewSlideOffset] = useState(0);
@@ -259,16 +260,19 @@ export default function ProgramsAndTestimonials() {
         ));
     };
 
-    const handleEnroll = (planId) => {
+    const handleProgramAction = (planId, action = "enroll") => {
         setSelectedPlanId(planId);
+        setSelectedProgramAction(action);
 
         if (!getStoredToken()) {
             savePendingPaymentPlan(planId);
+            savePendingProgramAction(action);
             router.push("/signup");
             return;
         }
 
-        router.push(`/payment/details?plan=${encodeURIComponent(planId)}`);
+        const mode = action === "book" ? "&mode=book" : "";
+        router.push(`/payment/details?plan=${encodeURIComponent(planId)}${mode}`);
     };
 
     return (
@@ -429,14 +433,25 @@ export default function ProgramsAndTestimonials() {
                                         </span>
                                     </div>
 
-                                    <button
-                                        type="button"
-                                        onClick={() => handleEnroll(card.id)}
-                                        disabled={selectedPlanId === card.id}
-                                        className={`w-full py-3.5 rounded-2xl text-xs tracking-wide transition-all duration-300 hover:brightness-110 active:scale-[0.98] disabled:cursor-wait disabled:opacity-70 ${card.buttonStyle}`}
-                                    >
-                                        {selectedPlanId === card.id ? "Opening form..." : "Enroll in This Program"}
-                                    </button>
+                                    <div className="grid gap-2">
+                                        <button
+                                            type="button"
+                                            onClick={() => handleProgramAction(card.id, "enroll")}
+                                            disabled={selectedPlanId === card.id}
+                                            className={`w-full py-3.5 rounded-2xl text-xs tracking-wide transition-all duration-300 hover:brightness-110 active:scale-[0.98] disabled:cursor-wait disabled:opacity-70 ${card.buttonStyle}`}
+                                        >
+                                            {selectedPlanId === card.id && selectedProgramAction === "enroll" ? "Opening form..." : "Enroll in This Program"}
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => handleProgramAction(card.id, "book")}
+                                            disabled={selectedPlanId === card.id}
+                                            className="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-[#DFB15B]/25 bg-[#DFB15B]/8 px-4 py-3.5 text-xs font-bold tracking-wide text-[#DFB15B] transition-all duration-300 hover:border-[#DFB15B]/45 hover:bg-[#DFB15B]/12 active:scale-[0.98] disabled:cursor-wait disabled:opacity-70"
+                                        >
+                                            <BookmarkCheck className="h-4 w-4" />
+                                            {selectedPlanId === card.id && selectedProgramAction === "book" ? "Opening booking..." : "Book Seat"}
+                                        </button>
+                                    </div>
                                 </div>
 
                             </motion.div>

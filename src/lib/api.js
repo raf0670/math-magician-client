@@ -148,6 +148,21 @@ export function clearPendingPaymentPlan() {
   window.localStorage.removeItem("exam_archive_pending_plan");
 }
 
+export function savePendingProgramAction(action = "enroll") {
+  if (typeof window === "undefined") return;
+  window.localStorage.setItem("exam_archive_pending_program_action", action);
+}
+
+export function getPendingProgramAction() {
+  if (typeof window === "undefined") return "enroll";
+  return window.localStorage.getItem("exam_archive_pending_program_action") || "enroll";
+}
+
+export function clearPendingProgramAction() {
+  if (typeof window === "undefined") return;
+  window.localStorage.removeItem("exam_archive_pending_program_action");
+}
+
 export function savePendingEnrollment(payload) {
   if (typeof window === "undefined") return;
   window.localStorage.setItem("exam_archive_pending_enrollment", JSON.stringify(payload));
@@ -200,15 +215,33 @@ export async function getCourses() {
   return request("/api/courses");
 }
 
-export async function submitManualEnrollment(planId, formData, paymentChoice = "full") {
+export async function submitManualEnrollment(planId, formData, paymentChoice = "full", paymentMethod = "bkash") {
   return request("/api/payments/manual-enrollment", {
     method: "POST",
-    body: { planId, formData, paymentChoice },
+    body: { planId, formData, paymentChoice, paymentMethod },
   });
 }
 
 export async function getPaymentAccess() {
   return request("/api/payments/my-access");
+}
+
+export async function submitSeatBooking(planId, formData) {
+  return request("/api/payments/book-seat", {
+    method: "POST",
+    body: { planId, formData },
+  });
+}
+
+export async function getMyBooking() {
+  return request("/api/payments/my-booking");
+}
+
+export async function submitBookedCheckout(payload) {
+  return request("/api/payments/booked-checkout", {
+    method: "POST",
+    body: payload,
+  });
 }
 
 export async function getAdminEnrollmentReviews(status = "") {

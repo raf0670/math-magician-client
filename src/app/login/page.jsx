@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { clearPendingPaymentPlan, getPendingPaymentPlan, loginUser, saveAuthSession } from "@/lib/api";
+import { clearPendingPaymentPlan, clearPendingProgramAction, getPendingPaymentPlan, getPendingProgramAction, loginUser, saveAuthSession } from "@/lib/api";
 import { LoadingButtonLabel } from "@/components/shared/FlashyLoader";
 
 export default function LoginPage() {
@@ -23,8 +23,11 @@ export default function LoginPage() {
 
       const pendingPlan = getPendingPaymentPlan();
       if (pendingPlan) {
+        const pendingAction = getPendingProgramAction();
         clearPendingPaymentPlan();
-        router.push(`/payment/details?plan=${encodeURIComponent(pendingPlan)}`);
+        clearPendingProgramAction();
+        const mode = pendingAction === "book" ? "&mode=book" : "";
+        router.push(`/payment/details?plan=${encodeURIComponent(pendingPlan)}${mode}`);
         return;
       }
 

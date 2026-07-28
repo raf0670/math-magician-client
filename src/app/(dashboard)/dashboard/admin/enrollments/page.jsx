@@ -29,6 +29,11 @@ const PAYMENT_CHOICE_STYLES = {
   partial: "border-sky-400/25 bg-sky-400/10 text-sky-200",
 };
 
+const PAYMENT_METHOD_STYLES = {
+  bkash: "border-pink-400/25 bg-pink-400/10 text-pink-100",
+  bank: "border-violet-400/25 bg-violet-400/10 text-violet-100",
+};
+
 const PLAN_DISPLAY_NAMES = {
   offline: "Gryffindor",
   premium: "Ravenclaw",
@@ -80,6 +85,10 @@ function formatBDT(value) {
 
 function formatPaymentChoice(value) {
   return value === "partial" ? "Partial" : "Full";
+}
+
+function formatPaymentMethod(value) {
+  return value === "bank" ? "Bank" : "bKash";
 }
 
 function formatDeliveryMode(value) {
@@ -379,11 +388,16 @@ export default function AdminEnrollmentReviewsPage() {
                       <span className={`rounded-full border px-3 py-1 text-xs font-bold uppercase tracking-wider ${PAYMENT_CHOICE_STYLES[item.paymentChoice] || PAYMENT_CHOICE_STYLES.full}`}>
                         {formatPaymentChoice(item.paymentChoice)}
                       </span>
+                      <span className={`rounded-full border px-3 py-1 text-xs font-bold uppercase tracking-wider ${PAYMENT_METHOD_STYLES[item.paymentMethod] || PAYMENT_METHOD_STYLES.bkash}`}>
+                        {formatPaymentMethod(item.paymentMethod)}
+                      </span>
                     </div>
                     <p className="mt-2 text-sm text-[#8E8A9F]">{item.user?.email || item.enrollment?.emailAddress || "No email"}</p>
                   </div>
                   <div className="rounded-2xl border border-[#DFB15B]/15 bg-[#DFB15B]/8 px-4 py-3 text-left lg:text-right">
-                    <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#DFB15B]">BkashTrxID</p>
+                    <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#DFB15B]">
+                      {item.paymentMethod === "bank" ? "Bank Reference" : "BkashTrxID"}
+                    </p>
                     <p className="mt-1 font-mono text-base font-semibold text-white">{item.bkashTrxID}</p>
                   </div>
                 </div>
@@ -391,6 +405,7 @@ export default function AdminEnrollmentReviewsPage() {
                 <div className="mt-5 grid gap-3 text-sm sm:grid-cols-2 lg:grid-cols-4">
                   <Info label="Plan" value={formatPlanValue(item)} />
                   <Info label="Payment Type" value={formatPaymentChoice(item.paymentChoice)} />
+                  <Info label="Payment Method" value={formatPaymentMethod(item.paymentMethod)} />
                   <Info label="Delivery Mode" value={formatDeliveryMode(item.deliveryMode)} />
                   <Info label="Paid Now" value={formatBDT(item.paidAmount)} />
                   <Info label="Remaining Due" value={formatBDT(item.remainingAmount)} />
