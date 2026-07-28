@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { Banknote, CheckCircle2, Clock3, RefreshCw, ShieldAlert, XCircle } from "lucide-react";
 import {
   getAdminEnrollmentReviews,
+  getAdminPreBookings,
   getProfile,
   markAdminEnrollmentFullyPaid,
   saveAuthSession,
@@ -11,14 +12,17 @@ import {
 } from "@/lib/api";
 import FlashyLoader, { LoadingButtonLabel } from "@/components/shared/FlashyLoader";
 
+const PRE_BOOKING_STATUS = "pre-booking";
+
 const STATUS_TABS = [
-  { id: "", label: "All" },
+  { id: PRE_BOOKING_STATUS, label: "Pre-Booking" },
   { id: "pending", label: "Pending" },
   { id: "approved", label: "Approved" },
   { id: "rejected", label: "Rejected" },
 ];
 
 const STATUS_STYLES = {
+  [PRE_BOOKING_STATUS]: "border-cyan-400/25 bg-cyan-400/10 text-cyan-200",
   pending: "border-amber-400/25 bg-amber-400/10 text-amber-200",
   approved: "border-emerald-400/25 bg-emerald-400/10 text-emerald-200",
   rejected: "border-red-400/25 bg-red-400/10 text-red-200",
@@ -109,6 +113,41 @@ function formatPreferredBatch(value) {
   return BATCH_DISPLAY_NAMES[value] || value;
 }
 
+function getStatusLabel(value) {
+  if (value === PRE_BOOKING_STATUS) return "Pre-Booking";
+  return value || "All";
+}
+
+function getLoadingCopy(status) {
+  if (status === PRE_BOOKING_STATUS) {
+    return {
+      eyebrow: "Pre-Bookings",
+      title: "Loading booked seats",
+      message: "Saved seat bookings without submitted payment are being fetched.",
+    };
+  }
+
+  return {
+    eyebrow: "Enrollments",
+    title: "Loading reviews",
+    message: "Pending bKash submissions are being fetched.",
+  };
+}
+
+function getEmptyCopy(status) {
+  if (status === PRE_BOOKING_STATUS) {
+    return {
+      title: "No pre-bookings found",
+      message: "Students who book a seat before checkout will appear here.",
+    };
+  }
+
+  return {
+    title: "No enrollment reviews found",
+    message: "New manual bKash submissions will appear here.",
+  };
+}
+
 export default function AdminEnrollmentReviewsPage() {
   const [status, setStatus] = useState("pending");
   const [items, setItems] = useState([]);
@@ -137,10 +176,12 @@ export default function AdminEnrollmentReviewsPage() {
     setError("");
 
     try {
-      const payload = await getAdminEnrollmentReviews(nextStatus);
+      const payload = nextStatus === PRE_BOOKING_STATUS
+        ? await getAdminPreBookings()
+        : await getAdminEnrollmentReviews(nextStatus);
       setItems(payload?.data || []);
     } catch (err) {
-      setError(err.message || "Unable to load enrollment reviews.");
+      setError(err.message || (nextStatus === PRE_BOOKING_STATUS ? "Unable to load pre-bookings." : "Unable to load enrollment reviews."));
     } finally {
       if (!silent) {
         setLoading(false);
@@ -272,6 +313,9 @@ export default function AdminEnrollmentReviewsPage() {
     }
   };
 
+  const loadingCopy = getLoadingCopy(status);
+  const emptyCopy = getEmptyCopy(status);
+
   if (profileLoading) {
     return (
       <FlashyLoader
@@ -303,10 +347,10 @@ export default function AdminEnrollmentReviewsPage() {
     <div className="flex w-full flex-col gap-6">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div>
-          <p className="text-xs font-bold uppercase tracking-[0.3em] text-[#DFB15B]">Manual bKash Review</p>
+          <p className="text-xs font-bold uppercase tracking-[0.3em] text-[#DFB15B]">Admin Enrollment Desk</p>
           <h1 className="mt-2 font-serif text-3xl font-medium tracking-wide text-white">Enrollment Approvals</h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-[#8E8A9F]">
-            Verify submitted transaction IDs, then approve legitimate payments to unlock class access.
+            Review booked seats and verify submitted transaction IDs before class access is unlocked.
           </p>
         </div>
         <button
@@ -345,9 +389,9 @@ export default function AdminEnrollmentReviewsPage() {
 
       {loading ? (
         <FlashyLoader
-          eyebrow="Enrollments"
-          title="Loading reviews"
-          message="Pending bKash submissions are being fetched."
+          eyebrow={loadingCopy.eyebrow}
+          title={loadingCopy.title}
+          message={loadingCopy.message}
           iconName="credit"
           skeleton="cards"
           className="min-h-90"
@@ -357,8 +401,8 @@ export default function AdminEnrollmentReviewsPage() {
       {!loading && !items.length ? (
         <div className="rounded-3xl border border-white/5 bg-[#121017] px-6 py-12 text-center">
           <Clock3 className="mx-auto h-9 w-9 text-[#DFB15B]" />
-          <h2 className="mt-4 font-serif text-2xl font-medium text-white">No enrollment reviews found</h2>
-          <p className="mt-2 text-sm text-[#8E8A9F]">New manual bKash submissions will appear here.</p>
+          <h2 className="mt-4 font-serif text-2xl font-medium text-white">{emptyCopy.title}</h2>
+          <p className="mt-2 text-sm text-[#8E8A9F]">{emptyCopy.message}</p>
         </div>
       ) : null}
 
@@ -366,59 +410,73 @@ export default function AdminEnrollmentReviewsPage() {
         <div className="grid gap-4">
           {items.map((item) => {
             const paymentId = item.paymentId;
-            const note = reviewNotes[paymentId] ?? item.reviewNote ?? "";
+            const isPreBooking = item.status === PRE_BOOKING_STATUS;
+            const itemKey = paymentId || item.bookingId;
+            const note = isPreBooking ? "" : reviewNotes[paymentId] ?? item.reviewNote ?? "";
             const approveKey = `${paymentId}:approved`;
             const rejectKey = `${paymentId}:rejected`;
             const fullyPaidKey = `${paymentId}:fully-paid`;
             const isPending = item.status === "pending";
             const isPartial = item.paymentChoice === "partial";
             const hasRemainingDue = Number(item.remainingAmount || 0) > 0;
-            const canMarkFullyPaid = item.status === "approved" && isPartial && hasRemainingDue && !item.finalTrxID;
+            const canMarkFullyPaid = !isPreBooking && item.status === "approved" && isPartial && hasRemainingDue && !item.finalTrxID;
             const finalTrxID = finalTrxIDs[paymentId] || "";
 
             return (
-              <section key={paymentId} className="rounded-3xl border border-white/6 bg-[#121017] p-5">
+              <section key={itemKey} className="rounded-3xl border border-white/6 bg-[#121017] p-5">
                 <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                   <div>
                     <div className="flex flex-wrap items-center gap-3">
                       <h2 className="font-serif text-2xl font-medium text-white">{getEnrollmentName(item)}</h2>
                       <span className={`rounded-full border px-3 py-1 text-xs font-bold uppercase tracking-wider ${STATUS_STYLES[item.status] || STATUS_STYLES.pending}`}>
-                        {item.status}
+                        {getStatusLabel(item.status)}
                       </span>
-                      <span className={`rounded-full border px-3 py-1 text-xs font-bold uppercase tracking-wider ${PAYMENT_CHOICE_STYLES[item.paymentChoice] || PAYMENT_CHOICE_STYLES.full}`}>
-                        {formatPaymentChoice(item.paymentChoice)}
-                      </span>
-                      <span className={`rounded-full border px-3 py-1 text-xs font-bold uppercase tracking-wider ${PAYMENT_METHOD_STYLES[item.paymentMethod] || PAYMENT_METHOD_STYLES.bkash}`}>
-                        {formatPaymentMethod(item.paymentMethod)}
-                      </span>
+                      {!isPreBooking ? (
+                        <>
+                          <span className={`rounded-full border px-3 py-1 text-xs font-bold uppercase tracking-wider ${PAYMENT_CHOICE_STYLES[item.paymentChoice] || PAYMENT_CHOICE_STYLES.full}`}>
+                            {formatPaymentChoice(item.paymentChoice)}
+                          </span>
+                          <span className={`rounded-full border px-3 py-1 text-xs font-bold uppercase tracking-wider ${PAYMENT_METHOD_STYLES[item.paymentMethod] || PAYMENT_METHOD_STYLES.bkash}`}>
+                            {formatPaymentMethod(item.paymentMethod)}
+                          </span>
+                        </>
+                      ) : null}
                     </div>
                     <p className="mt-2 text-sm text-[#8E8A9F]">{item.user?.email || item.enrollment?.emailAddress || "No email"}</p>
                   </div>
                   <div className="rounded-2xl border border-[#DFB15B]/15 bg-[#DFB15B]/8 px-4 py-3 text-left lg:text-right">
                     <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#DFB15B]">
-                      {item.paymentMethod === "bank" ? "Bank Reference" : "BkashTrxID"}
+                      {isPreBooking ? "Booked Seat" : item.paymentMethod === "bank" ? "Bank Reference" : "BkashTrxID"}
                     </p>
-                    <p className="mt-1 font-mono text-base font-semibold text-white">{item.bkashTrxID}</p>
+                    <p className="mt-1 font-mono text-base font-semibold text-white">
+                      {isPreBooking ? formatDate(item.createdAt) : item.bkashTrxID}
+                    </p>
                   </div>
                 </div>
 
                 <div className="mt-5 grid gap-3 text-sm sm:grid-cols-2 lg:grid-cols-4">
                   <Info label="Plan" value={formatPlanValue(item)} />
-                  <Info label="Payment Type" value={formatPaymentChoice(item.paymentChoice)} />
-                  <Info label="Payment Method" value={formatPaymentMethod(item.paymentMethod)} />
+                  {!isPreBooking ? <Info label="Payment Type" value={formatPaymentChoice(item.paymentChoice)} /> : null}
+                  {!isPreBooking ? <Info label="Payment Method" value={formatPaymentMethod(item.paymentMethod)} /> : null}
                   <Info label="Delivery Mode" value={formatDeliveryMode(item.deliveryMode)} />
-                  <Info label="Paid Now" value={formatBDT(item.paidAmount)} />
-                  <Info label="Remaining Due" value={formatBDT(item.remainingAmount)} />
-                  <Info label="Final TrxID" value={item.finalTrxID} />
+                  {!isPreBooking ? <Info label="Paid Now" value={formatBDT(item.paidAmount)} /> : null}
+                  {!isPreBooking ? <Info label="Remaining Due" value={formatBDT(item.remainingAmount)} /> : null}
+                  {!isPreBooking ? <Info label="Final TrxID" value={item.finalTrxID} /> : null}
                   <Info label="Phone" value={item.enrollment?.phoneNumber} />
                   <Info label="College" value={item.enrollment?.college} />
                   <Info label="Preferred Batch" value={formatPreferredBatch(item.enrollment?.preferredBatch) || "Not selected"} />
                   <Info label="Group" value={item.enrollment?.group} />
                   <Info label="HSC Batch" value={item.enrollment?.hscBatch} />
                   <Info label="Backup Choice" value={item.enrollment?.backupChoice} />
-                  <Info label="Submitted" value={formatDate(item.createdAt)} />
+                  <Info label={isPreBooking ? "Booked" : "Submitted"} value={formatDate(item.createdAt)} />
+                  {isPreBooking ? <Info label="Last Updated" value={formatDate(item.updatedAt)} /> : null}
                 </div>
 
+                {isPreBooking ? (
+                  <div className="mt-5 rounded-2xl border border-cyan-400/20 bg-cyan-400/8 px-4 py-3 text-sm font-semibold text-cyan-100">
+                    This student has booked a seat but has not submitted a payment reference yet.
+                  </div>
+                ) : (
                 <div className="mt-5 grid gap-4 lg:grid-cols-[1fr_auto] lg:items-end">
                   <label className="block">
                     <span className="text-sm font-semibold text-white">Review note</span>
@@ -469,6 +527,7 @@ export default function AdminEnrollmentReviewsPage() {
                     </div>
                   )}
                 </div>
+                )}
 
                 {canMarkFullyPaid ? (
                   <div className="mt-5 rounded-2xl border border-sky-400/20 bg-sky-400/8 px-4 py-4">
@@ -503,10 +562,12 @@ export default function AdminEnrollmentReviewsPage() {
                   </div>
                 ) : null}
 
-                <div className="mt-4 flex flex-wrap items-center gap-2 text-xs text-[#6B667B]">
-                  <CheckCircle2 className="h-4 w-4 text-[#DFB15B]" />
-                  <span>Last reviewed: {formatDate(item.reviewedAt)}</span>
-                </div>
+                {!isPreBooking ? (
+                  <div className="mt-4 flex flex-wrap items-center gap-2 text-xs text-[#6B667B]">
+                    <CheckCircle2 className="h-4 w-4 text-[#DFB15B]" />
+                    <span>Last reviewed: {formatDate(item.reviewedAt)}</span>
+                  </div>
+                ) : null}
               </section>
             );
           })}

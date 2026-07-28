@@ -263,6 +263,10 @@ export async function getAdminEnrollmentReviews(status = "") {
   return request(`/api/payments/admin/enrollments${suffix}`);
 }
 
+export async function getAdminPreBookings() {
+  return request("/api/payments/admin/pre-bookings");
+}
+
 export async function updateAdminEnrollmentStatus(paymentId, status, reviewNote = "") {
   return request(`/api/payments/admin/enrollments/${paymentId}/status`, {
     method: "PATCH",
