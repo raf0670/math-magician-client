@@ -193,6 +193,20 @@ export async function registerUser(payload) {
   });
 }
 
+export async function requestPasswordReset(email) {
+  return request("/api/auth/forgot-password", {
+    method: "POST",
+    body: { email },
+  });
+}
+
+export async function resetPassword(token, password) {
+  return request(`/api/auth/reset-password/${encodeURIComponent(token)}`, {
+    method: "PUT",
+    body: { password },
+  });
+}
+
 export async function getProfile() {
   return request("/api/auth/me");
 }
