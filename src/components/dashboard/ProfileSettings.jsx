@@ -18,7 +18,7 @@ export default function ProfileSettings() {
         currentXp: 0,
         nextLevelXp: 1000,
     });
-    const [form, setForm] = useState({ name: "", email: "", bio: "" });
+    const [form, setForm] = useState({ name: "", bio: "" });
     const [passwordForm, setPasswordForm] = useState({ currentPassword: "", newPassword: "", confirmPassword: "" });
     const [isSaving, setIsSaving] = useState(false);
     const [message, setMessage] = useState("");
@@ -36,7 +36,6 @@ export default function ProfileSettings() {
                 }));
                 setForm({
                     name: currentUser.name || "",
-                    email: currentUser.email || "",
                     bio: currentUser.bio || "",
                 });
             }
@@ -84,7 +83,7 @@ export default function ProfileSettings() {
         setMessage("");
 
         try {
-            const payload = await updateProfile({ name: form.name, email: form.email, bio: form.bio });
+            const payload = await updateProfile({ name: form.name, bio: form.bio });
             const updatedUser = payload?.data || {};
             const currentUser = getStoredUser();
             const nextUser = { ...(currentUser || {}), ...updatedUser };
@@ -95,7 +94,7 @@ export default function ProfileSettings() {
                 email: updatedUser.email || prev.email,
                 bio: updatedUser.bio || prev.bio,
             }));
-            setForm({ name: updatedUser.name || "", email: updatedUser.email || "", bio: updatedUser.bio || "" });
+            setForm({ name: updatedUser.name || "", bio: updatedUser.bio || "" });
             setMessage("Profile updated successfully.");
         } catch (err) {
             setError(err.message || "Unable to save your profile.");
@@ -230,15 +229,13 @@ export default function ProfileSettings() {
                                 className="w-full rounded-xl border border-white/5 bg-[#1A1722] px-3 py-2.5 text-sm text-white outline-none ring-0"
                             />
                         </label>
-                        <label className="text-sm text-[#8E8A9F]">
+                        <div className="text-sm text-[#8E8A9F]">
                             <span className="mb-2 block text-[10px] font-bold uppercase tracking-[0.3em]">Email address</span>
-                            <input
-                                type="email"
-                                value={form.email}
-                                onChange={(event) => setForm((prev) => ({ ...prev, email: event.target.value }))}
-                                className="w-full rounded-xl border border-white/5 bg-[#1A1722] px-3 py-2.5 text-sm text-white outline-none ring-0"
-                            />
-                        </label>
+                            <div className="flex w-full items-center gap-2 rounded-xl border border-white/5 bg-[#1A1722]/70 px-3 py-2.5 text-sm text-white/70">
+                                <Mail className="h-4 w-4 shrink-0 text-[#6B667B]" />
+                                <span className="min-w-0 truncate">{profile.email}</span>
+                            </div>
+                        </div>
                         <label className="text-sm text-[#8E8A9F]">
                             <span className="mb-2 block text-[10px] font-bold uppercase tracking-[0.3em]">Short bio</span>
                             <textarea

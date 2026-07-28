@@ -8,6 +8,11 @@ import { useRouter } from "next/navigation";
 import { getStoredToken, savePendingPaymentPlan, savePendingProgramAction } from "@/lib/api";
 
 const REVIEW_CARD_GAP = 32;
+const PROGRAM_ACCENT_MARKS = [
+    { className: "left-[12%] top-[18%]", size: "h-3 w-3", delay: 0 },
+    { className: "right-[14%] top-[34%]", size: "h-3.5 w-3.5", delay: 0.12 },
+    { className: "right-[24%] bottom-[30%]", size: "h-2.5 w-2.5", delay: 0.24 },
+];
 
 export default function ProgramsAndTestimonials() {
     const router = useRouter();
@@ -24,23 +29,6 @@ export default function ProgramsAndTestimonials() {
     useEffect(() => {
         // eslint-disable-next-line react-hooks/set-state-in-effect
         setHasMounted(true);
-    }, []);
-
-    // 🪄 Localized floating background magic sparks for the highlight card
-    const popularSparks = useMemo(() => {
-        const magicGlyphs = ["★", "✦", "✧", "•"];
-        return Array.from({ length: 14 }).map((_, idx) => ({
-            id: idx,
-            char: magicGlyphs[idx % magicGlyphs.length],
-            left: `${Math.random() * 90 + 5}%`,
-            bottom: `${Math.random() * 20}%`,
-            size: Math.random() * 8 + 10,
-            opacity: Math.random() * 0.4 + 0.2,
-            driftX: [0, Math.random() * 30 - 15, Math.random() * -30 + 15, 0],
-            driftY: [0, -120, -260, -400],
-            speed: Math.random() * 5 + 4,
-            delay: Math.random() * -8,
-        }));
     }, []);
 
     const testimonialSparks = useMemo(() => (
@@ -83,10 +71,14 @@ export default function ProgramsAndTestimonials() {
             ],
             price: "BDT 18,000",
             period: "/ full program",
-            borderClass: "border-white/3 hover:border-white/10",
+            borderClass: "border-[#F97316]/18 hover:border-[#F97316]/35",
             bgClass: "bg-[#121017]",
             badgeStyle: "bg-white/5 border-white/10 text-white/80",
-            iconStyle: "bg-white/5 text-white/80 border-white/10",
+            iconStyle: "bg-white/5 text-white/80 border-[#F97316]/25",
+            accentGlowClass: "bg-[#F97316]/16",
+            accentLineClass: "from-transparent via-[#F97316]/45 to-transparent",
+            sparkleClass: "text-[#F97316]/45",
+            crestFrameClass: "shadow-[0_0_34px_rgba(249,115,22,0.18)]",
             buttonStyle: "bg-white/5 hover:bg-white/10 text-white border border-white/10"
         },
         {
@@ -111,12 +103,15 @@ export default function ProgramsAndTestimonials() {
             ],
             price: "BDT 17,500",
             period: "/ full program",
-            borderClass: "border-[#DFB15B]/25 shadow-[0_4px_30px_rgba(213,175,55,0.03)]",
+            borderClass: "border-[#60A5FA]/18 hover:border-[#60A5FA]/35 shadow-[0_4px_30px_rgba(96,165,250,0.04)]",
             bgClass: "bg-[#121017]",
-            badgeStyle: "bg-[#DFB15B]/10 border-[#DFB15B]/20 text-[#DFB15B]",
-            iconStyle: "bg-[#DFB15B]/10 text-[#DFB15B] border-[#DFB15B]/20",
-            buttonStyle: "bg-gradient-to-r from-[#E6C687] via-[#D4AF37] to-[#AA7C11] text-black font-bold shadow-[0_4px_20px_rgba(212,175,55,0.15)]",
-            isPopular: true
+            badgeStyle: "bg-[#60A5FA]/10 border-[#60A5FA]/20 text-[#BFDBFE]",
+            iconStyle: "bg-[#60A5FA]/10 text-[#BFDBFE] border-[#60A5FA]/25",
+            accentGlowClass: "bg-[#60A5FA]/16",
+            accentLineClass: "from-transparent via-[#60A5FA]/45 to-transparent",
+            sparkleClass: "text-[#93C5FD]/45",
+            crestFrameClass: "shadow-[0_0_34px_rgba(96,165,250,0.18)]",
+            buttonStyle: "bg-white/5 hover:bg-white/10 text-white border border-white/10"
         },
         {
             id: "online",
@@ -141,10 +136,14 @@ export default function ProgramsAndTestimonials() {
             ],
             price: "BDT 18,000",
             period: "/ full program",
-            borderClass: "border-white/3 hover:border-white/10",
+            borderClass: "border-[#FACC15]/18 hover:border-[#FACC15]/35",
             bgClass: "bg-[#121017]",
             badgeStyle: "bg-white/5 border-white/10 text-white/80",
-            iconStyle: "bg-white/5 text-white/80 border-white/10",
+            iconStyle: "bg-white/5 text-white/80 border-[#FACC15]/25",
+            accentGlowClass: "bg-[#FACC15]/14",
+            accentLineClass: "from-transparent via-[#FACC15]/40 to-transparent",
+            sparkleClass: "text-[#FACC15]/45",
+            crestFrameClass: "shadow-[0_0_34px_rgba(250,204,21,0.16)]",
             buttonStyle: "bg-white/5 hover:bg-white/10 text-white border border-white/10"
         }
     ];
@@ -317,31 +316,20 @@ export default function ProgramsAndTestimonials() {
                                 whileHover={{ y: -6 }}
                                 className={`${card.bgClass} ${card.borderClass} rounded-3xl p-8 flex flex-col justify-between transition-all duration-300 relative group overflow-hidden hover:shadow-[0_12px_40px_rgba(0,0,0,0.5)]`}
                             >
-                                {/* Active Floating Sparks System for Highlighted Card */}
-                                {card.isPopular && hasMounted && (
-                                    <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-3xl z-0 opacity-40">
-                                        {popularSparks.map((spark) => (
-                                            <motion.span
-                                                key={spark.id}
-                                                className="absolute font-sans text-[#DFB15B]/40"
-                                                style={{ left: spark.left, bottom: spark.bottom, fontSize: spark.size }}
-                                                animate={{
-                                                    x: spark.driftX,
-                                                    y: spark.driftY,
-                                                    opacity: [spark.opacity, spark.opacity * 2, spark.opacity, 0],
-                                                }}
-                                                transition={{
-                                                    duration: spark.speed,
-                                                    repeat: Infinity,
-                                                    ease: "linear",
-                                                    delay: spark.delay,
-                                                }}
-                                            >
-                                                {spark.char}
-                                            </motion.span>
-                                        ))}
-                                    </div>
-                                )}
+                                <div className={`pointer-events-none absolute -right-16 -top-16 h-44 w-44 rounded-full ${card.accentGlowClass} blur-3xl opacity-[0.55] transition-opacity duration-500 group-hover:opacity-90`} />
+                                <div className={`pointer-events-none absolute inset-x-8 top-0 h-px bg-linear-to-r ${card.accentLineClass} opacity-70`} />
+                                <div className="pointer-events-none absolute inset-0 bg-linear-to-br from-white/[0.055] via-transparent to-white/[0.025] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+                                <div className="pointer-events-none absolute bottom-6 right-6 h-24 w-24 rounded-full border border-white/5 opacity-[0.08] transition group-hover:scale-110" />
+                                {hasMounted && PROGRAM_ACCENT_MARKS.map((mark) => (
+                                    <motion.span
+                                        key={mark.className}
+                                        className={`pointer-events-none absolute ${mark.className} ${card.sparkleClass} opacity-0 transition-opacity duration-500 group-hover:opacity-100`}
+                                        animate={{ scale: [0.92, 1.15, 0.92], rotate: [0, 12, 0] }}
+                                        transition={{ duration: 3.4, repeat: Infinity, ease: "easeInOut", delay: mark.delay + index * 0.08 }}
+                                    >
+                                        <Sparkles className={mark.size} strokeWidth={1.7} />
+                                    </motion.span>
+                                ))}
 
                                 <div className="relative z-10">
                                     {/* Top Metadata Headers */}
@@ -353,13 +341,14 @@ export default function ProgramsAndTestimonials() {
 
                                     {/* Title Header Structure */}
                                     <div className="flex items-center gap-4 mb-4">
-                                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center overflow-hidden border ${card.iconStyle}`}>
+                                        <div className={`relative w-12 h-12 rounded-2xl flex items-center justify-center overflow-hidden border ${card.iconStyle} ${card.crestFrameClass}`}>
+                                            <div className={`absolute inset-[-10px] ${card.accentGlowClass} blur-xl opacity-[0.55] transition-opacity group-hover:opacity-95`} />
                                             <Image
                                                 src={card.imageSrc}
                                                 alt={card.imageAlt}
-                                                width={40}
-                                                height={40}
-                                                className="h-full w-full object-cover"
+                                                width={48}
+                                                height={48}
+                                                className="relative h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
                                             />
                                         </div>
                                         <h3 className="font-serif text-xl font-semibold text-white tracking-wide">
