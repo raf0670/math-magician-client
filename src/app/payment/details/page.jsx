@@ -91,6 +91,20 @@ function isFieldComplete(value) {
   return Array.isArray(value) ? value.length > 0 : Boolean(value?.trim());
 }
 
+function isFacebookProfileLink(value) {
+  const trimmedValue = value?.trim();
+  if (!trimmedValue) return false;
+
+  try {
+    const url = new URL(trimmedValue);
+    const hostname = url.hostname.toLowerCase();
+    return ["http:", "https:"].includes(url.protocol)
+      && (hostname === "facebook.com" || hostname.endsWith(".facebook.com"));
+  } catch {
+    return false;
+  }
+}
+
 const SECTION_VARIANTS = {
   hidden: { opacity: 0, y: 28 },
   visible: {
@@ -198,6 +212,11 @@ function PaymentDetailsContent() {
     requiredFields.forEach((field) => {
       if (!isFieldComplete(form[field])) missing[field] = true;
     });
+
+    if (!missing.facebookProfile && !isFacebookProfileLink(form.facebookProfile)) {
+      missing.facebookProfile = "invalid";
+    }
+
     return missing;
   }, [form, requiredFields]);
 
@@ -223,6 +242,11 @@ function PaymentDetailsContent() {
     const hasMissingRequired = requiredFields.some((field) => !isFieldComplete(form[field]));
     if (hasMissingRequired) {
       setError("Please complete all required fields before continuing.");
+      return;
+    }
+
+    if (!isFacebookProfileLink(form.facebookProfile)) {
+      setError("Please enter a valid Facebook profile link.");
       return;
     }
 
@@ -425,7 +449,16 @@ function PaymentDetailsContent() {
               <TextField label="Your Name:" field="yourName" required value={form.yourName} error={fieldErrors.yourName} onChange={updateField} />
               <TextField label="Address:" field="address" required value={form.address} error={fieldErrors.address} onChange={updateField} />
               <TextField label="Phone Number:" field="phoneNumber" type="tel" required value={form.phoneNumber} error={fieldErrors.phoneNumber} onChange={updateField} />
-              <TextField label="Facebook Profile:" field="facebookProfile" required value={form.facebookProfile} error={fieldErrors.facebookProfile} onChange={updateField} />
+              <TextField
+                label="Facebook Profile Link:"
+                field="facebookProfile"
+                required
+                value={form.facebookProfile}
+                error={fieldErrors.facebookProfile}
+                errorMessage={fieldErrors.facebookProfile === "invalid" ? "Please enter a valid Facebook profile link." : ""}
+                onChange={updateField}
+                placeholder="https://www.facebook.com/your.profile"
+              />
               <TextField label="Email Address:" field="emailAddress" type="email" required value={form.emailAddress} error={fieldErrors.emailAddress} onChange={updateField} />
             </FormSection>
 
@@ -707,7 +740,7 @@ function PaymentChoiceField({ selectedPlan, value, onChange }) {
   );
 }
 
-function TextField({ label, field, value, onChange, required = false, type = "text", placeholder = "Short answer text", error = false }) {
+function TextField({ label, field, value, onChange, required = false, type = "text", placeholder = "Short answer text", error = false, errorMessage = "" }) {
   const complete = isFieldComplete(value);
   const labelTone = error ? "text-[#F8C7C0]" : complete ? "text-[#B7F3D0]" : "text-white";
   const inputBorder = error
@@ -729,6 +762,7 @@ function TextField({ label, field, value, onChange, required = false, type = "te
         placeholder={placeholder}
         className={`mt-3 w-full border-0 border-b bg-transparent px-0 py-2 text-sm text-white outline-none transition placeholder:text-[#6B667B] ${inputBorder}`}
       />
+      {errorMessage ? <p className="mt-2 text-xs font-semibold text-[#F8C7C0]">{errorMessage}</p> : null}
     </motion.label>
   );
 }
