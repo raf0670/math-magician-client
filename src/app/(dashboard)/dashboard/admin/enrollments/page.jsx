@@ -463,6 +463,7 @@ export default function AdminEnrollmentReviewsPage() {
                   {!isPreBooking ? <Info label="Remaining Due" value={formatBDT(item.remainingAmount)} /> : null}
                   {!isPreBooking ? <Info label="Final TrxID" value={item.finalTrxID} /> : null}
                   <Info label="Phone" value={item.enrollment?.phoneNumber} />
+                  {isPreBooking ? <Info label="Facebook Profile" value={item.enrollment?.facebookProfile} /> : null}
                   <Info label="College" value={item.enrollment?.college} />
                   <Info label="Preferred Batch" value={formatPreferredBatch(item.enrollment?.preferredBatch) || "Not selected"} />
                   <Info label="Group" value={item.enrollment?.group} />
