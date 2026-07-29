@@ -13,8 +13,12 @@ const SUBJECTS = [
     { name: "Analytical", label: "Analytical", icon: Brain },
 ];
 
-function getDefaultQuestionCount(topic) {
-    const availableCount = Number(topic?.questionCount) || 0;
+function getAvailableQuestionCount(topics = []) {
+    return topics.reduce((sum, topic) => sum + (Number(topic?.questionCount) || 0), 0);
+}
+
+function getDefaultQuestionCount(topics = []) {
+    const availableCount = getAvailableQuestionCount(topics);
     return availableCount ? Math.min(10, availableCount) : "";
 }
 
@@ -22,7 +26,7 @@ export default function MockDirectory() {
     const router = useRouter();
     const [subjects, setSubjects] = useState(SUBJECTS.map((subject) => ({ ...subject, topics: [] })));
     const [activeSubject, setActiveSubject] = useState("Math");
-    const [selectedTopic, setSelectedTopic] = useState("");
+    const [selectedTopics, setSelectedTopics] = useState([]);
     const [questionCount, setQuestionCount] = useState("");
     const [mockExams, setMockExams] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -52,8 +56,8 @@ export default function MockDirectory() {
                 const firstSubjectWithTopic = mergedSubjects.find((subject) => subject.topics.length);
                 if (firstSubjectWithTopic) {
                     setActiveSubject(firstSubjectWithTopic.name);
-                    setSelectedTopic(firstSubjectWithTopic.topics[0].name);
-                    setQuestionCount(getDefaultQuestionCount(firstSubjectWithTopic.topics[0]));
+                    setSelectedTopics([firstSubjectWithTopic.topics[0].name]);
+                    setQuestionCount(getDefaultQuestionCount([firstSubjectWithTopic.topics[0]]));
                 }
             } catch (err) {
                 if (isMounted) setFatalError(err);
@@ -72,12 +76,13 @@ export default function MockDirectory() {
         return subjects.find((subject) => subject.name === activeSubject) || subjects[0];
     }, [subjects, activeSubject]);
 
-    const currentTopic = useMemo(() => {
-        return currentSubject?.topics?.find((topic) => topic.name === selectedTopic) || null;
-    }, [currentSubject, selectedTopic]);
+    const selectedTopicRows = useMemo(() => {
+        return currentSubject?.topics?.filter((topic) => selectedTopics.includes(topic.name)) || [];
+    }, [currentSubject, selectedTopics]);
 
-    const maxQuestionCount = currentTopic?.questionCount || 0;
+    const maxQuestionCount = getAvailableQuestionCount(selectedTopicRows);
     const parsedQuestionCount = Number(questionCount);
+    const hasSelectedTopics = selectedTopicRows.length > 0;
     const hasValidQuestionCount = Number.isInteger(parsedQuestionCount)
         && parsedQuestionCount > 0
         && parsedQuestionCount <= maxQuestionCount;
@@ -91,17 +96,27 @@ export default function MockDirectory() {
         const nextTopic = nextSubject?.topics?.[0];
 
         setActiveSubject(subjectName);
-        setSelectedTopic(nextTopic?.name || "");
-        setQuestionCount(getDefaultQuestionCount(nextTopic));
+        setSelectedTopics(nextTopic ? [nextTopic.name] : []);
+        setQuestionCount(getDefaultQuestionCount(nextTopic ? [nextTopic] : []));
     };
 
-    const handleTopicChange = (topic) => {
-        setSelectedTopic(topic.name);
-        setQuestionCount(getDefaultQuestionCount(topic));
+    const handleTopicToggle = (topic) => {
+        const nextSelectedTopics = selectedTopics.includes(topic.name)
+            ? selectedTopics.filter((topicName) => topicName !== topic.name)
+            : [...selectedTopics, topic.name];
+        const nextSelectedTopicRows = currentSubject?.topics?.filter((topicRow) => nextSelectedTopics.includes(topicRow.name)) || [];
+        const nextMaxQuestionCount = getAvailableQuestionCount(nextSelectedTopicRows);
+
+        setSelectedTopics(nextSelectedTopics);
+        if (!nextMaxQuestionCount) {
+            setQuestionCount("");
+        } else if (!parsedQuestionCount || parsedQuestionCount > nextMaxQuestionCount) {
+            setQuestionCount(getDefaultQuestionCount(nextSelectedTopicRows));
+        }
     };
 
     const handleStartPractice = async () => {
-        if (!currentTopic || !hasValidQuestionCount || starting) return;
+        if (!hasSelectedTopics || !hasValidQuestionCount || starting) return;
 
         setStarting(true);
         setError("");
@@ -109,7 +124,7 @@ export default function MockDirectory() {
         try {
             const payload = await startPracticeExam({
                 subject: activeSubject,
-                topic: currentTopic.name,
+                topics: selectedTopicRows.map((topic) => topic.name),
                 questionCount: parsedQuestionCount,
             });
             router.push(`/dashboard/mock-tests/${payload.data._id}`);
@@ -132,7 +147,7 @@ export default function MockDirectory() {
                             <SlidersHorizontal className="h-3.5 w-3.5" /> Exam Setup
                         </span>
                         <h2 className="text-xl font-semibold tracking-wide text-white">Choose your practice paper</h2>
-                        <p className="text-sm font-medium text-[#8E8A9F]">Pick a subject, topic, and how many questions you want. Every practice paper is untimed and built from your selected topic.</p>
+                        <p className="text-sm font-medium text-[#8E8A9F]">Pick a subject, choose one or more topics, and set how many questions you want. Every practice paper is untimed and balanced across your selected topics.</p>
                     </div>
 
                     <div className="grid grid-cols-1 gap-5 lg:grid-cols-[260px_minmax(0,1fr)]">
@@ -160,7 +175,7 @@ export default function MockDirectory() {
 
                         <div className="flex min-h-72 flex-col gap-5 rounded-xl border border-white/5 bg-[#1A1722]/35 p-4">
                             <div>
-                                <span className="text-[10px] font-bold uppercase tracking-widest text-[#6B667B]">Sub-topic</span>
+                                <span className="text-[10px] font-bold uppercase tracking-widest text-[#6B667B]">Sub-topics</span>
                                 {loading ? (
                                     <InlineFlashyLoader
                                         text="Loading topic constellations..."
@@ -171,11 +186,11 @@ export default function MockDirectory() {
                                 ) : currentSubject?.topics?.length ? (
                                     <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
                                         {currentSubject.topics.map((topic) => {
-                                            const isSelected = selectedTopic === topic.name;
+                                            const isSelected = selectedTopics.includes(topic.name);
                                             return (
                                                 <button
                                                     key={topic.name}
-                                                    onClick={() => handleTopicChange(topic)}
+                                                    onClick={() => handleTopicToggle(topic)}
                                                     className={`flex min-h-16 items-center justify-between rounded-xl border p-3 text-left transition-colors ${isSelected ? "border-emerald-400/30 bg-emerald-400/10" : "border-white/5 bg-[#121017] hover:border-white/10"}`}
                                                 >
                                                     <span>
@@ -213,7 +228,7 @@ export default function MockDirectory() {
                                                 min={1}
                                                 max={maxQuestionCount || 1}
                                                 value={questionCount}
-                                                disabled={!currentTopic || !maxQuestionCount}
+                                                disabled={!hasSelectedTopics || !maxQuestionCount}
                                                 onChange={(event) => setQuestionCount(event.target.value)}
                                                 className="h-12 rounded-xl border border-white/5 bg-[#121017] px-4 text-sm font-bold text-white outline-none transition-colors focus:border-[#DFB15B]/40 disabled:cursor-not-allowed disabled:opacity-50"
                                             />
@@ -226,14 +241,16 @@ export default function MockDirectory() {
 
                                     <span className={`text-[11px] font-semibold ${hasValidQuestionCount ? "text-emerald-300" : "text-red-400"}`}>
                                         {hasValidQuestionCount
-                                            ? `${parsedQuestionCount} question${parsedQuestionCount === 1 ? "" : "s"} will be selected from ${maxQuestionCount || 0} available.`
-                                            : "Choose a valid total within the available question count."}
+                                            ? `${parsedQuestionCount} question${parsedQuestionCount === 1 ? "" : "s"} will be balanced across ${selectedTopicRows.length} selected topic${selectedTopicRows.length === 1 ? "" : "s"}.`
+                                            : hasSelectedTopics
+                                                ? "Choose a valid total within the available question count."
+                                                : "Select at least one topic to start a practice exam."}
                                     </span>
                                 </div>
 
                                 <button
                                     onClick={handleStartPractice}
-                                    disabled={!currentTopic || !hasValidQuestionCount || starting}
+                                    disabled={!hasSelectedTopics || !hasValidQuestionCount || starting}
                                     className="inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-linear-to-r from-[#E6C687] to-[#AA7C11] px-5 text-xs font-bold uppercase tracking-wider text-black shadow-md transition-all hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
                                 >
                                     <LoadingButtonLabel
