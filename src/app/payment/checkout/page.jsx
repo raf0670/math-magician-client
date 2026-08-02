@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
@@ -373,19 +374,17 @@ function PaymentInstructions({ paymentMethod }) {
     <div className="space-y-3 rounded-3xl border border-[#DFB15B]/20 bg-[#DFB15B]/8 p-5">
       <div className="flex items-center gap-3 text-[#DFB15B]">
         <CreditCard className="h-5 w-5" />
-        <p className="text-xs font-bold uppercase tracking-[0.2em]">bKash Numbers</p>
+        <p className="text-xs font-bold uppercase tracking-[0.2em]">bKash QR</p>
       </div>
-      <div className="space-y-3">
-        <div className="rounded-2xl border border-white/8 bg-[#100E16]/70 px-4 py-3">
-          <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#DFB15B]">Send Money</p>
-          <p className="text-xs font-semibold text-[#A9A3BA]">Bkash ( personal )</p>
-          <p className="mt-1 font-mono text-lg font-bold text-white">01894688018</p>
-        </div>
-        <div className="rounded-2xl border border-white/8 bg-[#100E16]/70 px-4 py-3">
-          <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#DFB15B]">Make Payment</p>
-          <p className="text-xs font-semibold text-[#A9A3BA]">Bkash ( retail )</p>
-          <p className="mt-1 font-mono text-lg font-bold text-white">01968803335</p>
-        </div>
+      <div className="rounded-2xl border border-white/8 bg-[#100E16]/70 p-4">
+        <Image
+          src="/bkash-qr.jpg"
+          alt="bKash payment QR code"
+          width={612}
+          height={780}
+          className="mx-auto h-auto w-full max-w-[280px] rounded-xl"
+          priority={false}
+        />
       </div>
     </div>
   );
