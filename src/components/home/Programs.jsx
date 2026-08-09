@@ -2,7 +2,7 @@
 "use client";
 import { useCallback, useEffect, useState, useMemo, useRef } from "react";
 import { motion } from "framer-motion";
-import { BookmarkCheck, ChevronLeft, ChevronRight, Clock3, MapPin, Plus, Sparkles, Star } from "lucide-react";
+import { BookmarkCheck, ChevronLeft, ChevronRight, Clock3, MapPin, Plus, Shield, Sparkles, Star } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { getStoredToken, savePendingPaymentPlan, savePendingProgramAction } from "@/lib/api";
@@ -145,6 +145,39 @@ export default function ProgramsAndTestimonials() {
             sparkleClass: "text-[#FACC15]/45",
             crestFrameClass: "shadow-[0_0_34px_rgba(250,204,21,0.16)]",
             buttonStyle: "bg-white/5 hover:bg-white/10 text-white border border-white/10"
+        },
+        {
+            id: "mathAdvanced",
+            badge: "Math Advanced",
+            title: "Slytherin",
+            desc: "An advanced math program joining the house competition later. Details, schedule, and enrollment will open after the program is finalized.",
+            imageSrc: "",
+            imageAlt: "Slytherin house crest",
+            location: {
+                text: "Coming Soon"
+            },
+            schedule: {
+                days: "Schedule to be announced",
+                time: "Enrollment not open yet"
+            },
+            features: [
+                "Advanced Math-Focused Track",
+                "Live Exam Competition Access",
+                "House Points Starting From Zero",
+                "Program Details Coming Soon"
+            ],
+            price: "Coming Soon",
+            period: "",
+            comingSoon: true,
+            borderClass: "border-emerald-400/18 hover:border-emerald-400/35",
+            bgClass: "bg-[#121017]",
+            badgeStyle: "bg-emerald-400/10 border-emerald-400/20 text-emerald-100",
+            iconStyle: "bg-emerald-400/10 text-emerald-100 border-emerald-400/25",
+            accentGlowClass: "bg-emerald-400/14",
+            accentLineClass: "from-transparent via-emerald-400/40 to-transparent",
+            sparkleClass: "text-emerald-300/45",
+            crestFrameClass: "shadow-[0_0_34px_rgba(52,211,153,0.16)]",
+            buttonStyle: "bg-white/5 text-white/40 border border-white/10 cursor-not-allowed"
         }
     ];
 
@@ -343,13 +376,17 @@ export default function ProgramsAndTestimonials() {
                                     <div className="flex items-center gap-4 mb-4">
                                         <div className={`relative w-12 h-12 rounded-2xl flex items-center justify-center overflow-hidden border ${card.iconStyle} ${card.crestFrameClass}`}>
                                             <div className={`absolute inset-[-10px] ${card.accentGlowClass} blur-xl opacity-[0.55] transition-opacity group-hover:opacity-95`} />
-                                            <Image
-                                                src={card.imageSrc}
-                                                alt={card.imageAlt}
-                                                width={48}
-                                                height={48}
-                                                className="relative h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
-                                            />
+                                            {card.imageSrc ? (
+                                                <Image
+                                                    src={card.imageSrc}
+                                                    alt={card.imageAlt}
+                                                    width={48}
+                                                    height={48}
+                                                    className="relative h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                                />
+                                            ) : (
+                                                <Shield className="relative h-6 w-6" />
+                                            )}
                                         </div>
                                         <h3 className="font-serif text-xl font-semibold text-white tracking-wide">
                                             {card.title}
@@ -371,10 +408,7 @@ export default function ProgramsAndTestimonials() {
                                     </ul>
 
                                     {card.location ? (
-                                        <a
-                                            href={card.location.href}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
+                                        <div
                                             className="mb-3 flex items-center gap-3 rounded-2xl border border-[#DFB15B]/20 bg-[#DFB15B]/8 px-4 py-3 text-left transition hover:border-[#DFB15B]/45 hover:bg-[#DFB15B]/12"
                                         >
                                             <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#DFB15B] text-black shadow-[0_0_22px_rgba(223,177,91,0.22)]">
@@ -388,7 +422,7 @@ export default function ProgramsAndTestimonials() {
                                                     {card.location.text}
                                                 </span>
                                             </span>
-                                        </a>
+                                        </div>
                                     ) : null}
 
                                     {card.schedule ? (
@@ -423,23 +457,35 @@ export default function ProgramsAndTestimonials() {
                                     </div>
 
                                     <div className="grid gap-2">
-                                        <button
-                                            type="button"
-                                            onClick={() => handleProgramAction(card.id, "enroll")}
-                                            disabled={selectedPlanId === card.id}
-                                            className={`w-full py-3.5 rounded-2xl text-xs tracking-wide transition-all duration-300 hover:brightness-110 active:scale-[0.98] disabled:cursor-wait disabled:opacity-70 ${card.buttonStyle}`}
-                                        >
-                                            {selectedPlanId === card.id && selectedProgramAction === "enroll" ? "Opening form..." : "Enroll in This Program"}
-                                        </button>
-                                        <button
-                                            type="button"
-                                            onClick={() => handleProgramAction(card.id, "book")}
-                                            disabled={selectedPlanId === card.id}
-                                            className="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-[#DFB15B]/25 bg-[#DFB15B]/8 px-4 py-3.5 text-xs font-bold tracking-wide text-[#DFB15B] transition-all duration-300 hover:border-[#DFB15B]/45 hover:bg-[#DFB15B]/12 active:scale-[0.98] disabled:cursor-wait disabled:opacity-70"
-                                        >
-                                            <BookmarkCheck className="h-4 w-4" />
-                                            {selectedPlanId === card.id && selectedProgramAction === "book" ? "Opening booking..." : "Book Seat"}
-                                        </button>
+                                        {card.comingSoon ? (
+                                            <button
+                                                type="button"
+                                                disabled
+                                                className={`w-full py-3.5 rounded-2xl text-xs font-bold tracking-wide ${card.buttonStyle}`}
+                                            >
+                                                Coming Soon
+                                            </button>
+                                        ) : (
+                                            <>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleProgramAction(card.id, "enroll")}
+                                                    disabled={selectedPlanId === card.id}
+                                                    className={`w-full py-3.5 rounded-2xl text-xs tracking-wide transition-all duration-300 hover:brightness-110 active:scale-[0.98] disabled:cursor-wait disabled:opacity-70 ${card.buttonStyle}`}
+                                                >
+                                                    {selectedPlanId === card.id && selectedProgramAction === "enroll" ? "Opening form..." : "Enroll in This Program"}
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleProgramAction(card.id, "book")}
+                                                    disabled={selectedPlanId === card.id}
+                                                    className="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-[#DFB15B]/25 bg-[#DFB15B]/8 px-4 py-3.5 text-xs font-bold tracking-wide text-[#DFB15B] transition-all duration-300 hover:border-[#DFB15B]/45 hover:bg-[#DFB15B]/12 active:scale-[0.98] disabled:cursor-wait disabled:opacity-70"
+                                                >
+                                                    <BookmarkCheck className="h-4 w-4" />
+                                                    {selectedPlanId === card.id && selectedProgramAction === "book" ? "Opening booking..." : "Book Seat"}
+                                                </button>
+                                            </>
+                                        )}
                                     </div>
                                 </div>
 

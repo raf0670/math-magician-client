@@ -7,18 +7,23 @@ import {
   Clock3,
   Edit3,
   FileQuestion,
+  Gavel,
   PlusCircle,
   RefreshCw,
+  RotateCcw,
   Save,
   ShieldAlert,
   Trash2,
+  Users,
   X,
 } from "lucide-react";
 import {
   createAdminLiveExam,
   getAdminLiveExams,
+  getAdminLiveExamSubmissions,
   getProfile,
   saveAuthSession,
+  updateSubmissionModeration,
   updateAdminLiveExam,
 } from "@/lib/api";
 import FlashyLoader, { LoadingButtonLabel } from "@/components/shared/FlashyLoader";
@@ -29,9 +34,15 @@ const OPTION_LABELS = ["A", "B", "C", "D", "E"];
 
 const EMPTY_SCHEDULE = {
   title: "",
+  competitionCategory: "daily",
   startTime: "",
   endTime: "",
 };
+
+const COMPETITION_CATEGORIES = [
+  { value: "daily", label: "Daily Exam" },
+  { value: "weekly", label: "Weekly Exam" },
+];
 
 const STATUS_STYLES = {
   upcoming: "border-sky-400/25 bg-sky-400/10 text-sky-200",
@@ -223,6 +234,7 @@ export default function AdminLiveExamsPage() {
     setEditingId(exam._id);
     setSchedule({
       title: exam.title || "",
+      competitionCategory: exam.competitionCategory || "daily",
       startTime: toDateTimeInputValue(exam.startTime),
       endTime: toDateTimeInputValue(exam.endTime),
     });
@@ -234,6 +246,7 @@ export default function AdminLiveExamsPage() {
 
   const buildPayload = () => ({
     title: schedule.title,
+    competitionCategory: schedule.competitionCategory,
     startTime: toApiDate(schedule.startTime),
     endTime: toApiDate(schedule.endTime),
     questions: questions.map((question) => ({
@@ -344,8 +357,9 @@ export default function AdminLiveExamsPage() {
         </div>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-          <div className="grid gap-4 lg:grid-cols-3">
+          <div className="grid gap-4 lg:grid-cols-4">
             <TextField label="Exam title" required value={schedule.title} onChange={(value) => updateSchedule("title", value)} placeholder="Example: Live Exam 01" icon={<FileQuestion className="h-4 w-4" />} />
+            <SelectField label="Competition type" value={schedule.competitionCategory} onChange={(value) => updateSchedule("competitionCategory", value)} options={COMPETITION_CATEGORIES} />
             <TextField label="Start time" required type="datetime-local" value={schedule.startTime} onChange={(value) => updateSchedule("startTime", value)} icon={<CalendarClock className="h-4 w-4" />} />
             <TextField label="End time" required type="datetime-local" value={schedule.endTime} onChange={(value) => updateSchedule("endTime", value)} icon={<Clock3 className="h-4 w-4" />} />
           </div>
@@ -440,7 +454,7 @@ export default function AdminLiveExamsPage() {
                       {formatDateTime(exam.startTime)} to {formatDateTime(exam.endTime)}
                     </p>
                     <p className="mt-2 text-sm font-semibold text-[#DFB15B]">
-                      {exam.questionCount || exam.questions?.length || 0} question{(exam.questionCount || exam.questions?.length || 0) === 1 ? "" : "s"} / {exam.totalMarks || 0} marks
+                      {(exam.competitionCategory || "daily").toUpperCase()} - {exam.questionCount || exam.questions?.length || 0} question{(exam.questionCount || exam.questions?.length || 0) === 1 ? "" : "s"} / {exam.totalMarks || 0} marks
                     </p>
                   </div>
 
@@ -457,7 +471,122 @@ export default function AdminLiveExamsPage() {
                   <CheckCircle2 className="h-4 w-4 text-[#DFB15B]" />
                   <span>Created by {exam.createdBy?.name || "admin"}</span>
                 </div>
+                <SubmissionModerationPanel examId={exam._id} />
               </section>
+            );
+          })}
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+function SubmissionModerationPanel({ examId }) {
+  const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [submissions, setSubmissions] = useState([]);
+  const [error, setError] = useState("");
+  const [reasonBySubmissionId, setReasonBySubmissionId] = useState({});
+  const [savingId, setSavingId] = useState("");
+
+  const loadSubmissions = useCallback(async () => {
+    if (!examId) return;
+    setLoading(true);
+    setError("");
+
+    try {
+      const payload = await getAdminLiveExamSubmissions(examId);
+      setSubmissions(payload?.data?.submissions || []);
+    } catch (err) {
+      setError(err.message || "Unable to load submissions.");
+    } finally {
+      setLoading(false);
+    }
+  }, [examId]);
+
+  const updateModeration = async (submission, isDisqualified) => {
+    const submissionId = submission._id;
+    const reason = reasonBySubmissionId[submissionId] || "Manual admin review";
+    setSavingId(submissionId);
+    setError("");
+
+    try {
+      const payload = await updateSubmissionModeration(submissionId, { isDisqualified, reason });
+      const updated = payload?.data;
+      if (updated) {
+        setSubmissions((current) => current.map((item) => (item._id === updated._id ? updated : item)));
+      }
+    } catch (err) {
+      setError(err.message || "Unable to update submission.");
+    } finally {
+      setSavingId("");
+    }
+  };
+
+  return (
+    <div className="mt-5 rounded-3xl border border-white/5 bg-[#0F0D15] p-4">
+      <button
+        type="button"
+        onClick={() => {
+          const nextOpen = !open;
+          setOpen(nextOpen);
+          if (nextOpen) loadSubmissions();
+        }}
+        className="inline-flex items-center gap-2 text-sm font-bold text-white transition hover:text-[#DFB15B]"
+      >
+        <Users className="h-4 w-4 text-[#DFB15B]" />
+        {open ? "Hide Results Moderation" : "Manage Results Moderation"}
+      </button>
+
+      {open ? (
+        <div className="mt-4 space-y-3">
+          {loading ? <p className="text-sm text-[#8E8A9F]">Loading submissions...</p> : null}
+          {error ? <p className="rounded-2xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm font-medium text-red-300">{error}</p> : null}
+          {!loading && !submissions.length ? (
+            <p className="rounded-2xl border border-white/5 bg-[#121017] px-4 py-5 text-sm text-[#8E8A9F]">No submissions yet.</p>
+          ) : null}
+
+          {submissions.map((submission) => {
+            const isDisqualified = Boolean(submission.isDisqualified);
+            return (
+              <div key={submission._id} className="grid gap-3 rounded-2xl border border-white/5 bg-[#121017] p-4 lg:grid-cols-[minmax(0,1fr)_minmax(220px,0.55fr)_auto] lg:items-center">
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-bold text-white">{submission.student?.name || "Student"}</p>
+                  <p className="mt-1 text-xs font-semibold text-[#8E8A9F]">{submission.student?.house || "No house"} - Score {Number(submission.score || 0).toFixed(2)} - Effective {Number(submission.effectiveScore || 0).toFixed(2)}</p>
+                  {isDisqualified ? (
+                    <p className="mt-1 text-xs font-semibold text-red-300">Disqualified: {submission.disqualificationReason || "No reason saved"}</p>
+                  ) : null}
+                </div>
+
+                <input
+                  value={reasonBySubmissionId[submission._id] || ""}
+                  onChange={(event) => setReasonBySubmissionId((current) => ({ ...current, [submission._id]: event.target.value }))}
+                  placeholder="Reason for disqualification"
+                  className="h-11 rounded-2xl border border-white/8 bg-[#0A090F] px-3 text-sm text-white outline-none transition placeholder:text-[#6B667B] focus:border-[#DFB15B]/45"
+                />
+
+                {isDisqualified ? (
+                  <button
+                    type="button"
+                    disabled={savingId === submission._id}
+                    onClick={() => updateModeration(submission, false)}
+                    className="inline-flex items-center justify-center gap-2 rounded-2xl border border-emerald-400/20 bg-emerald-400/10 px-4 py-3 text-xs font-bold uppercase tracking-wider text-emerald-200 transition hover:bg-emerald-400/15 disabled:cursor-wait disabled:opacity-60"
+                  >
+                    <RotateCcw className="h-4 w-4" />
+                    Reinstate
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    disabled={savingId === submission._id}
+                    onClick={() => updateModeration(submission, true)}
+                    className="inline-flex items-center justify-center gap-2 rounded-2xl border border-red-400/20 bg-red-500/10 px-4 py-3 text-xs font-bold uppercase tracking-wider text-red-200 transition hover:bg-red-500/20 disabled:cursor-wait disabled:opacity-60"
+                  >
+                    <Gavel className="h-4 w-4" />
+                    Disqualify
+                  </button>
+                )}
+              </div>
             );
           })}
         </div>

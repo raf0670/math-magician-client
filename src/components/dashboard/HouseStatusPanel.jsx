@@ -1,10 +1,10 @@
 "use client";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { CheckCircle2, Clock3, CreditCard, Crown, Sparkles } from "lucide-react";
+import { CheckCircle2, Clock3, CreditCard, Crown, Shield, Sparkles, Trophy } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { getProfile, getStoredUser, saveAuthSession } from "@/lib/api";
+import { getCompetitionSummary, getProfile, getStoredUser, saveAuthSession } from "@/lib/api";
 
 const houses = [
     {
@@ -34,10 +34,24 @@ const houses = [
         imageSrc: "/ravenclaw.jpeg",
         imageAlt: "Ravenclaw house crest",
     },
+    {
+        name: "Slytherin",
+        mode: "Advanced",
+        location: "Coming Soon",
+        tone: "from-emerald-500/24 via-white/8 to-transparent",
+        iconClass: "border-emerald-300/25 bg-emerald-500/12 text-emerald-200",
+        imageSrc: "",
+        imageAlt: "Slytherin house crest",
+    },
 ];
+
+function formatPoints(value) {
+    return Number(value || 0).toFixed(2);
+}
 
 export default function HouseStatusPanel() {
     const [currentUser, setCurrentUser] = useState(null);
+    const [standings, setStandings] = useState([]);
 
     useEffect(() => {
         const syncUser = () => setCurrentUser(getStoredUser());
@@ -54,6 +68,9 @@ export default function HouseStatusPanel() {
 
         syncUser();
         refreshProfile();
+        getCompetitionSummary()
+            .then((payload) => setStandings(payload?.data?.houses || []))
+            .catch(() => setStandings([]));
         window.addEventListener("auth-state-changed", syncUser);
         window.addEventListener("storage", syncUser);
 
@@ -76,13 +93,14 @@ export default function HouseStatusPanel() {
             ? "Your seat is reserved. Submit your payment reference when you are ready, then class access will unlock after admin approval."
             : "Your academy access will unlock after admin approval. The available houses are shown below without assigning you to one.";
     const StatusIcon = hasClassAccess ? CheckCircle2 : Clock3;
+    const standingByHouse = new Map(standings.map((item) => [item.name, item]));
 
     return (
         <motion.section
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-            className="grid gap-5 lg:grid-cols-[0.92fr_1.35fr]"
+            className="grid gap-5 lg:grid-cols-[0.82fr_1.55fr]"
         >
             <div className="relative overflow-hidden rounded-3xl border border-[#DFB15B]/15 bg-[#121017]/92 p-5 shadow-[0_18px_55px_rgba(0,0,0,0.32)]">
                 <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-[#DFB15B]/70 to-transparent" />
@@ -106,11 +124,11 @@ export default function HouseStatusPanel() {
                 <div className="relative z-10 mt-5 flex flex-wrap gap-2">
                     <span className="inline-flex items-center gap-1.5 rounded-full border border-white/8 bg-white/5 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-[#D8D4E5]">
                         <Crown className="h-3.5 w-3.5 text-[#DFB15B]" />
-                        {canCheckout ? "Seat Reserved" : isPartiallyPaid ? "Partial Payment" : "Premium Academy"}
+                        {currentUser?.house || (canCheckout ? "Seat Reserved" : isPartiallyPaid ? "Partial Payment" : "Premium Academy")}
                     </span>
                     <span className="inline-flex items-center gap-1.5 rounded-full border border-white/8 bg-white/5 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-[#D8D4E5]">
                         <Sparkles className="h-3.5 w-3.5 text-[#A78BFA]" />
-                        Three Houses
+                        Four Houses
                     </span>
                 </div>
 
@@ -125,34 +143,57 @@ export default function HouseStatusPanel() {
                 ) : null}
             </div>
 
-            <div className="grid gap-4 sm:grid-cols-3">
-                {houses.map((house, index) => (
-                    <motion.div
-                        key={house.name}
-                        initial={{ opacity: 0, y: 18 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5, delay: 0.08 * index, ease: [0.22, 1, 0.36, 1] }}
-                        whileHover={{ y: -4 }}
-                        className="group relative min-h-44 overflow-hidden rounded-3xl border border-white/6 bg-[#121017]/90 p-5 shadow-[0_14px_45px_rgba(0,0,0,0.28)]"
-                    >
-                        <div className={`pointer-events-none absolute inset-0 bg-linear-to-br ${house.tone}`} />
-                        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-white/24 to-transparent opacity-70" />
-                        <div className="relative z-10 flex h-full flex-col">
-                            <div className={`flex h-10 w-10 items-center justify-center overflow-hidden rounded-2xl border ${house.iconClass}`}>
-                                <Image
-                                    src={house.imageSrc}
-                                    alt={house.imageAlt}
-                                    width={40}
-                                    height={40}
-                                    className="h-full w-full object-cover"
-                                />
+            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                {houses.map((house, index) => {
+                    const standing = standingByHouse.get(house.name);
+                    const isCurrentHouse = currentUser?.house === house.name;
+
+                    return (
+                        <motion.div
+                            key={house.name}
+                            initial={{ opacity: 0, y: 18 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.5, delay: 0.08 * index, ease: [0.22, 1, 0.36, 1] }}
+                            whileHover={{ y: -4 }}
+                            className={`group relative min-h-52 overflow-hidden rounded-3xl border bg-[#121017]/90 p-5 shadow-[0_14px_45px_rgba(0,0,0,0.28)] ${isCurrentHouse ? "border-[#DFB15B]/35" : "border-white/6"}`}
+                        >
+                            <div className={`pointer-events-none absolute inset-0 bg-linear-to-br ${house.tone}`} />
+                            <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-white/24 to-transparent opacity-70" />
+                            <div className="relative z-10 flex h-full flex-col">
+                                <div className={`flex h-10 w-10 items-center justify-center overflow-hidden rounded-2xl border ${house.iconClass}`}>
+                                    {house.imageSrc ? (
+                                        <Image
+                                            src={house.imageSrc}
+                                            alt={house.imageAlt}
+                                            width={40}
+                                            height={40}
+                                            className="h-full w-full object-cover"
+                                        />
+                                    ) : (
+                                        <Shield className="h-5 w-5" />
+                                    )}
+                                </div>
+                                <h3 className="mt-5 font-serif text-xl font-semibold tracking-wide text-white">{house.name}</h3>
+                                <p className="mt-2 text-xs font-semibold uppercase tracking-[0.18em] text-[#DFB15B]">{house.mode}</p>
+                                <p className="mt-2 text-sm font-medium text-[#9D96B3]">{house.location}</p>
+                                <div className="mt-auto pt-4">
+                                    <div className="flex items-center justify-between rounded-2xl border border-white/6 bg-[#0F0D15]/70 px-3 py-2">
+                                        <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-[#8E8A9F]">
+                                            <Trophy className="h-3.5 w-3.5 text-[#DFB15B]" />
+                                            Points
+                                        </span>
+                                        <span className="text-sm font-black text-white">{formatPoints(standing?.totalPoints)}</span>
+                                    </div>
+                                    {isCurrentHouse ? (
+                                        <span className="mt-2 inline-flex rounded-full border border-[#DFB15B]/20 bg-[#DFB15B]/10 px-2.5 py-1 text-[9px] font-bold uppercase tracking-wider text-[#DFB15B]">
+                                            Your House
+                                        </span>
+                                    ) : null}
+                                </div>
                             </div>
-                            <h3 className="mt-5 font-serif text-xl font-semibold tracking-wide text-white">{house.name}</h3>
-                            <p className="mt-2 text-xs font-semibold uppercase tracking-[0.18em] text-[#DFB15B]">{house.mode}</p>
-                            <p className="mt-2 text-sm font-medium text-[#9D96B3]">{house.location}</p>
-                        </div>
-                    </motion.div>
-                ))}
+                        </motion.div>
+                    );
+                })}
             </div>
         </motion.section>
     );

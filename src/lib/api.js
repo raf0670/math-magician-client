@@ -355,6 +355,21 @@ export async function getLeaderboard() {
   return request("/api/analytics/leaderboard");
 }
 
+export async function getCompetitionSummary() {
+  return request("/api/analytics/competition");
+}
+
+export async function getAdminLiveExamSubmissions(examId) {
+  return request(`/api/analytics/admin/live-exams/${examId}/submissions`);
+}
+
+export async function updateSubmissionModeration(submissionId, payload) {
+  return request(`/api/analytics/admin/submissions/${submissionId}/moderation`, {
+    method: "PATCH",
+    body: payload,
+  });
+}
+
 export async function getExamById(examId) {
   return request(`/api/exams/${examId}`);
 }
