@@ -63,6 +63,8 @@ const INITIAL_FORM = {
   strongestSection: "",
   weakestSection: "",
   preferredBatch: "",
+  referenceName: "",
+  referenceEmail: "",
   bkashTrxID: "",
 };
 
@@ -104,6 +106,10 @@ function isFacebookProfileLink(value) {
   } catch {
     return false;
   }
+}
+
+function isBasicEmail(value) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value?.trim() || "");
 }
 
 const SECTION_VARIANTS = {
@@ -218,6 +224,10 @@ function PaymentDetailsContent() {
       missing.facebookProfile = "invalid";
     }
 
+    if (form.referenceEmail.trim() && !isBasicEmail(form.referenceEmail)) {
+      missing.referenceEmail = "invalid";
+    }
+
     return missing;
   }, [form, requiredFields]);
 
@@ -251,10 +261,19 @@ function PaymentDetailsContent() {
       return;
     }
 
+    if (form.referenceEmail.trim() && !isBasicEmail(form.referenceEmail)) {
+      setError("Please enter a valid reference email address.");
+      return;
+    }
+
     try {
       setLoading(true);
       if (isBookingMode) {
-        const payload = await submitSeatBooking(selectedPlanId, form);
+        const bookingForm = { ...form };
+        delete bookingForm.bkashTrxID;
+        delete bookingForm.referenceName;
+        delete bookingForm.referenceEmail;
+        const payload = await submitSeatBooking(selectedPlanId, bookingForm);
         const token = window.localStorage.getItem("exam_archive_token");
         if (token && payload?.data?.user) {
           saveAuthSession(token, payload.data.user);
@@ -498,6 +517,9 @@ function PaymentDetailsContent() {
                   paymentChoice={paymentChoice}
                   paymentMethod={paymentMethod}
                   setPaymentMethod={setPaymentMethod}
+                  referenceName={form.referenceName}
+                  referenceEmail={form.referenceEmail}
+                  referenceEmailError={fieldErrors.referenceEmail}
                   trxValue={form.bkashTrxID}
                   trxError={fieldErrors.bkashTrxID}
                   onChange={updateField}
@@ -585,6 +607,9 @@ function PaymentDetailsSection({
   paymentChoice,
   paymentMethod,
   setPaymentMethod,
+  referenceName,
+  referenceEmail,
+  referenceEmailError,
   trxValue,
   trxError,
   onChange,
@@ -668,6 +693,23 @@ function PaymentDetailsSection({
                 {remainingAmount ? `, ${formatBDT(remainingAmount)} later` : ""}
               </span>
             </div>
+            <TextField
+              label="Reference Name"
+              field="referenceName"
+              value={referenceName}
+              onChange={onChange}
+              placeholder="Who told you about this website?"
+            />
+            <TextField
+              label="Reference Email"
+              field="referenceEmail"
+              type="email"
+              value={referenceEmail}
+              error={referenceEmailError}
+              errorMessage={referenceEmailError === "invalid" ? "Please enter a valid reference email address." : ""}
+              onChange={onChange}
+              placeholder="reference@example.com"
+            />
             <TextField
               label={paymentMethod === "bank" ? "Transaction ID / Reference" : "BkashTrxID"}
               field="bkashTrxID"

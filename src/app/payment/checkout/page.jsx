@@ -38,6 +38,10 @@ function formatBDT(amount) {
   return `BDT ${Number(amount || 0).toLocaleString("en-US")}`;
 }
 
+function isBasicEmail(value) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value?.trim() || "");
+}
+
 export default function BookedCheckoutPage() {
   return (
     <Suspense fallback={<CheckoutLoading />}>
@@ -52,6 +56,8 @@ function BookedCheckoutContent() {
   const [loadingBooking, setLoadingBooking] = useState(true);
   const [paymentChoice, setPaymentChoice] = useState("full");
   const [paymentMethod, setPaymentMethod] = useState("bkash");
+  const [referenceName, setReferenceName] = useState("");
+  const [referenceEmail, setReferenceEmail] = useState("");
   const [trxID, setTrxID] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
@@ -90,6 +96,11 @@ function BookedCheckoutContent() {
     event.preventDefault();
     setError("");
 
+    if (referenceEmail.trim() && !isBasicEmail(referenceEmail)) {
+      setError("Please enter a valid reference email address.");
+      return;
+    }
+
     if (!trxID.trim()) {
       setError("Please enter the transaction ID or bank reference.");
       return;
@@ -100,6 +111,8 @@ function BookedCheckoutContent() {
       const payload = await submitBookedCheckout({
         paymentChoice,
         paymentMethod,
+        referenceName,
+        referenceEmail,
         trxID,
       });
       const paymentId = payload?.data?.paymentId;
@@ -215,6 +228,20 @@ function BookedCheckoutContent() {
                         {remainingAmount ? `, ${formatBDT(remainingAmount)} later` : ""}
                       </span>
                     </div>
+                    <ReferenceField
+                      label="Reference Name"
+                      value={referenceName}
+                      onChange={setReferenceName}
+                      placeholder="Who told you about this website?"
+                    />
+                    <ReferenceField
+                      label="Reference Email"
+                      type="email"
+                      value={referenceEmail}
+                      onChange={setReferenceEmail}
+                      placeholder="reference@example.com"
+                      error={referenceEmail.trim() && !isBasicEmail(referenceEmail)}
+                    />
                     <label className={`block rounded-2xl border px-4 py-4 transition ${trxID.trim() ? "border-[#74D99F]/30 bg-[#102019]/55" : "border-white/5 bg-[#0F0D15]/70"}`}>
                       <span className="text-sm font-semibold text-white">
                         {paymentMethod === "bank" ? "Transaction ID / Reference" : "BkashTrxID"} <span className="text-[#DFB15B]">*</span>
@@ -296,6 +323,30 @@ function FormSection({ title, description, children, index }) {
       </div>
       <div className="space-y-6">{children}</div>
     </motion.section>
+  );
+}
+
+function ReferenceField({ label, value, onChange, type = "text", placeholder = "", error = false }) {
+  const complete = Boolean(value.trim());
+  const labelTone = error ? "text-[#F8C7C0]" : complete ? "text-[#B7F3D0]" : "text-white";
+  const inputBorder = error
+    ? "border-[#F2A7A7]"
+    : complete
+      ? "border-[#74D99F] focus:border-[#8EE6B2]"
+      : "border-white/20 focus:border-[#DFB15B]";
+
+  return (
+    <label className={`block rounded-2xl border px-4 py-4 transition ${error ? "border-[#F2A7A7]/35 bg-[#2A171B]/50" : complete ? "border-[#74D99F]/30 bg-[#102019]/55" : "border-white/5 bg-[#0F0D15]/70"}`}>
+      <span className={`text-sm font-semibold ${labelTone}`}>{label}</span>
+      <input
+        type={type}
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        placeholder={placeholder}
+        className={`mt-3 w-full border-0 border-b bg-transparent px-0 py-2 text-sm text-white outline-none transition placeholder:text-[#6B667B] ${inputBorder}`}
+      />
+      {error ? <p className="mt-2 text-xs font-semibold text-[#F8C7C0]">Please enter a valid reference email address.</p> : null}
+    </label>
   );
 }
 
