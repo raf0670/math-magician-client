@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
@@ -650,17 +649,14 @@ function PaymentDetailsSection({
             <div className="space-y-3 rounded-3xl border border-[#DFB15B]/20 bg-[#DFB15B]/8 p-5">
               <div className="flex items-center gap-3 text-[#DFB15B]">
                 <CreditCard className="h-5 w-5" />
-                <p className="text-xs font-bold uppercase tracking-[0.2em]">bKash QR</p>
+                <p className="text-xs font-bold uppercase tracking-[0.2em]">bKash Number</p>
               </div>
-              <div className="rounded-2xl border border-white/8 bg-[#100E16]/70 p-4">
-                <Image
-                  src="/bkash-qr.jpg"
-                  alt="bKash payment QR code"
-                  width={612}
-                  height={780}
-                  className="mx-auto h-auto w-full max-w-[280px] rounded-xl"
-                  priority={false}
-                />
+              <div className="rounded-2xl border border-white/8 bg-[#100E16]/70 px-4 py-4">
+                <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#DFB15B]">Send Money Option</p>
+                <p className="mt-2 font-mono text-2xl font-bold text-white">01894688018</p>
+                <p className="mt-4 rounded-xl border border-[#DFB15B]/30 bg-[#DFB15B]/12 px-3 py-3 text-sm font-black uppercase leading-5 tracking-wide text-[#FFE7A3]">
+                  DO NOT INCLUDE CASH OUT CHARGE ONLY PAY THE REQUIRED AMOUNT
+                </p>
               </div>
             </div>
           ) : (
