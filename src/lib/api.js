@@ -374,14 +374,15 @@ export async function getExamById(examId) {
   return request(`/api/exams/${examId}`);
 }
 
-export async function submitExam(examId, answers) {
+export async function submitExam(examId, answers, metadata = {}) {
   const maxAttempts = 3;
+  const submissionReason = metadata?.submissionReason;
 
   for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
     try {
       return await request(`/api/exams/${examId}/submit`, {
         method: "POST",
-        body: { answers },
+        body: submissionReason ? { answers, submissionReason } : { answers },
       });
     } catch (error) {
       if (attempt === maxAttempts || !shouldRetryRequest(error)) {

@@ -4,6 +4,11 @@ import { CheckCircle, ChevronLeft, ChevronRight, Clock3, Eraser, Infinity, Send,
 import FormattedText from "@/components/shared/FormattedText";
 
 const OPTION_LABELS = ["A", "B", "C", "D", "E"];
+const SUBMISSION_REASONS = {
+    MANUAL: "manual",
+    TIMER_EXPIRED: "timer_expired",
+    TAB_SWITCH: "tab_switch",
+};
 
 function getQuestionId(question, index) {
     const rawId = question?._id?.$oid || question?._id || question?.id;
@@ -62,7 +67,8 @@ export default function ExamEngine({ examData, onComplete }) {
     const [answers, setAnswers] = useState({});
     const [remainingSeconds, setRemainingSeconds] = useState(() => getInitialRemainingSeconds(examData));
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const timerSubmittedRef = useRef(false);
+    const submissionStartedRef = useRef(false);
+    const tabSwitchSubmittedRef = useRef(false);
     const autoSubmitAttemptedRef = useRef(false);
     const hasHydratedAnswersRef = useRef(false);
 
@@ -147,16 +153,16 @@ export default function ExamEngine({ examData, onComplete }) {
         setAnswers(updatedAnswers);
     };
 
-    const handleSubmit = useCallback(async () => {
-        if (!normalizedQuestions.length || isSubmitting || timerSubmittedRef.current) return;
-        timerSubmittedRef.current = true;
+    const handleSubmit = useCallback(async (submissionReason = SUBMISSION_REASONS.MANUAL) => {
+        if (!normalizedQuestions.length || isSubmitting || submissionStartedRef.current) return;
+        submissionStartedRef.current = true;
         setIsSubmitting(true);
         const submissionAnswers = normalizedQuestions.map((question) => answers[question.id] ?? -1);
         try {
-            if (onComplete) await onComplete(submissionAnswers, examData);
+            if (onComplete) await onComplete(submissionAnswers, examData, { submissionReason });
             if (answerStorageKey) window.localStorage.removeItem(answerStorageKey);
         } catch {
-            timerSubmittedRef.current = false;
+            submissionStartedRef.current = false;
             setIsSubmitting(false);
         }
     }, [answerStorageKey, answers, examData, isSubmitting, normalizedQuestions, onComplete]);
@@ -179,11 +185,30 @@ export default function ExamEngine({ examData, onComplete }) {
 
         autoSubmitAttemptedRef.current = true;
         const submitTimer = window.setTimeout(() => {
-            handleSubmit();
+            handleSubmit(SUBMISSION_REASONS.TIMER_EXPIRED);
         }, 0);
 
         return () => window.clearTimeout(submitTimer);
     }, [handleSubmit, hasTimedExam, remainingSeconds]);
+
+    useEffect(() => {
+        const handleVisibilityChange = () => {
+            if (
+                document.visibilityState !== "hidden"
+                || tabSwitchSubmittedRef.current
+                || submissionStartedRef.current
+                || !normalizedQuestions.length
+            ) {
+                return;
+            }
+
+            tabSwitchSubmittedRef.current = true;
+            handleSubmit(SUBMISSION_REASONS.TAB_SWITCH);
+        };
+
+        document.addEventListener("visibilitychange", handleVisibilityChange);
+        return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
+    }, [handleSubmit, normalizedQuestions.length]);
 
     if (!currentQuestion) {
         return <p className="text-sm text-[#8E8A9F]">Preparing the exam...</p>;
@@ -335,7 +360,7 @@ export default function ExamEngine({ examData, onComplete }) {
 
                     <button
                         disabled={isSubmitting}
-                        onClick={handleSubmit}
+                        onClick={() => handleSubmit(SUBMISSION_REASONS.MANUAL)}
                         className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-linear-to-r from-emerald-500 to-teal-600 py-3.5 text-xs font-bold uppercase tracking-wider text-white shadow-md transition-all hover:brightness-110 disabled:cursor-wait disabled:opacity-70"
                     >
                         <Send className="h-4 w-4" /> {isSubmitting ? "Submitting Answer Sheet..." : "Submit Final Answer Sheet"}

@@ -39,6 +39,12 @@ const EMPTY_SCHEDULE = {
   endTime: "",
 };
 
+function formatSubmissionReason(value) {
+  if (value === "tab_switch") return "Tab switch auto-submit";
+  if (value === "timer_expired") return "Timer auto-submit";
+  return "Manual submit";
+}
+
 const COMPETITION_CATEGORIES = [
   { value: "daily", label: "Daily Exam" },
   { value: "weekly", label: "Weekly Exam" },
@@ -553,6 +559,10 @@ function SubmissionModerationPanel({ examId }) {
                 <div className="min-w-0">
                   <p className="truncate text-sm font-bold text-white">{submission.student?.name || "Student"}</p>
                   <p className="mt-1 text-xs font-semibold text-[#8E8A9F]">{submission.student?.house || "No house"} - Score {Number(submission.score || 0).toFixed(2)} - Effective {Number(submission.effectiveScore || 0).toFixed(2)}</p>
+                  <p className="mt-1 inline-flex items-center gap-1.5 text-xs font-semibold text-[#DFB15B]">
+                    <ShieldAlert className="h-3.5 w-3.5" />
+                    {formatSubmissionReason(submission.submissionReason)}
+                  </p>
                   {isDisqualified ? (
                     <p className="mt-1 text-xs font-semibold text-red-300">Disqualified: {submission.disqualificationReason || "No reason saved"}</p>
                   ) : null}

@@ -112,9 +112,9 @@ function LiveExamArenaContent() {
 
   const status = useMemo(() => getStatus(examData), [examData]);
 
-  const handleEvaluationTrigger = async (finalAnswers, examPayload) => {
+  const handleEvaluationTrigger = async (finalAnswers, examPayload, metadata = {}) => {
     try {
-      const payload = await submitExam(examId, finalAnswers);
+      const payload = await submitExam(examId, finalAnswers, metadata);
       setUserSelections(Array.isArray(payload?.answers) ? payload.answers : finalAnswers);
       setExamData(examPayload);
       setSubmissionResult(payload);
@@ -175,6 +175,12 @@ function LiveExamArenaContent() {
               Your answer sheet has been submitted and scored by the backend.
             </p>
           </div>
+
+          {submissionResult?.submissionReason === "tab_switch" ? (
+            <div className="rounded-2xl border border-red-400/20 bg-red-500/10 px-4 py-3 text-sm font-semibold text-red-100">
+              This exam auto-submitted because the exam tab was hidden.
+            </div>
+          ) : null}
 
           <AnalyticalScorecard
             answers={userSelections}

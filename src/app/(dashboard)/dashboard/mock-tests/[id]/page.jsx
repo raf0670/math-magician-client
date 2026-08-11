@@ -75,9 +75,9 @@ function ActiveMockExamContent() {
         };
     }, [examId]);
 
-    const handleEvaluationTrigger = async (finalAnswers, examPayload) => {
+    const handleEvaluationTrigger = async (finalAnswers, examPayload, metadata = {}) => {
         try {
-            const data = await submitExam(examId, finalAnswers);
+            const data = await submitExam(examId, finalAnswers, metadata);
             setUserSelections(Array.isArray(data?.answers) ? data.answers : finalAnswers);
             setExamDataPayload(examPayload);
             setSubmissionResult(data);
@@ -121,6 +121,12 @@ function ActiveMockExamContent() {
                             Your submission has been scored against the backend evaluation logic.
                         </p>
                     </div>
+
+                    {submissionResult?.submissionReason === "tab_switch" ? (
+                        <div className="rounded-2xl border border-red-400/20 bg-red-500/10 px-4 py-3 text-sm font-semibold text-red-100">
+                            This exam auto-submitted because the exam tab was hidden.
+                        </div>
+                    ) : null}
 
                     <AnalyticalScorecard answers={userSelections} examData={examDataPayload} submissionResult={submissionResult} />
                 </div>
