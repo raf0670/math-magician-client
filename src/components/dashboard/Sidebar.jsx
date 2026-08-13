@@ -8,6 +8,8 @@ import { clearAuthSession, getProfile, getStoredUser, saveAuthSession } from "@/
 import BrandMark from "@/components/shared/BrandMark";
 import { getDefaultRankInfo, getRankInfo } from "@/lib/rank";
 
+const SHOW_STUDENT_LIVE_EXAMS_NAV = false;
+
 export default function DashboardSidebar() {
     const pathname = usePathname();
     const router = useRouter();
@@ -45,7 +47,7 @@ export default function DashboardSidebar() {
         { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
         { href: "/dashboard/classes", label: "Live Classes", icon: Video },
         { href: "/dashboard/archived-classes", label: "Archived Classes", icon: Archive },
-        { href: "/dashboard/live-exams", label: "Live Exams", icon: Radio },
+        SHOW_STUDENT_LIVE_EXAMS_NAV ? { href: "/dashboard/live-exams", label: "Live Exams", icon: Radio } : null,
         { href: "/dashboard/mock-tests", label: "Practice", icon: ClipboardCheck },
         { href: "/dashboard/quiz", label: "Quiz", icon: Brain },
         { href: "/dashboard/analytics", label: "Analytics", icon: BarChart3 },
