@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Bell, Flame, ChevronDown, Sparkles, ShieldCheck } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { clearAuthSession, getMyStats, getStoredUser } from "@/lib/api";
+import { getDefaultRankInfo, getRankInfo } from "@/lib/rank";
 
 export default function DashboardTopbar() {
     const router = useRouter();
@@ -12,9 +13,14 @@ export default function DashboardTopbar() {
     const [currentUser, setCurrentUser] = useState(null);
     const [stats, setStats] = useState(null);
     const [history, setHistory] = useState([]);
+    const [rankInfo, setRankInfo] = useState(getDefaultRankInfo());
 
     useEffect(() => {
-        const syncUser = () => setCurrentUser(getStoredUser());
+        const syncUser = () => {
+            const storedUser = getStoredUser();
+            setCurrentUser(storedUser);
+            setRankInfo(getRankInfo(storedUser?.rankInfo));
+        };
         syncUser();
         window.addEventListener("auth-state-changed", syncUser);
         window.addEventListener("storage", syncUser);
@@ -23,6 +29,7 @@ export default function DashboardTopbar() {
             .then((payload) => {
                 setStats(payload?.stats || {});
                 setHistory(Array.isArray(payload?.history) ? payload.history : []);
+                setRankInfo(getRankInfo(payload?.rankInfo || payload?.stats?.rankInfo));
             })
             .catch(() => {
                 setStats(null);
@@ -124,7 +131,7 @@ export default function DashboardTopbar() {
                         <div className="hidden flex-col items-start text-left sm:flex">
                             <span className="text-xs font-bold text-white tracking-wide leading-none">{fullName}</span>
                             <span className="text-[9px] text-[#6B667B] font-bold mt-1 tracking-wide uppercase flex items-center gap-1">
-                                <ShieldCheck className="w-2.5 h-2.5 text-[#DFB15B]" /> {firstName}&apos;s Workspace
+                                <ShieldCheck className="w-2.5 h-2.5 text-[#DFB15B]" /> {rankInfo.rankName}
                             </span>
                         </div>
                         <ChevronDown className={`w-3.5 h-3.5 text-[#6B667B] group-hover:text-white transition-transform duration-200 ${showProfileMenu ? "rotate-180" : ""}`} />

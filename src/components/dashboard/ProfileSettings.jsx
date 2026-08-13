@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { User, BookOpen, GraduationCap, ShieldCheck, Mail, Lock, Save } from "lucide-react";
 import { changePassword, getMyStats, getStoredUser, saveAuthSession, updateProfile } from "@/lib/api";
+import { POINTS_PER_LEVEL, formatRankPoints, getDefaultRankInfo, getRankInfo, getRankProgressPercent } from "@/lib/rank";
 
 export default function ProfileSettings() {
     const [profile, setProfile] = useState({
@@ -13,10 +14,7 @@ export default function ProfileSettings() {
         targetGoal: "Complete your first mock exam",
         focusArea: "No submissions yet",
         mocksCompleted: 0,
-        currentTier: "Starter",
-        level: 1,
-        currentXp: 0,
-        nextLevelXp: 1000,
+        rankInfo: getDefaultRankInfo(),
     });
     const [form, setForm] = useState({ name: "", bio: "" });
     const [passwordForm, setPasswordForm] = useState({ currentPassword: "", newPassword: "", confirmPassword: "" });
@@ -33,6 +31,7 @@ export default function ProfileSettings() {
                     fullName: currentUser.name || prev.fullName,
                     email: currentUser.email || prev.email,
                     bio: currentUser.bio || prev.bio,
+                    rankInfo: getRankInfo(currentUser.rankInfo || prev.rankInfo),
                 }));
                 setForm({
                     name: currentUser.name || "",
@@ -51,21 +50,16 @@ export default function ProfileSettings() {
                 const history = Array.isArray(payload?.history) ? payload.history : [];
                 const averageScore = Number(stats?.averageScore || 0);
                 const completed = Number(stats?.totalExams || 0);
-                const level = Math.max(1, Math.floor(completed / 3) + 1);
-                const currentXp = Math.max(0, completed * 250 + Math.round(averageScore * 10));
-                const nextLevelXp = level * 1000;
+                const rankInfo = getRankInfo(payload?.rankInfo || stats?.rankInfo);
 
                 setProfile((prev) => ({
                     ...prev,
                     mocksCompleted: completed,
-                    currentTier: completed >= 3 ? "Vanguard Tracker" : completed >= 1 ? "Rising Student" : "Starter",
-                    level,
-                    currentXp,
-                    nextLevelXp,
+                    rankInfo,
                     institution: completed > 0 ? "Self-paced progress" : "Practice dashboard",
                     department: completed > 0 ? `${completed} exam${completed === 1 ? "" : "s"} tracked` : "Exam history will appear here",
                     targetGoal: completed > 0 ? `Average score ${averageScore.toFixed(2)}` : "Complete your first mock exam",
-                    focusArea: completed > 0 ? `${history.length} submission${history.length === 1 ? "" : "s"} recorded` : "No submissions yet",
+                    focusArea: rankInfo.countedExamCount > 0 ? `${rankInfo.countedExamCount} ranked exam${rankInfo.countedExamCount === 1 ? "" : "s"} counted` : history.length > 0 ? "No ranked exams finalized yet" : "No submissions yet",
                 }));
             })
             .catch(() => {});
@@ -93,6 +87,7 @@ export default function ProfileSettings() {
                 fullName: updatedUser.name || prev.fullName,
                 email: updatedUser.email || prev.email,
                 bio: updatedUser.bio || prev.bio,
+                rankInfo: getRankInfo(updatedUser.rankInfo || prev.rankInfo),
             }));
             setForm({ name: updatedUser.name || "", bio: updatedUser.bio || "" });
             setMessage("Profile updated successfully.");
@@ -125,7 +120,8 @@ export default function ProfileSettings() {
         }
     };
 
-    const xpPercentage = ((profile.currentXp / profile.nextLevelXp) * 100).toFixed(0);
+    const rankInfo = getRankInfo(profile.rankInfo);
+    const progressPercentage = getRankProgressPercent(rankInfo).toFixed(0);
 
     return (
         <div className="w-full flex flex-col gap-8 text-left select-none">
@@ -139,7 +135,7 @@ export default function ProfileSettings() {
                 <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                         <h2 className="text-xl font-bold text-white tracking-wide truncate">{profile.fullName}</h2>
-                        <span className="px-2 py-0.5 rounded bg-[#DFB15B]/10 border border-[#DFB15B]/20 text-[9px] font-bold uppercase text-[#DFB15B] tracking-wider shrink-0">{profile.currentTier}</span>
+                        <span className="px-2 py-0.5 rounded bg-[#DFB15B]/10 border border-[#DFB15B]/20 text-[9px] font-bold uppercase text-[#DFB15B] tracking-wider shrink-0">{rankInfo.rankName}</span>
                     </div>
                     <p className="text-xs text-[#8E8A9F] mt-1 flex items-center gap-1.5 font-medium truncate">
                         <Mail className="w-3.5 h-3.5 text-[#6B667B]" /> {profile.email}
@@ -183,10 +179,14 @@ export default function ProfileSettings() {
                         <ShieldCheck className="w-4 h-4 text-emerald-400" />
                         <span>Progression</span>
                     </div>
-                    <span className="text-[#8E8A9F] font-mono text-[11px]">Level {profile.level} • {profile.currentXp} / {profile.nextLevelXp} XP</span>
+                    <span className="text-[#8E8A9F] font-mono text-[11px]">{formatRankPoints(rankInfo.pointsIntoLevel)} / {POINTS_PER_LEVEL} RP</span>
                 </div>
                 <div className="w-full h-2 rounded-full bg-white/3 overflow-hidden">
-                    <div className="h-full rounded-full bg-linear-to-r from-emerald-500 to-teal-500 transition-all duration-300" style={{ width: `${xpPercentage}%` }} />
+                    <div className="h-full rounded-full bg-linear-to-r from-emerald-500 to-teal-500 transition-all duration-300" style={{ width: `${progressPercentage}%` }} />
+                </div>
+                <div className="flex flex-wrap items-center justify-between gap-2 text-[11px] font-semibold text-[#8E8A9F]">
+                    <span>Total rank points: {formatRankPoints(rankInfo.rankPoints)}</span>
+                    <span>{rankInfo.nextRankName ? `${formatRankPoints(rankInfo.pointsToNextLevel)} to ${rankInfo.nextRankName}` : "Top rank reached"}</span>
                 </div>
             </div>
 

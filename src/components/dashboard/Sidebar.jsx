@@ -6,14 +6,20 @@ import { motion } from "framer-motion";
 import { LayoutDashboard, Video, ClipboardCheck, BarChart3, User, LogOut, ShieldCheck, Brain, Archive, Radio, FileQuestion, Trophy } from "lucide-react";
 import { clearAuthSession, getProfile, getStoredUser, saveAuthSession } from "@/lib/api";
 import BrandMark from "@/components/shared/BrandMark";
+import { getDefaultRankInfo, getRankInfo } from "@/lib/rank";
 
 export default function DashboardSidebar() {
     const pathname = usePathname();
     const router = useRouter();
     const [currentUser, setCurrentUser] = useState(null);
+    const [rankInfo, setRankInfo] = useState(getDefaultRankInfo());
 
     useEffect(() => {
-        const syncUser = () => setCurrentUser(getStoredUser());
+        const syncUser = () => {
+            const storedUser = getStoredUser();
+            setCurrentUser(storedUser);
+            setRankInfo(getRankInfo(storedUser?.rankInfo));
+        };
         const refreshProfile = async () => {
             const token = window.localStorage.getItem("exam_archive_token");
             if (!token) return;
@@ -73,6 +79,9 @@ export default function DashboardSidebar() {
                 <div className="mb-6 rounded-2xl border border-white/5 bg-[#121017] px-3 py-3">
                     <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-[#6B667B]">Signed in</p>
                     <p className="mt-1 text-sm font-semibold text-white">Hi, {firstName}</p>
+                    <p className="mt-1 inline-flex rounded-full border border-[#DFB15B]/20 bg-[#DFB15B]/10 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-[#DFB15B]">
+                        {rankInfo.rankName}
+                    </p>
                 </div>
 
                 <nav className="flex-1 flex flex-col gap-1.5">

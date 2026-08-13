@@ -2,6 +2,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { CheckCircle, ChevronLeft, ChevronRight, Clock3, Eraser, Infinity, Send, Sparkles } from "lucide-react";
 import FormattedText from "@/components/shared/FormattedText";
+import { formatSubjectLabel } from "@/lib/rank";
 
 const OPTION_LABELS = ["A", "B", "C", "D", "E"];
 const SUBMISSION_REASONS = {
@@ -9,6 +10,7 @@ const SUBMISSION_REASONS = {
     TIMER_EXPIRED: "timer_expired",
     TAB_SWITCH: "tab_switch",
 };
+const SUBJECT_NAV_ORDER = ["English", "Maths", "Analytical"];
 
 function getQuestionId(question, index) {
     const rawId = question?._id?.$oid || question?._id || question?.id;
@@ -85,9 +87,33 @@ export default function ExamEngine({ examData, onComplete }) {
                 options: getOptionMap(question.options),
                 subject: question.subject || "General",
                 topic: question.topic || question.chapter || "",
+                subjectLabel: formatSubjectLabel(question.subject),
             };
         });
     }, [examData]);
+    const questionGroups = useMemo(() => {
+        const groupBySubject = new Map();
+
+        normalizedQuestions.forEach((question, index) => {
+            const subjectLabel = question.subjectLabel || "General";
+            const group = groupBySubject.get(subjectLabel) || {
+                subjectLabel,
+                questions: [],
+            };
+
+            group.questions.push({ question, index });
+            groupBySubject.set(subjectLabel, group);
+        });
+
+        const orderedGroups = SUBJECT_NAV_ORDER
+            .map((subjectLabel) => groupBySubject.get(subjectLabel))
+            .filter(Boolean);
+        const remainingGroups = [...groupBySubject.values()].filter((group) => (
+            !SUBJECT_NAV_ORDER.includes(group.subjectLabel)
+        ));
+
+        return [...orderedGroups, ...remainingGroups];
+    }, [normalizedQuestions]);
 
     const currentQuestion = normalizedQuestions[currentIndex];
     const answeredCount = normalizedQuestions.filter((question) => answers[question.id] !== undefined).length;
@@ -250,28 +276,37 @@ export default function ExamEngine({ examData, onComplete }) {
                                 {answeredCount}/{normalizedQuestions.length} answered
                             </span>
                         </div>
-                        <div className="flex gap-2 overflow-x-auto pb-1">
-                            {normalizedQuestions.map((question, idx) => {
-                                const isAnswered = answers[question.id] !== undefined;
-                                const isCurrent = idx === currentIndex;
-                                return (
-                                    <button
-                                        key={question.id}
-                                        disabled={isSubmitting}
-                                        onClick={() => setCurrentIndex(idx)}
-                                        className={`flex h-10 min-w-16 items-center justify-center rounded-xl border px-3 text-xs font-bold transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${isCurrent ? "border-[#DFB15B] bg-[#DFB15B] text-black shadow-md shadow-[#DFB15B]/10" : isAnswered ? "border-emerald-400/20 bg-emerald-400/10 text-emerald-300" : "border-white/5 bg-[#121017] text-[#8E8A9F] hover:border-white/15 hover:text-white"}`}
-                                    >
-                                        #{question.displayQuestionNo}
-                                    </button>
-                                );
-                            })}
+                        <div className="flex gap-3 overflow-x-auto pb-1">
+                            {questionGroups.map((group) => (
+                                <div key={group.subjectLabel} className="flex min-w-[10.5rem] flex-col gap-2">
+                                    <div className="flex h-9 items-center justify-center rounded-xl border border-white/5 bg-[#121017] px-4 text-sm font-black text-white">
+                                        {group.subjectLabel}
+                                    </div>
+                                    <div className="grid grid-cols-3 gap-1.5">
+                                        {group.questions.map(({ question, index }) => {
+                                            const isAnswered = answers[question.id] !== undefined;
+                                            const isCurrent = index === currentIndex;
+                                            return (
+                                                <button
+                                                    key={question.id}
+                                                    disabled={isSubmitting}
+                                                    onClick={() => setCurrentIndex(index)}
+                                                    className={`flex h-8 min-w-0 items-center justify-center rounded-lg border px-2 text-xs font-black transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${isCurrent ? "border-[#DFB15B] bg-[#DFB15B] text-black shadow-md shadow-[#DFB15B]/10" : isAnswered ? "border-emerald-400/20 bg-emerald-400/10 text-emerald-300" : "border-white/5 bg-[#121017] text-[#8E8A9F] hover:border-white/15 hover:text-white"}`}
+                                                >
+                                                    {question.displayQuestionNo}
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            ))}
                         </div>
                     </div>
 
                     <div className="rounded-2xl border border-white/5 bg-[#17141F] p-5 sm:p-7">
                         <div className="flex flex-wrap items-center justify-between gap-3">
                             <span className="rounded-lg border border-indigo-500/20 bg-indigo-500/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-indigo-300">
-                                {currentQuestion.topic ? `${currentQuestion.subject} / ${currentQuestion.topic}` : currentQuestion.subject}
+                                {currentQuestion.topic ? `${currentQuestion.subjectLabel} / ${currentQuestion.topic}` : currentQuestion.subjectLabel}
                             </span>
                             <span className="rounded-lg border border-[#DFB15B]/20 bg-[#DFB15B]/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#DFB15B]">
                                 Question #{currentQuestion.displayQuestionNo}

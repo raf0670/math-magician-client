@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { BarChart3, Crown, Medal, Shield, Sparkles, Target, Trophy, Users, Zap } from "lucide-react";
 import { getCompetitionSummary, getStoredUser } from "@/lib/api";
 import FlashyLoader from "@/components/shared/FlashyLoader";
+import { formatRankPoints, getRankInfo } from "@/lib/rank";
 
 function formatNumber(value) {
     return Number(value || 0).toFixed(2);
@@ -58,6 +59,7 @@ export default function LeaderboardPortal() {
     const currentUserEntry = useMemo(() => {
         return summary?.currentUserEntry || leaderboard.find((entry) => getStudentId(entry) === currentUserId) || null;
     }, [leaderboard, currentUserId, summary?.currentUserEntry]);
+    const currentRankInfo = getRankInfo(currentUserEntry?.rankInfo);
 
     if (loading) {
         return (
@@ -91,9 +93,12 @@ export default function LeaderboardPortal() {
                         <h2 className="mt-4 font-serif text-3xl font-semibold tracking-wide text-white sm:text-4xl">
                             {currentUserEntry ? `Rank #${currentUserEntry.rank}` : "No Rank Yet"}
                         </h2>
+                        <div className="mt-3 inline-flex rounded-full border border-[#DFB15B]/20 bg-[#DFB15B]/10 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[#DFB15B]">
+                            {currentRankInfo.rankName}
+                        </div>
                         <p className="mt-3 max-w-xl text-sm font-medium leading-6 text-[#9D96B3]">
                             {currentUserEntry
-                                ? "Your rank is calculated from live daily and weekly exams only. Disqualified submissions count as zero."
+                                ? "Your exact position is based on live exam scores. Your tier badge is calculated from finalized daily and weekly exam points."
                                 : "Submit a live exam to enter the competition leaderboard."}
                         </p>
                     </div>
@@ -103,7 +108,7 @@ export default function LeaderboardPortal() {
                             { label: "Total Score", value: formatNumber(currentUserEntry?.totalScore), icon: Zap },
                             { label: "Live Exams", value: currentUserEntry?.examsTaken || 0, icon: BarChart3 },
                             { label: "Average", value: formatNumber(currentUserEntry?.averageScore), icon: Target },
-                            { label: "Badges", value: currentUserEntry?.badgeCount || 0, icon: Sparkles },
+                            { label: "Rank Points", value: formatRankPoints(currentRankInfo.rankPoints), icon: Sparkles },
                         ].map((item) => (
                             <div key={item.label} className="rounded-2xl border border-white/7 bg-white/5 px-4 py-3">
                                 <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-[#6B667B]">
@@ -206,6 +211,7 @@ export default function LeaderboardPortal() {
                         {leaderboard.map((entry, index) => {
                             const rank = entry.rank || index + 1;
                             const isCurrentUser = currentUserId && getStudentId(entry) === currentUserId;
+                            const entryRankInfo = getRankInfo(entry.rankInfo);
 
                             return (
                                 <motion.div
@@ -224,9 +230,12 @@ export default function LeaderboardPortal() {
                                                     You
                                                 </span>
                                             ) : null}
+                                            <span className="rounded-full border border-emerald-400/15 bg-emerald-400/10 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-emerald-300">
+                                                {entryRankInfo.rankName}
+                                            </span>
                                         </div>
                                         <div className="mt-0.5 text-[11px] font-medium text-[#8E8A9F]">
-                                            {entry.house || "No house"} - {entry.examsTaken || 0} live exams - {entry.badgeCount || 0} badges - Avg {formatNumber(entry.averageScore)}
+                                            {entry.house || "No house"} - {entry.examsTaken || 0} live exams - {entry.badgeCount || 0} badges - Avg {formatNumber(entry.averageScore)} - RP {formatRankPoints(entryRankInfo.rankPoints)}
                                         </div>
                                     </div>
                                     <div className="col-span-2 flex items-center justify-between rounded-xl border border-white/5 bg-[#121017]/70 px-3 py-2 sm:col-span-1 sm:block sm:border-0 sm:bg-transparent sm:p-0 sm:text-right">
