@@ -363,6 +363,34 @@ export async function getAdminLiveExamSubmissions(examId) {
   return request(`/api/analytics/admin/live-exams/${examId}/submissions`);
 }
 
+export async function getAssessmentTest() {
+  return request("/api/assessment-test");
+}
+
+export async function getAssessmentTestExam() {
+  return request("/api/assessment-test/exam");
+}
+
+export async function submitAssessmentTest(answers, metadata = {}) {
+  const maxAttempts = 3;
+  const submissionReason = metadata?.submissionReason;
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    try {
+      return await request("/api/assessment-test/submit", {
+        method: "POST",
+        body: submissionReason ? { answers, submissionReason } : { answers },
+      });
+    } catch (error) {
+      if (attempt === maxAttempts || !shouldRetryRequest(error)) {
+        throw error;
+      }
+
+      await wait(500 * attempt);
+    }
+  }
+}
+
 export async function updateSubmissionModeration(submissionId, payload) {
   return request(`/api/analytics/admin/submissions/${submissionId}/moderation`, {
     method: "PATCH",

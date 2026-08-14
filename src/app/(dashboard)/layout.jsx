@@ -40,6 +40,7 @@ export default function DashboardLayout({ children }) {
     const fullscreenExamPrefixes = [
         "/dashboard/mock-tests/",
         "/dashboard/live-exams/",
+        "/dashboard/assessment-test/exam",
     ];
     const isFullscreenExamRoute = fullscreenExamPrefixes.some((prefix) =>
         pathname.startsWith(prefix)

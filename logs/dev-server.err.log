@@ -1,9 +1,10 @@
-⚠ Port 3000 is in use by process 5300, using available port 3001 instead.
+npm notice run exam-archive-frontend@0.1.0 dev
+npm notice run next dev --port 3001
 ⨯ Another next dev server is already running.
 
 - Local:        http://localhost:3000
-- PID:          5300
+- PID:          8548
 - Dir:          C:\Users\Rafsan Rahman\Desktop\Batch 13\exam-archive-frontend
 - Log:          .next\dev\logs\next-development.log
 
-Run taskkill /PID 5300 /F to stop it.
+Run taskkill /PID 8548 /F to stop it.

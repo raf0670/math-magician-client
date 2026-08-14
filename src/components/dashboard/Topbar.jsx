@@ -11,6 +11,7 @@ const SECTION_TITLES = {
     "/dashboard/classes": "Live Classes",
     "/dashboard/archived-classes": "Archived Classes",
     "/dashboard/live-exams": "Live Exams",
+    "/dashboard/assessment-test": "Assessment Test",
     "/dashboard/mock-tests": "Practice",
     "/dashboard/quiz": "Quiz",
     "/dashboard/analytics": "Analytics",

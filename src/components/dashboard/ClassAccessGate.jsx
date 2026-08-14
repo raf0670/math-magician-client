@@ -21,6 +21,13 @@ const ACCESS_COPY = {
         lockedTitle: "Live exams unlock after admin approval",
         lockedMessage: "Submit the enrollment form with your full or partial bKash transaction ID. Once an admin approves it, scheduled live exams will open here.",
     },
+    assessmentTest: {
+        loadingEyebrow: "Assessment",
+        loadingTitle: "Checking assessment access",
+        loadingMessage: "Your payment access and student profile are being verified before the assessment room opens.",
+        lockedTitle: "Assessment test unlocks after admin approval",
+        lockedMessage: "Submit the enrollment form with your full or partial bKash transaction ID. Once an admin approves it, the official assessment test will open here.",
+    },
     mockTests: {
         loadingEyebrow: "Mock Tests",
         loadingTitle: "Checking practice access",
