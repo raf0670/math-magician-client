@@ -7,32 +7,38 @@ const socialLinks = [
     {
         name: "FB Community",
         href: "https://m.me/j/AbazInHCd4ZkmBmV/?send_source=gc%3Acopy_invite_link_t",
-        icon: <FaFacebook className="w-3.5 h-3.5 text-[#6B667B] group-hover:text-white" />,
+        icon: FaFacebook,
+        colorClass: "border-blue-500/20 bg-blue-500/10 text-blue-400 hover:border-blue-400/35 hover:bg-blue-500/18 hover:text-blue-200 hover:shadow-[0_10px_28px_rgba(59,130,246,0.12)]",
     },
     {
         name: "Messenger Group",
         href: "https://m.me/j/AbbUmVRClo6YFnc7/?send_source=gc%3Acopy_invite_link_t",
-        icon: <FaFacebookMessenger className="w-3.5 h-3.5 text-[#6B667B] group-hover:text-white" />,
+        icon: FaFacebookMessenger,
+        colorClass: "border-cyan-400/20 bg-cyan-400/10 text-cyan-300 hover:border-cyan-300/35 hover:bg-cyan-400/18 hover:text-cyan-100 hover:shadow-[0_10px_28px_rgba(34,211,238,0.12)]",
     },
     {
         name: "Discord Server",
         href: "https://discord.gg/Yt2bxXkqzU",
-        icon: <FaDiscord className="w-3.5 h-3.5 text-[#6B667B] group-hover:text-white" />,
+        icon: FaDiscord,
+        colorClass: "border-indigo-400/20 bg-indigo-500/10 text-indigo-300 hover:border-indigo-300/35 hover:bg-indigo-500/18 hover:text-indigo-100 hover:shadow-[0_10px_28px_rgba(129,140,248,0.12)]",
     },
     {
         name: "FB Page",
         href: "https://www.facebook.com/profile.php?id=61586225977175",
-        icon: <FaFacebook className="w-3.5 h-3.5 text-[#6B667B] group-hover:text-white" />,
+        icon: FaFacebook,
+        colorClass: "border-sky-400/20 bg-sky-500/10 text-sky-300 hover:border-sky-300/35 hover:bg-sky-500/18 hover:text-sky-100 hover:shadow-[0_10px_28px_rgba(14,165,233,0.12)]",
     },
     {
         name: "Instagram Page",
         href: "https://www.instagram.com/math_magician35/",
-        icon: <FaInstagram className="w-3.5 h-3.5 text-[#6B667B] group-hover:text-white" />,
+        icon: FaInstagram,
+        colorClass: "border-fuchsia-400/20 bg-fuchsia-500/10 text-fuchsia-300 hover:border-fuchsia-300/35 hover:bg-fuchsia-500/18 hover:text-fuchsia-100 hover:shadow-[0_10px_28px_rgba(217,70,239,0.12)]",
     },
     {
         name: "YouTube Link",
         href: "https://www.youtube.com/@Mehrab.DU-IBA",
-        icon: <FaYoutube className="w-3.5 h-3.5 text-[#6B667B] group-hover:text-white" />,
+        icon: FaYoutube,
+        colorClass: "border-red-400/20 bg-red-500/10 text-red-300 hover:border-red-300/35 hover:bg-red-500/18 hover:text-red-100 hover:shadow-[0_10px_28px_rgba(239,68,68,0.12)]",
     },
 ];
 
@@ -166,12 +172,16 @@ export default function Community() {
                     viewport={{ once: false }}
                     transition={{ delay: 0.3, duration: 0.6 }}
                 >
-                    {socialLinks.map((link) => (
-                        <a key={link.name} href={link.href} target="_blank" rel="noopener noreferrer" className="group flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#121017] border border-white/3 hover:border-white/10 text-xs font-semibold text-[#8E8A9F] hover:text-white shadow-md transition-all duration-200 hover:scale-[1.03]">
-                            {link.icon}
-                            <span>{link.name}</span>
-                        </a>
-                    ))}
+                    {socialLinks.map((link) => {
+                        const Icon = link.icon;
+
+                        return (
+                            <a key={link.name} href={link.href} target="_blank" rel="noopener noreferrer" className={`group flex items-center gap-2 rounded-xl border px-5 py-2.5 text-xs font-semibold shadow-md transition-all duration-200 hover:scale-[1.03] ${link.colorClass}`}>
+                                <Icon className="h-3.5 w-3.5 shrink-0" />
+                                <span>{link.name}</span>
+                            </a>
+                        );
+                    })}
                 </motion.div>
             </div>
         </section>
