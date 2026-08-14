@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { BarChart3, Crown, Medal, Shield, Sparkles, Target, Trophy, Users, Zap } from "lucide-react";
 import { getCompetitionSummary, getStoredUser } from "@/lib/api";
 import FlashyLoader from "@/components/shared/FlashyLoader";
-import { formatRankPoints, getRankInfo } from "@/lib/rank";
+import { formatRankPoints, getRankInfo, getRankTone } from "@/lib/rank";
 
 function formatNumber(value) {
     return Number(value || 0).toFixed(2);
@@ -60,6 +60,7 @@ export default function LeaderboardPortal() {
         return summary?.currentUserEntry || leaderboard.find((entry) => getStudentId(entry) === currentUserId) || null;
     }, [leaderboard, currentUserId, summary?.currentUserEntry]);
     const currentRankInfo = getRankInfo(currentUserEntry?.rankInfo);
+    const currentRankTone = getRankTone(currentRankInfo);
 
     if (loading) {
         return (
@@ -90,10 +91,10 @@ export default function LeaderboardPortal() {
                             <Medal className="h-3.5 w-3.5" />
                             Your Standing
                         </div>
-                        <h2 className="mt-4 font-serif text-3xl font-semibold tracking-wide text-white sm:text-4xl">
+                        <h2 className={`mt-4 font-serif text-3xl font-semibold tracking-wide sm:text-4xl ${currentRankTone.name}`}>
                             {currentUserEntry ? `Rank #${currentUserEntry.rank}` : "No Rank Yet"}
                         </h2>
-                        <div className="mt-3 inline-flex rounded-full border border-[#DFB15B]/20 bg-[#DFB15B]/10 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[#DFB15B]">
+                        <div className={`mt-3 inline-flex rounded-full border px-3 py-1 text-[10px] font-bold uppercase tracking-wider ${currentRankTone.badge}`}>
                             {currentRankInfo.rankName}
                         </div>
                         <p className="mt-3 max-w-xl text-sm font-medium leading-6 text-[#9D96B3]">
@@ -212,6 +213,7 @@ export default function LeaderboardPortal() {
                             const rank = entry.rank || index + 1;
                             const isCurrentUser = currentUserId && getStudentId(entry) === currentUserId;
                             const entryRankInfo = getRankInfo(entry.rankInfo);
+                            const entryRankTone = getRankTone(entryRankInfo);
 
                             return (
                                 <motion.div
@@ -224,13 +226,13 @@ export default function LeaderboardPortal() {
                                     <RankBadge rank={rank} />
                                     <div className="min-w-0">
                                         <div className="flex min-w-0 flex-wrap items-center gap-2">
-                                            <span className="truncate text-sm font-semibold text-white">{entry.name || "Student"}</span>
+                                            <span className={`truncate text-sm font-semibold ${entryRankTone.name}`}>{entry.name || "Student"}</span>
                                             {isCurrentUser ? (
                                                 <span className="rounded-full border border-[#DFB15B]/20 bg-[#DFB15B]/10 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-[#DFB15B]">
                                                     You
                                                 </span>
                                             ) : null}
-                                            <span className="rounded-full border border-emerald-400/15 bg-emerald-400/10 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-emerald-300">
+                                            <span className={`rounded-full border px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider ${entryRankTone.badge}`}>
                                                 {entryRankInfo.rankName}
                                             </span>
                                         </div>
@@ -253,12 +255,14 @@ export default function LeaderboardPortal() {
 }
 
 function ChampionRow({ title, item, highlight = false }) {
+    const rankTone = getRankTone(item?.rankInfo);
+
     return (
         <div className={`rounded-2xl border px-4 py-3 ${highlight ? "border-[#DFB15B]/20 bg-[#DFB15B]/10" : "border-white/5 bg-[#1A1722]/45"}`}>
             <p className="text-xs font-bold uppercase tracking-wider text-[#8E8A9F]">{title}</p>
-            <p className="mt-1 text-sm font-bold text-white">{item?.name || "Not decided yet"}</p>
+            <p className={`mt-1 text-sm font-bold ${item ? rankTone.name : "text-white"}`}>{item?.name || "Not decided yet"}</p>
             {item ? (
-                <p className="mt-0.5 text-xs font-semibold text-[#DFB15B]">{item.house} - {formatNumber(item.totalScore)} score</p>
+                <p className={`mt-0.5 text-xs font-semibold ${rankTone.name}`}>{item.house} - {formatNumber(item.totalScore)} score</p>
             ) : null}
         </div>
     );

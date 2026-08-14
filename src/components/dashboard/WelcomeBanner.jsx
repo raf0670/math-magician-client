@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { ArrowUpRight, BookOpenCheck, ClipboardCheck, Sparkles, WandSparkles } from "lucide-react";
 import { getExams, getStoredUser } from "@/lib/api";
+import { getRankInfo, getRankTone } from "@/lib/rank";
 
 const starPoints = [
     { left: "10%", top: "20%", delay: 0 },
@@ -38,6 +39,8 @@ export default function WelcomeBanner() {
     }, []);
 
     const firstName = currentUser?.name?.trim().split(" ")[0] || "Student";
+    const rankInfo = getRankInfo(currentUser?.rankInfo);
+    const rankTone = getRankTone(rankInfo);
     const title = nextExam?.title || "Practice exam bank";
     const duration = nextExam?.duration ? `${nextExam.duration} min` : "Live practice";
     const questionCount = nextExam?.questionCount || nextExam?.questions?.length || 0;
@@ -96,7 +99,7 @@ export default function WelcomeBanner() {
                     </div>
 
                     <h1 className="mt-5 font-serif text-3xl font-semibold leading-tight tracking-wide text-white sm:text-4xl lg:text-5xl">
-                        Welcome back, <span className="text-transparent bg-clip-text bg-linear-to-r from-[#F6D98B] via-[#DFB15B] to-[#A78BFA]">{firstName}</span>
+                        Welcome back, <span className={rankTone.name}>{firstName}</span>
                     </h1>
 
                     <p className="mt-4 max-w-xl text-sm font-medium leading-7 text-[#A9A3BA]">

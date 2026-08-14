@@ -27,6 +27,7 @@ import {
   updateAdminLiveExam,
 } from "@/lib/api";
 import FlashyLoader, { LoadingButtonLabel } from "@/components/shared/FlashyLoader";
+import { getRankInfo, getRankTone } from "@/lib/rank";
 
 const SUBJECTS = ["Maths", "English", "Analytical"];
 const DIFFICULTIES = ["Easy", "Medium", "Hard"];
@@ -554,10 +555,17 @@ function SubmissionModerationPanel({ examId }) {
 
           {submissions.map((submission) => {
             const isDisqualified = Boolean(submission.isDisqualified);
+            const rankInfo = getRankInfo(submission.rankInfo);
+            const rankTone = getRankTone(rankInfo);
             return (
               <div key={submission._id} className="grid gap-3 rounded-2xl border border-white/5 bg-[#121017] p-4 lg:grid-cols-[minmax(0,1fr)_minmax(220px,0.55fr)_auto] lg:items-center">
                 <div className="min-w-0">
-                  <p className="truncate text-sm font-bold text-white">{submission.student?.name || "Student"}</p>
+                  <div className="flex min-w-0 flex-wrap items-center gap-2">
+                    <p className={`truncate text-sm font-bold ${rankTone.name}`}>{submission.student?.name || "Student"}</p>
+                    <span className={`rounded-full border px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider ${rankTone.badge}`}>
+                      {rankInfo.rankName}
+                    </span>
+                  </div>
                   <p className="mt-1 text-xs font-semibold text-[#8E8A9F]">{submission.student?.house || "No house"} - Score {Number(submission.score || 0).toFixed(2)} - Effective {Number(submission.effectiveScore || 0).toFixed(2)}</p>
                   <p className="mt-1 inline-flex items-center gap-1.5 text-xs font-semibold text-[#DFB15B]">
                     <ShieldAlert className="h-3.5 w-3.5" />

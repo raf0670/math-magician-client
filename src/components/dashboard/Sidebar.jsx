@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 import { LayoutDashboard, Video, ClipboardCheck, BarChart3, User, LogOut, ShieldCheck, Brain, Archive, Radio, FileQuestion, Trophy } from "lucide-react";
 import { clearAuthSession, getProfile, getStoredUser, saveAuthSession } from "@/lib/api";
 import BrandMark from "@/components/shared/BrandMark";
-import { getDefaultRankInfo, getRankInfo } from "@/lib/rank";
+import { getDefaultRankInfo, getRankInfo, getRankTone } from "@/lib/rank";
 
 const SHOW_STUDENT_LIVE_EXAMS_NAV = false;
 
@@ -59,6 +59,7 @@ export default function DashboardSidebar() {
     ].filter(Boolean);
 
     const firstName = currentUser?.name?.trim().split(" ")[0] || "Student";
+    const rankTone = getRankTone(rankInfo);
 
     const handleSignOut = () => {
         clearAuthSession();
@@ -80,8 +81,8 @@ export default function DashboardSidebar() {
 
                 <div className="mb-6 rounded-2xl border border-white/5 bg-[#121017] px-3 py-3">
                     <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-[#6B667B]">Signed in</p>
-                    <p className="mt-1 text-sm font-semibold text-white">Hi, {firstName}</p>
-                    <p className="mt-1 inline-flex rounded-full border border-[#DFB15B]/20 bg-[#DFB15B]/10 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-[#DFB15B]">
+                    <p className={`mt-1 text-sm font-semibold ${rankTone.name}`}>Hi, {firstName}</p>
+                    <p className={`mt-1 inline-flex rounded-full border px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider ${rankTone.badge}`}>
                         {rankInfo.rankName}
                     </p>
                 </div>

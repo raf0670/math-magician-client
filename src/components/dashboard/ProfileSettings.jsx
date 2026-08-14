@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { User, BookOpen, GraduationCap, ShieldCheck, Mail, Lock, Save } from "lucide-react";
 import { changePassword, getMyStats, getStoredUser, saveAuthSession, updateProfile } from "@/lib/api";
-import { POINTS_PER_LEVEL, formatRankPoints, getDefaultRankInfo, getRankInfo, getRankProgressPercent } from "@/lib/rank";
+import { POINTS_PER_LEVEL, formatRankPoints, getDefaultRankInfo, getRankInfo, getRankProgressPercent, getRankTone } from "@/lib/rank";
 
 export default function ProfileSettings() {
     const [profile, setProfile] = useState({
@@ -121,6 +121,7 @@ export default function ProfileSettings() {
     };
 
     const rankInfo = getRankInfo(profile.rankInfo);
+    const rankTone = getRankTone(rankInfo);
     const progressPercentage = getRankProgressPercent(rankInfo).toFixed(0);
 
     return (
@@ -134,8 +135,8 @@ export default function ProfileSettings() {
 
                 <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                        <h2 className="text-xl font-bold text-white tracking-wide truncate">{profile.fullName}</h2>
-                        <span className="px-2 py-0.5 rounded bg-[#DFB15B]/10 border border-[#DFB15B]/20 text-[9px] font-bold uppercase text-[#DFB15B] tracking-wider shrink-0">{rankInfo.rankName}</span>
+                        <h2 className={`text-xl font-bold tracking-wide truncate ${rankTone.name}`}>{profile.fullName}</h2>
+                        <span className={`px-2 py-0.5 rounded border text-[9px] font-bold uppercase tracking-wider shrink-0 ${rankTone.badge}`}>{rankInfo.rankName}</span>
                     </div>
                     <p className="text-xs text-[#8E8A9F] mt-1 flex items-center gap-1.5 font-medium truncate">
                         <Mail className="w-3.5 h-3.5 text-[#6B667B]" /> {profile.email}

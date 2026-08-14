@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Bell, Flame, ChevronDown, Sparkles, ShieldCheck } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { clearAuthSession, getMyStats, getStoredUser } from "@/lib/api";
-import { getDefaultRankInfo, getRankInfo } from "@/lib/rank";
+import { getDefaultRankInfo, getRankInfo, getRankTone } from "@/lib/rank";
 
 export default function DashboardTopbar() {
     const router = useRouter();
@@ -68,6 +68,7 @@ export default function DashboardTopbar() {
     const firstName = fullName.split(" ")[0] || "Student";
     const email = currentUser?.email || "student@example.com";
     const initials = firstName.slice(0, 1).toUpperCase();
+    const rankTone = getRankTone(rankInfo);
     const streak = useMemo(() => {
         const uniqueDays = new Set(
             history
@@ -129,9 +130,9 @@ export default function DashboardTopbar() {
                     <button onClick={() => setShowProfileMenu(!showProfileMenu)} className="flex items-center gap-2.5 pl-1.5 pr-2.5 py-1.5 rounded-xl bg-[#121017] border border-white/3 hover:border-white/8 transition-all duration-200 group">
                         <div className="w-7 h-7 rounded-lg bg-[#1F1A2B] border border-white/10 flex items-center justify-center text-sm font-bold text-[#DFB15B]">{initials}</div>
                         <div className="hidden flex-col items-start text-left sm:flex">
-                            <span className="text-xs font-bold text-white tracking-wide leading-none">{fullName}</span>
-                            <span className="text-[9px] text-[#6B667B] font-bold mt-1 tracking-wide uppercase flex items-center gap-1">
-                                <ShieldCheck className="w-2.5 h-2.5 text-[#DFB15B]" /> {rankInfo.rankName}
+                            <span className={`text-xs font-bold tracking-wide leading-none ${rankTone.name}`}>{fullName}</span>
+                            <span className={`text-[9px] font-bold mt-1 tracking-wide uppercase flex items-center gap-1 ${rankTone.name}`}>
+                                <ShieldCheck className={`w-2.5 h-2.5 ${rankTone.icon}`} /> {rankInfo.rankName}
                             </span>
                         </div>
                         <ChevronDown className={`w-3.5 h-3.5 text-[#6B667B] group-hover:text-white transition-transform duration-200 ${showProfileMenu ? "rotate-180" : ""}`} />
