@@ -358,7 +358,7 @@ export default function ProfileSettings() {
                 className="relative overflow-hidden rounded-3xl border border-white/7 bg-[#121017]/92 p-6 shadow-[0_18px_55px_rgba(0,0,0,0.30)] flex flex-col gap-5"
             >
                 <div className="pointer-events-none absolute -left-16 -top-20 h-52 w-52 rounded-full bg-emerald-400/10 blur-3xl" />
-                <div className="pointer-events-none absolute -right-20 bottom-[-80px] h-56 w-56 rounded-full bg-[#DFB15B]/11 blur-3xl" />
+                <div className="pointer-events-none absolute -right-20 -bottom-20 h-56 w-56 rounded-full bg-[#DFB15B]/11 blur-3xl" />
                 <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-white/25 to-transparent" />
                 <div className="pb-3 border-b border-white/3">
                     <h3 className="text-sm font-semibold text-white tracking-wide flex items-center gap-2">
