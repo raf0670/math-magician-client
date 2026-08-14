@@ -1,4 +1,4 @@
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Open_Sans } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/shared/Navbar";
 
@@ -12,6 +12,11 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const openSans = Open_Sans({
+  variable: "--font-open-sans",
+  subsets: ["latin"],
+});
+
 export const metadata = {
   title: "MathMagician's School",
   description: "IBA Simplified",
@@ -21,7 +26,7 @@ export default function RootLayout({ children }) {
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${openSans.variable} h-full antialiased`}
     >
       <body className="min-h-screen flex flex-col">
         <Navbar></Navbar>
