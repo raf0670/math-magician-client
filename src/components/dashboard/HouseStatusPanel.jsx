@@ -100,9 +100,9 @@ export default function HouseStatusPanel() {
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-            className="grid gap-5 lg:grid-cols-[0.82fr_1.55fr]"
+            className="grid min-w-0 max-w-full gap-5 lg:grid-cols-[0.82fr_1.55fr]"
         >
-            <div className="relative overflow-hidden rounded-3xl border border-[#DFB15B]/15 bg-[#121017]/92 p-5 shadow-[0_18px_55px_rgba(0,0,0,0.32)]">
+            <div className="relative min-w-0 max-w-full overflow-hidden rounded-3xl border border-[#DFB15B]/15 bg-[#121017]/92 p-4 shadow-[0_18px_55px_rgba(0,0,0,0.32)] sm:p-5">
                 <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-[#DFB15B]/70 to-transparent" />
                 <motion.div
                     className="pointer-events-none absolute -right-14 -top-14 h-44 w-44 rounded-full bg-[#DFB15B]/10 blur-3xl"
@@ -110,40 +110,40 @@ export default function HouseStatusPanel() {
                     transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
                 />
 
-                <div className="relative z-10 flex items-start gap-4">
+                <div className="relative z-10 flex min-w-0 items-start gap-3 sm:gap-4">
                     <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border ${hasClassAccess ? "border-emerald-400/25 bg-emerald-400/10 text-emerald-200" : "border-[#DFB15B]/25 bg-[#DFB15B]/10 text-[#DFB15B]"}`}>
                         <StatusIcon className="h-5 w-5" />
                     </div>
                     <div className="min-w-0">
-                        <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-[#DFB15B]">House Status</p>
-                        <h2 className="mt-2 font-serif text-2xl font-semibold tracking-wide text-white">{statusTitle}</h2>
-                        <p className="mt-3 text-sm font-medium leading-6 text-[#9D96B3]">{statusCopy}</p>
+                        <p className="break-words text-[10px] font-bold uppercase tracking-[0.18em] text-[#DFB15B] sm:tracking-[0.24em]">House Status</p>
+                        <h2 className="mt-2 break-words font-serif text-xl font-semibold tracking-wide text-white [overflow-wrap:anywhere] sm:text-2xl">{statusTitle}</h2>
+                        <p className="mt-3 break-words text-sm font-medium leading-6 text-[#9D96B3]">{statusCopy}</p>
                     </div>
                 </div>
 
                 <div className="relative z-10 mt-5 flex flex-wrap gap-2">
-                    <span className="inline-flex items-center gap-1.5 rounded-full border border-white/8 bg-white/5 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-[#D8D4E5]">
-                        <Crown className="h-3.5 w-3.5 text-[#DFB15B]" />
-                        {currentUser?.house || (canCheckout ? "Seat Reserved" : isPartiallyPaid ? "Partial Payment" : "Premium Academy")}
+                    <span className="inline-flex max-w-full items-center gap-1.5 rounded-full border border-white/8 bg-white/5 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wide text-[#D8D4E5] sm:tracking-wider">
+                        <Crown className="h-3.5 w-3.5 shrink-0 text-[#DFB15B]" />
+                        <span className="min-w-0 truncate">{currentUser?.house || (canCheckout ? "Seat Reserved" : isPartiallyPaid ? "Partial Payment" : "Premium Academy")}</span>
                     </span>
-                    <span className="inline-flex items-center gap-1.5 rounded-full border border-white/8 bg-white/5 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-[#D8D4E5]">
-                        <Sparkles className="h-3.5 w-3.5 text-[#A78BFA]" />
-                        Four Houses
+                    <span className="inline-flex max-w-full items-center gap-1.5 rounded-full border border-white/8 bg-white/5 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wide text-[#D8D4E5] sm:tracking-wider">
+                        <Sparkles className="h-3.5 w-3.5 shrink-0 text-[#A78BFA]" />
+                        <span className="min-w-0 truncate">Four Houses</span>
                     </span>
                 </div>
 
                 {canCheckout ? (
                     <Link
                         href="/payment/checkout"
-                        className="relative z-10 mt-5 inline-flex items-center justify-center gap-2 rounded-2xl bg-[#DFB15B] px-5 py-3 text-sm font-bold uppercase tracking-wider text-black transition hover:brightness-110"
+                        className="relative z-10 mt-5 inline-flex w-full max-w-full items-center justify-center gap-2 rounded-2xl bg-[#DFB15B] px-4 py-3 text-center text-sm font-bold uppercase tracking-wide text-black transition hover:brightness-110 sm:w-auto sm:px-5 sm:tracking-wider"
                     >
-                        <CreditCard className="h-4 w-4" />
-                        Proceed to Checkout
+                        <CreditCard className="h-4 w-4 shrink-0" />
+                        <span className="min-w-0 truncate">Proceed to Checkout</span>
                     </Link>
                 ) : null}
             </div>
 
-            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            <div className="grid min-w-0 max-w-full gap-4 sm:grid-cols-2 xl:grid-cols-4">
                 {houses.map((house, index) => {
                     const standing = standingByHouse.get(house.name);
                     const isCurrentHouse = currentUser?.house === house.name;
@@ -155,7 +155,7 @@ export default function HouseStatusPanel() {
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.5, delay: 0.08 * index, ease: [0.22, 1, 0.36, 1] }}
                             whileHover={{ y: -4 }}
-                            className={`group relative min-h-52 overflow-hidden rounded-3xl border bg-[#121017]/90 p-5 shadow-[0_14px_45px_rgba(0,0,0,0.28)] ${isCurrentHouse ? "border-[#DFB15B]/35" : "border-white/6"}`}
+                            className={`group relative min-h-52 min-w-0 overflow-hidden rounded-3xl border bg-[#121017]/90 p-5 shadow-[0_14px_45px_rgba(0,0,0,0.28)] ${isCurrentHouse ? "border-[#DFB15B]/35" : "border-white/6"}`}
                         >
                             <div className={`pointer-events-none absolute inset-0 bg-linear-to-br ${house.tone}`} />
                             <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-white/24 to-transparent opacity-70" />
@@ -173,20 +173,20 @@ export default function HouseStatusPanel() {
                                         <Shield className="h-5 w-5" />
                                     )}
                                 </div>
-                                <h3 className="mt-5 font-serif text-xl font-semibold tracking-wide text-white">{house.name}</h3>
-                                <p className="mt-2 text-xs font-semibold uppercase tracking-[0.18em] text-[#DFB15B]">{house.mode}</p>
-                                <p className="mt-2 text-sm font-medium text-[#9D96B3]">{house.location}</p>
+                                <h3 className="mt-5 break-words font-serif text-xl font-semibold tracking-wide text-white [overflow-wrap:anywhere]">{house.name}</h3>
+                                <p className="mt-2 break-words text-xs font-semibold uppercase tracking-[0.16em] text-[#DFB15B] sm:tracking-[0.18em]">{house.mode}</p>
+                                <p className="mt-2 break-words text-sm font-medium text-[#9D96B3]">{house.location}</p>
                                 <div className="mt-auto pt-4">
-                                    <div className="flex items-center justify-between rounded-2xl border border-white/6 bg-[#0F0D15]/70 px-3 py-2">
-                                        <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-[#8E8A9F]">
-                                            <Trophy className="h-3.5 w-3.5 text-[#DFB15B]" />
+                                    <div className="flex min-w-0 items-center justify-between gap-2 rounded-2xl border border-white/6 bg-[#0F0D15]/70 px-3 py-2">
+                                        <span className="inline-flex min-w-0 items-center gap-1.5 text-[10px] font-bold uppercase tracking-wide text-[#8E8A9F] sm:tracking-wider">
+                                            <Trophy className="h-3.5 w-3.5 shrink-0 text-[#DFB15B]" />
                                             Points
                                         </span>
-                                        <span className="text-sm font-black text-white">{formatPoints(standing?.totalPoints)}</span>
+                                        <span className="shrink-0 text-sm font-black text-white">{formatPoints(standing?.totalPoints)}</span>
                                     </div>
                                     {isCurrentHouse ? (
-                                        <span className="mt-2 inline-flex rounded-full border border-[#DFB15B]/20 bg-[#DFB15B]/10 px-2.5 py-1 text-[9px] font-bold uppercase tracking-wider text-[#DFB15B]">
-                                            Your House
+                                        <span className="mt-2 inline-flex max-w-full rounded-full border border-[#DFB15B]/20 bg-[#DFB15B]/10 px-2.5 py-1 text-[9px] font-bold uppercase tracking-wide text-[#DFB15B] sm:tracking-wider">
+                                            <span className="min-w-0 truncate">Your House</span>
                                         </span>
                                     ) : null}
                                 </div>
