@@ -91,7 +91,7 @@ export default function DashboardSidebar() {
 
     return (
         <>
-            <aside className="hidden md:flex fixed inset-y-0 left-0 z-30 w-64 select-none flex-col overflow-hidden border-r border-[#DFB15B]/10 bg-[#0D0B14]/95 px-4 py-6 shadow-[22px_0_70px_rgba(0,0,0,0.28)]">
+            <aside className="hidden md:flex fixed inset-y-0 left-0 z-30 w-64 select-none flex-col justify-center overflow-hidden border-r border-[#DFB15B]/10 bg-[#0D0B14]/95 px-4 py-6 shadow-[22px_0_70px_rgba(0,0,0,0.28)]">
                 <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(223,177,91,0.045)_1px,transparent_1px),linear-gradient(90deg,rgba(124,58,237,0.035)_1px,transparent_1px)] bg-size-[38px_38px]" />
                 <motion.div
                     className="pointer-events-none absolute -left-24 -top-24 h-64 w-64 rounded-full bg-[#DFB15B]/13 blur-3xl"
@@ -161,7 +161,7 @@ export default function DashboardSidebar() {
                     </div>
                 </div>
 
-                <nav className="relative z-10 flex flex-1 flex-col gap-1.5 overflow-y-auto pr-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                <nav className="relative z-10 flex max-h-[52vh] flex-none flex-col gap-1.5 overflow-y-auto pr-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                     {navItems.map((item) => {
                         const isActive = pathname === item.href;
                         const accent = NAV_ACCENTS[item.href] || "from-[#DFB15B]/20 via-white/6 to-transparent";
@@ -200,7 +200,7 @@ export default function DashboardSidebar() {
                     })}
                 </nav>
 
-                <div className="relative z-10 mt-4 border-t border-white/5 pt-4">
+                <div className="relative z-10 mt-5 border-t border-white/5 pt-4">
                     <button
                         onClick={handleSignOut}
                         className="group flex w-full items-center gap-3 rounded-2xl border border-white/6 bg-white/[0.03] px-3 py-3 text-xs font-semibold text-[#8E8A9F] transition-all duration-200 hover:border-red-400/20 hover:bg-red-500/8 hover:text-red-300"
