@@ -30,7 +30,6 @@ import FlashyLoader, { LoadingButtonLabel } from "@/components/shared/FlashyLoad
 import { getRankInfo, getRankTone } from "@/lib/rank";
 
 const SUBJECTS = ["Maths", "English", "Analytical"];
-const DIFFICULTIES = ["Easy", "Medium", "Hard"];
 const OPTION_LABELS = ["A", "B", "C", "D", "E"];
 
 const EMPTY_SCHEDULE = {
@@ -258,9 +257,9 @@ export default function AdminLiveExamsPage() {
     endTime: toApiDate(schedule.endTime),
     questions: questions.map((question) => ({
       subject: question.subject,
-      topic: question.topic,
-      subTopic: question.subTopic,
-      difficulty: question.difficulty,
+      topic: "",
+      subTopic: "",
+      difficulty: "Medium",
       question: question.question,
       options: question.options,
       correct_answer: question.options[question.correctOptionIndex] || "",
@@ -632,11 +631,8 @@ function QuestionEditor({ question, index, canRemove, onChange, onOptionChange, 
         </button>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-[minmax(220px,320px)]">
         <SelectField label="Subject" value={question.subject} onChange={(value) => onChange(question.id, "subject", value)} options={SUBJECTS} />
-        <TextField label="Topic" required value={question.topic} onChange={(value) => onChange(question.id, "topic", value)} placeholder="Age" />
-        <TextField label="Sub-topic" required value={question.subTopic} onChange={(value) => onChange(question.id, "subTopic", value)} placeholder="Ages at Future Points in Time" />
-        <SelectField label="Difficulty" value={question.difficulty} onChange={(value) => onChange(question.id, "difficulty", value)} options={DIFFICULTIES} />
       </div>
 
       <label className="mt-4 block rounded-2xl border border-white/5 bg-[#121017] px-4 py-3">
