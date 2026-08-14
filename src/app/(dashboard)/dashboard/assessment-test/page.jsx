@@ -97,7 +97,7 @@ function AssessmentTestContent() {
           </p>
           <h1 className="mt-2 font-serif text-3xl font-medium tracking-wide text-white">Official Assessment Room</h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-[#8E8A9F]">
-            A timed 90-minute assessment with normal marks and no leaderboard ranking points.
+            A timed 90-minute assessment where your final score is added directly to your rank points.
           </p>
         </div>
 
