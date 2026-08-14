@@ -333,7 +333,7 @@ export default function UnifiedHeroDeck() {
                             >
                                 <div className="w-full h-full rounded-2xl overflow-hidden bg-[#16131C] border border-white/3 relative">
                                     <Image
-                                        src="https://i.ibb.co.com/tM2pbsr2/f39e5b4b-432e-4c5c-8626-46ca7d6d6cc7.jpg"
+                                        src="/Instructor.jpg"
                                         alt="Instructor Portrait"
                                         fill
                                         className="object-cover brightness-[0.88] contrast-[1.03] group-hover:scale-[1.03] transition-all duration-700"

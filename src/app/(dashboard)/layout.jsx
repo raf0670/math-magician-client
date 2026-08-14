@@ -2,7 +2,6 @@
 import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import DashboardSidebar from "@/components/dashboard/Sidebar";
-import DashboardTopbar from "@/components/dashboard/Topbar";
 import FlashyLoader from "@/components/shared/FlashyLoader";
 
 export default function DashboardLayout({ children }) {
@@ -64,8 +63,6 @@ export default function DashboardLayout({ children }) {
             {!isFullscreenExamRoute && <DashboardSidebar />}
 
             <div className={`flex-1 flex flex-col h-screen overflow-y-auto relative z-10 pb-24 md:pb-0 transition-all duration-200 ${isFullscreenExamRoute ? "md:pl-0" : "md:pl-64"}`}>
-                {!isFullscreenExamRoute && <DashboardTopbar />}
-
                 <main className={`flex-1 w-full mx-auto ${isFullscreenExamRoute ? "max-w-full px-0 py-0" : "max-w-7xl px-4 sm:px-8 py-8"}`}>
                     {children}
                 </main>

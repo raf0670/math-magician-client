@@ -50,7 +50,7 @@ export default function WelcomeBanner() {
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-            className="relative min-h-[360px] max-w-full overflow-hidden rounded-3xl border border-[#DFB15B]/18 bg-[#100E16] p-4 shadow-[0_26px_90px_rgba(0,0,0,0.48)] select-none sm:p-7 lg:p-8"
+            className="relative min-h-90 max-w-full overflow-hidden rounded-3xl border border-[#DFB15B]/18 bg-[#100E16] p-4 shadow-[0_26px_90px_rgba(0,0,0,0.48)] select-none sm:p-7 lg:p-8"
         >
             <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(223,177,91,0.055)_1px,transparent_1px),linear-gradient(90deg,rgba(124,58,237,0.04)_1px,transparent_1px)] bg-size-[42px_42px]" />
             <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-[#DFB15B] to-transparent" />
@@ -60,7 +60,7 @@ export default function WelcomeBanner() {
                 transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
             />
             <motion.div
-                className="pointer-events-none absolute bottom-[-120px] left-[18%] h-72 w-72 rounded-full bg-[#3156D4]/12 blur-3xl"
+                className="pointer-events-none absolute -bottom-30 left-[18%] h-72 w-72 rounded-full bg-[#3156D4]/12 blur-3xl"
                 animate={{ x: [0, 36, -18, 0], opacity: [0.3, 0.58, 0.3] }}
                 transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
             />
@@ -91,18 +91,18 @@ export default function WelcomeBanner() {
                 />
             ))}
 
-            <div className="relative z-10 grid min-h-[300px] min-w-0 max-w-full gap-8 lg:grid-cols-[1.25fr_0.75fr] lg:items-end">
+            <div className="relative z-10 grid min-h-75 min-w-0 max-w-full gap-8 lg:grid-cols-[1.25fr_0.75fr] lg:items-end">
                 <div className="flex min-w-0 max-w-2xl flex-col items-start">
                     <div className="inline-flex max-w-full items-center gap-2 rounded-full border border-[#DFB15B]/20 bg-[#DFB15B]/10 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.18em] text-[#DFB15B] sm:tracking-[0.24em]">
                         <WandSparkles className="h-3.5 w-3.5" />
                         <span className="min-w-0 truncate">Premium Academy</span>
                     </div>
 
-                    <h1 className="mt-5 max-w-full break-words font-serif text-2xl font-semibold leading-tight tracking-wide text-white [overflow-wrap:anywhere] sm:text-4xl lg:text-5xl">
+                    <h1 className="mt-5 max-w-full wrap-break-word font-serif text-2xl font-semibold leading-tight tracking-wide text-white sm:text-4xl lg:text-5xl">
                         Welcome back, <span className={rankTone.name}>{firstName}</span>
                     </h1>
 
-                    <p className="mt-4 max-w-xl break-words text-sm font-medium leading-7 text-[#A9A3BA]">
+                    <p className="mt-4 max-w-xl wrap-break-word text-sm font-medium leading-7 text-[#A9A3BA]">
                         Your dashboard is tuned for focused IBA preparation: live progress, house identity, and practice access in one calm workspace.
                     </p>
 
@@ -128,8 +128,8 @@ export default function WelcomeBanner() {
                             <BookOpenCheck className="h-5 w-5" />
                         </div>
                         <div className="min-w-0">
-                            <p className="break-words text-[10px] font-bold uppercase tracking-[0.18em] text-[#DFB15B] sm:tracking-[0.22em]">Practice Portal</p>
-                            <p className="mt-1 break-words text-sm font-medium leading-6 text-[#D8D4E5]">
+                            <p className="wrap-break-word text-[10px] font-bold uppercase tracking-[0.18em] text-[#DFB15B] sm:tracking-[0.22em]">Practice Portal</p>
+                            <p className="mt-1 wrap-break-word text-sm font-medium leading-6 text-[#D8D4E5]">
                                 Enter the mock arena and keep the preparation record moving.
                             </p>
                         </div>
@@ -150,7 +150,7 @@ export default function WelcomeBanner() {
 
                     <div className="flex min-w-0 items-center gap-2 rounded-2xl border border-[#A78BFA]/15 bg-[#A78BFA]/7 px-4 py-3 text-xs font-semibold text-[#CFC6FF]">
                         <Sparkles className="h-4 w-4 shrink-0 text-[#A78BFA]" />
-                        <span className="min-w-0 break-words">Performance updates automatically after every submission.</span>
+                        <span className="min-w-0 wrap-break-word">Performance updates automatically after every submission.</span>
                     </div>
                 </div>
             </div>

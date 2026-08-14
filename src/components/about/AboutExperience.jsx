@@ -8,7 +8,7 @@ import Footer from "@/components/shared/Footer";
 
 const instructor = {
   name: "Mehrabur Rahaman",
-  portrait: "https://i.ibb.co.com/tM2pbsr2/f39e5b4b-432e-4c5c-8626-46ca7d6d6cc7.jpg",
+  portrait: "/Instructor.jpg",
   message:
     "Hello good soul. This is your instructor Mehrab. To be honest, I can never make sure you get into IBA but surely enough I can make your path easier and smooth. I have already guided many aspirants in the same path who now go to the same campus as me. Join me in this journey, we'll share campus soon too.",
   credentials: [
