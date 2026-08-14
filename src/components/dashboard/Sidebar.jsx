@@ -161,7 +161,7 @@ export default function DashboardSidebar() {
                     </div>
                 </div>
 
-                <nav className="relative z-10 flex max-h-[52vh] flex-none flex-col gap-1.5 overflow-y-auto pr-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                <nav className="relative z-10 flex max-h-[52vh] flex-none flex-col gap-1.5 overflow-y-auto pr-1 scrollbar-none [&::-webkit-scrollbar]:hidden">
                     {navItems.map((item) => {
                         const isActive = pathname === item.href;
                         const accent = NAV_ACCENTS[item.href] || "from-[#DFB15B]/20 via-white/6 to-transparent";
@@ -179,7 +179,7 @@ export default function DashboardSidebar() {
                                         transition={{ type: "spring", stiffness: 380, damping: 30 }}
                                     />
                                 )}
-                                <span className="absolute inset-0 rounded-2xl border border-transparent bg-white/[0.025] opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
+                                <span className="absolute inset-0 rounded-2xl border border-transparent bg-white/2.5 opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
                                 {isActive ? (
                                     <motion.span
                                         layoutId="activeDesktopRail"
@@ -203,7 +203,7 @@ export default function DashboardSidebar() {
                 <div className="relative z-10 mt-5 border-t border-white/5 pt-4">
                     <button
                         onClick={handleSignOut}
-                        className="group flex w-full items-center gap-3 rounded-2xl border border-white/6 bg-white/[0.03] px-3 py-3 text-xs font-semibold text-[#8E8A9F] transition-all duration-200 hover:border-red-400/20 hover:bg-red-500/8 hover:text-red-300"
+                        className="group flex w-full items-center gap-3 rounded-2xl border border-white/6 bg-white/3 px-3 py-3 text-xs font-semibold text-[#8E8A9F] transition-all duration-200 hover:border-red-400/20 hover:bg-red-500/8 hover:text-red-300"
                     >
                         <span className="flex h-8 w-8 items-center justify-center rounded-xl border border-white/6 bg-white/4">
                             <LogOut className="h-4 w-4 shrink-0 transition-transform duration-200 group-hover:-translate-x-0.5" />
