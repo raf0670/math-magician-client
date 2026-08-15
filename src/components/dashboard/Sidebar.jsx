@@ -132,14 +132,14 @@ export default function DashboardSidebar() {
                     </div>
                 </div> */}
 
-                <div className="relative z-10 mb-5 overflow-hidden rounded-3xl border border-white/7 bg-[#121017]/78 px-4 py-4 shadow-[0_16px_42px_rgba(0,0,0,0.25)] backdrop-blur">
-                    <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_100%_0%,rgba(223,177,91,0.14),transparent_42%)]" />
+                <div className={`relative z-10 mb-5 overflow-hidden rounded-3xl border px-4 py-4 backdrop-blur ${rankTone.card}`}>
+                    <div className={`pointer-events-none absolute inset-0 ${rankTone.cardAura}`} />
                     <div className="relative z-10 flex items-start gap-3">
-                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-[#DFB15B]/20 bg-[#DFB15B]/10 text-sm font-black text-[#DFB15B]">
+                        <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border text-sm font-black ${rankTone.avatar}`}>
                             {firstName.slice(0, 1).toUpperCase()}
                         </div>
                         <div className="min-w-0 flex-1">
-                            <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-[#6B667B]">Signed in</p>
+                            <p className={`text-[10px] font-bold uppercase tracking-[0.24em] ${rankTone.mutedText}`}>Signed in</p>
                             <p className={`mt-1 truncate text-sm font-semibold ${rankTone.name}`}>Hi, {firstName}</p>
                             <p className={`mt-2 inline-flex rounded-full border px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider ${rankTone.badge}`}>
                                 {rankInfo.rankName}
@@ -148,16 +148,16 @@ export default function DashboardSidebar() {
                     </div>
 
                     <div className="relative z-10 mt-4">
-                        <div className="mb-1.5 flex items-center justify-between text-[9px] font-bold uppercase tracking-wider text-[#6B667B]">
+                        <div className={`mb-1.5 flex items-center justify-between text-[9px] font-bold uppercase tracking-wider ${rankTone.mutedText}`}>
                             <span>Rank Charge</span>
-                            <span className="text-white">{rankProgress}%</span>
+                            <span className={rankTone.name}>{rankProgress}%</span>
                         </div>
-                        <div className="h-2 overflow-hidden rounded-full border border-white/7 bg-[#08070D]">
+                        <div className={`h-2 overflow-hidden rounded-full border ${rankTone.progressTrack}`}>
                             <motion.div
                                 initial={{ width: 0 }}
                                 animate={{ width: `${rankProgress}%` }}
                                 transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1] }}
-                                className="h-full rounded-full bg-linear-to-r from-[#F6D98B] via-[#DFB15B] to-[#7C3AED] shadow-[0_0_20px_rgba(223,177,91,0.28)]"
+                                className={`h-full rounded-full ${rankTone.progressFill}`}
                             />
                         </div>
                     </div>
