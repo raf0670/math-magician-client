@@ -28,11 +28,6 @@ function getOptionMap(options) {
     return options && typeof options === "object" ? options : {};
 }
 
-function getEffectivePenalty(value) {
-    const penalty = Number(value);
-    return Number.isFinite(penalty) && penalty > 0 ? penalty : 0.25;
-}
-
 function getStudentFacingExamTitle(title, fallback = "Live Mock Test") {
     const cleanedTitle = title
         ?.toString()
@@ -118,7 +113,6 @@ export default function ExamEngine({ examData, onComplete }) {
     const currentQuestion = normalizedQuestions[currentIndex];
     const answeredCount = normalizedQuestions.filter((question) => answers[question.id] !== undefined).length;
     const skippedCount = normalizedQuestions.length - answeredCount;
-    const penalty = getEffectivePenalty(examData?.negativeMarksPerQuestion);
     const examTitle = getStudentFacingExamTitle(examData?.title);
     const hasTimedExam = remainingSeconds !== null;
     const answerStorageKey = examData?._id ? `exam_archive_answers_${examData._id}` : "";
@@ -261,9 +255,13 @@ export default function ExamEngine({ examData, onComplete }) {
                             <span>Untimed practice</span>
                         </div>
                     )}
-                    <div className="rounded-xl border border-red-500/15 bg-red-500/10 px-4 py-2 text-xs font-bold text-red-300">
-                        Wrong: -{penalty.toFixed(2)}
-                    </div>
+                    <button
+                        disabled={isSubmitting}
+                        onClick={() => handleSubmit(SUBMISSION_REASONS.MANUAL)}
+                        className="inline-flex items-center justify-center gap-2 rounded-xl bg-linear-to-r from-emerald-500 to-teal-600 px-4 py-2 text-xs font-bold uppercase tracking-wider text-white shadow-md transition-all hover:brightness-110 disabled:cursor-wait disabled:opacity-70"
+                    >
+                        <Send className="h-4 w-4" /> {isSubmitting ? "Submitting..." : "Submit"}
+                    </button>
                 </div>
             </div>
 
@@ -393,13 +391,6 @@ export default function ExamEngine({ examData, onComplete }) {
                         </p>
                     </div>
 
-                    <button
-                        disabled={isSubmitting}
-                        onClick={() => handleSubmit(SUBMISSION_REASONS.MANUAL)}
-                        className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-linear-to-r from-emerald-500 to-teal-600 py-3.5 text-xs font-bold uppercase tracking-wider text-white shadow-md transition-all hover:brightness-110 disabled:cursor-wait disabled:opacity-70"
-                    >
-                        <Send className="h-4 w-4" /> {isSubmitting ? "Submitting Answer Sheet..." : "Submit Final Answer Sheet"}
-                    </button>
                 </div>
             </div>
         </div>
