@@ -40,7 +40,7 @@ const houses = [
         location: "Coming Soon",
         tone: "from-emerald-500/24 via-white/8 to-transparent",
         iconClass: "border-emerald-300/25 bg-emerald-500/12 text-emerald-200",
-        imageSrc: "",
+        imageSrc: "/slytherin.jpg",
         imageAlt: "Slytherin house crest",
     },
 ];

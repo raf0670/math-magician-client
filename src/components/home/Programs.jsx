@@ -184,7 +184,7 @@ export default function ProgramsAndTestimonials() {
             badge: "Math Advanced",
             title: "Slytherin",
             desc: "An advanced math program joining the house competition later. Details, schedule, and enrollment will open after the program is finalized.",
-            imageSrc: "",
+            imageSrc: "/slytherin.jpg",
             imageAlt: "Slytherin house crest",
             location: {
                 text: "Coming Soon"
