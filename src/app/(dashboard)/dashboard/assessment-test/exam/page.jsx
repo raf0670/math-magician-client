@@ -179,19 +179,8 @@ function AssessmentExamContent() {
     );
   }
 
-  if (isPreview || (status === "ended" && examData?.hasSubmitted)) {
+  if (isPreview || status === "ended") {
     return <ReadOnlyAssessmentReview examData={examData} isPreview={isPreview} />;
-  }
-
-  if (status === "ended") {
-    return (
-      <AssessmentMessage
-        icon={<XCircle className="h-10 w-10 text-red-300" />}
-        eyebrow="Closed"
-        title="Assessment submissions are closed"
-        message="This assessment deadline has passed, so late submissions are no longer accepted."
-      />
-    );
   }
 
   return (
