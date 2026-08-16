@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { AlertTriangle, CalendarClock, CheckCircle2, Clock3, Eye, FileCheck2, LockKeyhole, Play, RefreshCw, ShieldCheck } from "lucide-react";
+import ClassAccessGate from "@/components/dashboard/ClassAccessGate";
 import FlashyLoader from "@/components/shared/FlashyLoader";
 import { getAssessmentTest } from "@/lib/api";
 
@@ -12,20 +13,35 @@ const STATUS_STYLES = {
   ended: "border-white/8 bg-white/5 text-[#8E8A9F]",
 };
 
+function formatDateTime(value) {
+  if (!value) return "Not set";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "Not set";
+
+  return new Intl.DateTimeFormat("en-US", {
+    dateStyle: "medium",
+    timeStyle: "short",
+  }).format(date);
+}
+
 function getStatus(data) {
   if (data?.status) return data.status;
   const now = Date.now();
   const startsAt = new Date(data?.startTime).getTime();
   const endsAt = new Date(data?.endTime).getTime();
 
-  if (Number.isNaN(startsAt) || Number.isNaN(endsAt)) return "open";
+  if (Number.isNaN(startsAt) || Number.isNaN(endsAt)) return "upcoming";
   if (now < startsAt) return "upcoming";
   if (now <= endsAt) return "open";
   return "ended";
 }
 
 export default function AssessmentTestPage() {
-  return <AssessmentTestContent />;
+  return (
+    <ClassAccessGate section="assessmentTest">
+      <AssessmentTestContent />
+    </ClassAccessGate>
+  );
 }
 
 function AssessmentTestContent() {
@@ -81,7 +97,7 @@ function AssessmentTestContent() {
           </p>
           <h1 className="mt-2 font-serif text-3xl font-medium tracking-wide text-white">Official Assessment Room</h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-[#8E8A9F]">
-            An open assessment where your final score is added directly to your rank points.
+            A timed 90-minute assessment where your final score is added directly to your rank points.
           </p>
         </div>
 
@@ -115,7 +131,7 @@ function AssessmentTestContent() {
               </span>
               <h2 className="mt-4 font-serif text-3xl font-medium tracking-wide text-white">{assessment.title || "Assessment Test"}</h2>
               <p className="mt-2 text-sm leading-6 text-[#8E8A9F]">
-                Open anytime
+                {formatDateTime(assessment.startTime)} to {formatDateTime(assessment.endTime)}
               </p>
             </div>
 
@@ -130,7 +146,7 @@ function AssessmentTestContent() {
           <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <Info icon={<FileCheck2 className="h-4 w-4" />} label="Questions" value={assessment.questionCount || 0} />
             <Info icon={<ShieldCheck className="h-4 w-4" />} label="Marks" value={assessment.totalMarks || 0} />
-            <Info icon={<Clock3 className="h-4 w-4" />} label="Duration" value="Untimed" />
+            <Info icon={<Clock3 className="h-4 w-4" />} label="Duration" value={`${assessment.duration || 90} min`} />
             <Info icon={<CalendarClock className="h-4 w-4" />} label="Wrong" value={`-${Number(assessment.negativeMarksPerQuestion || 0.25).toFixed(2)}`} />
           </div>
 

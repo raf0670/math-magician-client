@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { AlertTriangle, BookOpen, CheckCircle, LockKeyhole, XCircle } from "lucide-react";
 import AnalyticalScorecard from "@/components/dashboard/AnalyticalScorecard";
+import ClassAccessGate from "@/components/dashboard/ClassAccessGate";
 import ExamEngine from "@/components/dashboard/ExamEngine";
 import FlashyLoader from "@/components/shared/FlashyLoader";
 import FormattedText from "@/components/shared/FormattedText";
@@ -17,7 +18,7 @@ function getStatus(exam) {
   const startsAt = new Date(exam?.startTime).getTime();
   const endsAt = new Date(exam?.endTime).getTime();
 
-  if (Number.isNaN(startsAt) || Number.isNaN(endsAt)) return "open";
+  if (Number.isNaN(startsAt) || Number.isNaN(endsAt)) return "upcoming";
   if (now < startsAt) return "upcoming";
   if (now <= endsAt) return "open";
   return "ended";
@@ -47,7 +48,11 @@ function getCorrectOptionIndex(question) {
 }
 
 export default function AssessmentExamPage() {
-  return <AssessmentExamContent />;
+  return (
+    <ClassAccessGate section="assessmentTest" presentation="screen">
+      <AssessmentExamContent />
+    </ClassAccessGate>
+  );
 }
 
 function AssessmentExamContent() {

@@ -71,7 +71,7 @@ export default function DashboardSidebar() {
         { href: "/dashboard/classes", label: "Live Classes", icon: Video },
         { href: "/dashboard/archived-classes", label: "Archived Classes", icon: Archive },
         SHOW_STUDENT_LIVE_EXAMS_NAV ? { href: "/dashboard/live-exams", label: "Live Exams", icon: Radio } : null,
-        // { href: "/dashboard/assessment-test", label: "Assessment Test", icon: FileQuestion },
+        { href: "/dashboard/assessment-test", label: "Assessment Test", icon: FileQuestion },
         { href: "/dashboard/mock-tests", label: "Practice", icon: ClipboardCheck },
         { href: "/dashboard/quiz", label: "Quiz", icon: Brain },
         { href: "/dashboard/analytics", label: "Analytics", icon: BarChart3 },
