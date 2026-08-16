@@ -36,6 +36,22 @@ function formatDateTime(value) {
   }).format(date);
 }
 
+function formatCountdown(targetTime) {
+  const target = new Date(targetTime).getTime();
+  if (Number.isNaN(target)) return "";
+
+  const totalSeconds = Math.max(0, Math.floor((target - Date.now()) / 1000));
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+
+  if (hours > 0) {
+    return `${hours}h ${minutes.toString().padStart(2, "0")}m ${seconds.toString().padStart(2, "0")}s`;
+  }
+
+  return `${minutes.toString().padStart(2, "0")}m ${seconds.toString().padStart(2, "0")}s`;
+}
+
 function getOptionList(options) {
   if (Array.isArray(options)) return options;
   return OPTION_LABELS.map((label) => options?.[label]).filter(Boolean);
@@ -46,6 +62,60 @@ function getCorrectOptionIndex(question) {
   const optionList = getOptionList(question?.options);
   const correctAnswer = question?.correctAnswer || question?.correct_answer || "";
   return optionList.findIndex((option) => option?.toString().trim().toLowerCase() === correctAnswer.toString().trim().toLowerCase());
+}
+
+function PendingLiveExamResults({ receipt, examData }) {
+  const unlockTime = receipt?.resultsAvailableAt || examData?.endTime;
+  const [remainingLabel, setRemainingLabel] = useState(() => formatCountdown(unlockTime));
+
+  useEffect(() => {
+    const timerId = window.setInterval(() => {
+      setRemainingLabel(formatCountdown(unlockTime));
+    }, 1000);
+
+    return () => window.clearInterval(timerId);
+  }, [unlockTime]);
+
+  return (
+    <div className="flex min-h-screen w-full items-center justify-center px-4 py-6 sm:px-6 lg:px-10">
+      <div className="w-full max-w-2xl rounded-3xl border border-emerald-400/15 bg-[#121017] p-6 text-center shadow-lg shadow-black/20 sm:p-8">
+        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-3xl border border-emerald-400/20 bg-emerald-400/10">
+          <CheckCircle className="h-9 w-9 text-emerald-300" />
+        </div>
+        <p className="mt-5 text-xs font-bold uppercase tracking-[0.3em] text-[#DFB15B]">Answer Sheet Submitted</p>
+        <h1 className="mt-3 font-serif text-3xl font-medium text-white">Results unlock after the deadline</h1>
+        <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-[#8E8A9F]">
+          Your submission has been recorded. Scores, rankings, correct answers, and explanations will become available after {formatDateTime(unlockTime)}.
+        </p>
+
+        <div className="mt-6 grid gap-3 sm:grid-cols-2">
+          <div className="rounded-2xl border border-white/5 bg-[#0F0D15] px-4 py-4 text-left">
+            <span className="text-[10px] font-bold uppercase tracking-widest text-[#6B667B]">Submitted</span>
+            <span className="mt-1 block text-sm font-bold text-white">{formatDateTime(receipt?.submittedAt)}</span>
+          </div>
+          <div className="rounded-2xl border border-[#DFB15B]/12 bg-[#DFB15B]/5 px-4 py-4 text-left">
+            <span className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[#DFB15B]">
+              <CalendarClock className="h-3.5 w-3.5" /> Unlocks In
+            </span>
+            <span className="mt-1 block text-sm font-bold text-white">{remainingLabel || "After deadline"}</span>
+          </div>
+        </div>
+
+        {receipt?.submissionReason === "tab_switch" ? (
+          <div className="mt-5 rounded-2xl border border-red-400/20 bg-red-500/10 px-4 py-3 text-sm font-semibold text-red-100">
+            This exam auto-submitted because the exam tab was hidden.
+          </div>
+        ) : null}
+
+        <Link
+          href="/dashboard/live-exams"
+          className="mt-6 inline-flex items-center justify-center rounded-2xl bg-[#DFB15B] px-5 py-3 text-sm font-bold uppercase tracking-wider text-black transition hover:brightness-110"
+        >
+          Return to Live Exams
+        </Link>
+      </div>
+    </div>
+  );
 }
 
 export default function LiveExamArenaPage() {
@@ -66,6 +136,7 @@ function LiveExamArenaContent() {
   const [fatalError, setFatalError] = useState(null);
   const [submissionError, setSubmissionError] = useState("");
   const [submissionResult, setSubmissionResult] = useState(null);
+  const [submissionReceipt, setSubmissionReceipt] = useState(null);
   const [userSelections, setUserSelections] = useState([]);
 
   useEffect(() => {
@@ -78,6 +149,7 @@ function LiveExamArenaContent() {
       setFatalError(null);
       setSubmissionError("");
       setSubmissionResult(null);
+      setSubmissionReceipt(null);
       setUserSelections([]);
       setExamData(null);
 
@@ -89,7 +161,17 @@ function LiveExamArenaContent() {
 
       try {
         const payload = await getExamById(examId);
-        if (isMounted) setExamData(payload?.data || null);
+        if (isMounted) {
+          const nextExamData = payload?.data || null;
+          setExamData(nextExamData);
+
+          if (nextExamData?.submissionResult) {
+            setSubmissionResult(nextExamData.submissionResult);
+            setUserSelections(Array.isArray(nextExamData.submissionResult.answers) ? nextExamData.submissionResult.answers : []);
+          } else if (nextExamData?.submissionReceipt) {
+            setSubmissionReceipt(nextExamData.submissionReceipt);
+          }
+        }
       } catch (err) {
         if (!isMounted) return;
         if (err.status === 403) {
@@ -115,9 +197,16 @@ function LiveExamArenaContent() {
   const handleEvaluationTrigger = async (finalAnswers, examPayload, metadata = {}) => {
     try {
       const payload = await submitExam(examId, finalAnswers, metadata);
-      setUserSelections(Array.isArray(payload?.answers) ? payload.answers : finalAnswers);
       setExamData(examPayload);
-      setSubmissionResult(payload);
+      if (payload?.resultsAvailable === false) {
+        setSubmissionReceipt(payload);
+        setSubmissionResult(null);
+        setUserSelections([]);
+      } else {
+        setUserSelections(Array.isArray(payload?.answers) ? payload.answers : finalAnswers);
+        setSubmissionResult(payload);
+        setSubmissionReceipt(null);
+      }
       setSubmissionError("");
       return payload;
     } catch (err) {
@@ -163,6 +252,10 @@ function LiveExamArenaContent() {
         message={blockedMessage}
       />
     );
+  }
+
+  if (submissionReceipt) {
+    return <PendingLiveExamResults receipt={submissionReceipt} examData={examData} />;
   }
 
   if (submissionResult) {
