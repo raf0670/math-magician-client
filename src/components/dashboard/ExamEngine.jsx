@@ -125,16 +125,7 @@ export default function ExamEngine({ examData, onComplete }) {
     const examTitle = getStudentFacingExamTitle(examData?.title);
     const hasTimedExam = remainingSeconds !== null;
     const liveExamEndTimestamp = useMemo(() => getLiveExamEndTimestamp(examData), [examData]);
-    const startedAfterDeadlineRef = useRef(null);
     const answerStorageKey = examData?._id ? `exam_archive_answers_${examData._id}` : "";
-
-    if (startedAfterDeadlineRef.current === null) {
-        startedAfterDeadlineRef.current = Boolean(
-            examData?.allowLateSubmissions
-            && liveExamEndTimestamp !== null
-            && remainingSeconds === 0
-        );
-    }
 
     useEffect(() => {
         if (!answerStorageKey || !normalizedQuestions.length || hasHydratedAnswersRef.current) return;
@@ -226,7 +217,6 @@ export default function ExamEngine({ examData, onComplete }) {
 
     useEffect(() => {
         if (!hasTimedExam || autoSubmitAttemptedRef.current) return undefined;
-        if (startedAfterDeadlineRef.current) return undefined;
 
         if (liveExamEndTimestamp !== null) {
             const delay = Math.max(0, liveExamEndTimestamp - Date.now());

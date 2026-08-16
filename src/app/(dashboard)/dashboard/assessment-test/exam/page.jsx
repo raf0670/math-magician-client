@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { AlertTriangle, BookOpen, CheckCircle, LockKeyhole, XCircle } from "lucide-react";
 import AnalyticalScorecard from "@/components/dashboard/AnalyticalScorecard";
 import ClassAccessGate from "@/components/dashboard/ClassAccessGate";
@@ -56,6 +57,7 @@ export default function AssessmentExamPage() {
 }
 
 function AssessmentExamContent() {
+  const router = useRouter();
   const [examData, setExamData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [blockedMessage, setBlockedMessage] = useState("");
@@ -112,6 +114,7 @@ function AssessmentExamContent() {
       setExamData(examPayload);
       setSubmissionResult(payload);
       setSubmissionError("");
+      router.replace("/dashboard/assessment-test");
       return payload;
     } catch (err) {
       setSubmissionError(err.message || "We could not submit your answers right now. Please check your connection and try again.");
@@ -178,6 +181,17 @@ function AssessmentExamContent() {
 
   if (isPreview || (status === "ended" && examData?.hasSubmitted)) {
     return <ReadOnlyAssessmentReview examData={examData} isPreview={isPreview} />;
+  }
+
+  if (status === "ended") {
+    return (
+      <AssessmentMessage
+        icon={<XCircle className="h-10 w-10 text-red-300" />}
+        eyebrow="Closed"
+        title="Assessment submissions are closed"
+        message="This assessment deadline has passed, so late submissions are no longer accepted."
+      />
+    );
   }
 
   return (

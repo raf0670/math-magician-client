@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { AlertTriangle, BookOpen, CalendarClock, CheckCircle, LockKeyhole, XCircle } from "lucide-react";
 import AnalyticalScorecard from "@/components/dashboard/AnalyticalScorecard";
 import ClassAccessGate from "@/components/dashboard/ClassAccessGate";
@@ -128,6 +128,7 @@ export default function LiveExamArenaPage() {
 
 function LiveExamArenaContent() {
   const params = useParams();
+  const router = useRouter();
   const examId = params?.id;
   const [examData, setExamData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -208,6 +209,7 @@ function LiveExamArenaContent() {
         setSubmissionReceipt(null);
       }
       setSubmissionError("");
+      router.replace("/dashboard/live-exams");
       return payload;
     } catch (err) {
       setSubmissionError(err.message || "We could not submit your answers right now. Please check your connection and try again.");
