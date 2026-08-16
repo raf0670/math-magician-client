@@ -41,15 +41,24 @@ function getStudentFacingExamTitle(title, fallback = "Live Mock Test") {
 }
 
 function getInitialRemainingSeconds(examData) {
-    if (examData?.isLiveExam && examData?.endTime) {
-        const endTime = new Date(examData.endTime).getTime();
-        if (!Number.isNaN(endTime)) {
-            return Math.max(0, Math.floor((endTime - Date.now()) / 1000));
-        }
+    const liveExamEndTimestamp = getLiveExamEndTimestamp(examData);
+    if (liveExamEndTimestamp !== null) {
+        return getRemainingSecondsUntil(liveExamEndTimestamp);
     }
 
     const duration = Number(examData?.duration);
     return Number.isFinite(duration) && duration > 0 ? Math.floor(duration * 60) : null;
+}
+
+function getLiveExamEndTimestamp(examData) {
+    if (!examData?.isLiveExam || !examData?.endTime) return null;
+
+    const endTime = new Date(examData.endTime).getTime();
+    return Number.isNaN(endTime) ? null : endTime;
+}
+
+function getRemainingSecondsUntil(timestamp) {
+    return Math.max(0, Math.ceil((timestamp - Date.now()) / 1000));
 }
 
 function formatRemainingTime(totalSeconds) {
@@ -115,7 +124,17 @@ export default function ExamEngine({ examData, onComplete }) {
     const skippedCount = normalizedQuestions.length - answeredCount;
     const examTitle = getStudentFacingExamTitle(examData?.title);
     const hasTimedExam = remainingSeconds !== null;
+    const liveExamEndTimestamp = useMemo(() => getLiveExamEndTimestamp(examData), [examData]);
+    const startedAfterDeadlineRef = useRef(null);
     const answerStorageKey = examData?._id ? `exam_archive_answers_${examData._id}` : "";
+
+    if (startedAfterDeadlineRef.current === null) {
+        startedAfterDeadlineRef.current = Boolean(
+            examData?.allowLateSubmissions
+            && liveExamEndTimestamp !== null
+            && remainingSeconds === 0
+        );
+    }
 
     useEffect(() => {
         if (!answerStorageKey || !normalizedQuestions.length || hasHydratedAnswersRef.current) return;
@@ -191,6 +210,11 @@ export default function ExamEngine({ examData, onComplete }) {
         if (!hasTimedExam) return undefined;
 
         const timerId = window.setInterval(() => {
+            if (liveExamEndTimestamp !== null) {
+                setRemainingSeconds(getRemainingSecondsUntil(liveExamEndTimestamp));
+                return;
+            }
+
             setRemainingSeconds((currentSeconds) => {
                 if (currentSeconds === null || currentSeconds <= 0) return currentSeconds;
                 return currentSeconds - 1;
@@ -198,10 +222,25 @@ export default function ExamEngine({ examData, onComplete }) {
         }, 1000);
 
         return () => window.clearInterval(timerId);
-    }, [hasTimedExam]);
+    }, [hasTimedExam, liveExamEndTimestamp]);
 
     useEffect(() => {
-        if (!hasTimedExam || remainingSeconds !== 0 || autoSubmitAttemptedRef.current) return undefined;
+        if (!hasTimedExam || autoSubmitAttemptedRef.current) return undefined;
+        if (startedAfterDeadlineRef.current) return undefined;
+
+        if (liveExamEndTimestamp !== null) {
+            const delay = Math.max(0, liveExamEndTimestamp - Date.now());
+            const deadlineTimer = window.setTimeout(() => {
+                if (autoSubmitAttemptedRef.current) return;
+                autoSubmitAttemptedRef.current = true;
+                setRemainingSeconds(0);
+                handleSubmit(SUBMISSION_REASONS.TIMER_EXPIRED);
+            }, delay);
+
+            return () => window.clearTimeout(deadlineTimer);
+        }
+
+        if (remainingSeconds !== 0) return undefined;
 
         autoSubmitAttemptedRef.current = true;
         const submitTimer = window.setTimeout(() => {
@@ -209,7 +248,7 @@ export default function ExamEngine({ examData, onComplete }) {
         }, 0);
 
         return () => window.clearTimeout(submitTimer);
-    }, [handleSubmit, hasTimedExam, remainingSeconds]);
+    }, [handleSubmit, hasTimedExam, liveExamEndTimestamp, remainingSeconds]);
 
     useEffect(() => {
         const handleVisibilityChange = () => {

@@ -176,7 +176,7 @@ function AssessmentExamContent() {
     );
   }
 
-  if (isPreview || status === "ended") {
+  if (isPreview || (status === "ended" && examData?.hasSubmitted)) {
     return <ReadOnlyAssessmentReview examData={examData} isPreview={isPreview} />;
   }
 
