@@ -10,6 +10,7 @@ import FlashyLoader, { LoadingButtonLabel } from "@/components/shared/FlashyLoad
 
 const PLANS = {
   offline: { title: "Gryffindor", amount: 18000, deliveryMode: "offline" },
+  gryffindor2: { title: "Gryffindor 2.0", amount: 18000, deliveryMode: "offline" },
   premium: { title: "Ravenclaw", amount: 17500, deliveryMode: "online" },
   online: { title: "Hufflepuff", amount: 18000, deliveryMode: "offline" },
 };

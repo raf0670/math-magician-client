@@ -40,9 +40,12 @@ const PAYMENT_METHOD_STYLES = {
 
 const PLAN_DISPLAY_NAMES = {
   offline: "Gryffindor",
+  gryffindor2: "Gryffindor 2.0",
   premium: "Ravenclaw",
   online: "Hufflepuff",
   "IBA Offline Batch - Farmgate": "Gryffindor",
+  "Farmgate - Gryffindor 2.0": "Gryffindor 2.0",
+  "Gryffindor 2.0": "Gryffindor 2.0",
   "IBA Online Batch": "Ravenclaw",
   "IBA Offline Batch - Bailey Road": "Hufflepuff",
   "Farmgate - Gryffindor": "Gryffindor",
@@ -55,12 +58,14 @@ const PLAN_DISPLAY_NAMES = {
 
 const BATCH_DISPLAY_NAMES = {
   Farmgate: "Gryffindor",
+  "Farmgate - Gryffindor 2.0": "Gryffindor 2.0",
   "Bailey Road": "Hufflepuff",
   Online: "Ravenclaw",
   "Farmgate - Gryffindor": "Gryffindor",
   "Bailey Road - Hufflepuff": "Hufflepuff",
   "Online - Ravenclaw": "Ravenclaw",
   Gryffindor: "Gryffindor",
+  "Gryffindor 2.0": "Gryffindor 2.0",
   Hufflepuff: "Hufflepuff",
   Ravenclaw: "Ravenclaw",
 };

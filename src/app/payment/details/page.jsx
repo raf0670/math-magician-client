@@ -10,6 +10,7 @@ import FlashyLoader, { LoadingButtonLabel } from "@/components/shared/FlashyLoad
 
 const PLANS = {
   offline: { title: "Gryffindor", amount: 18000, deliveryMode: "offline" },
+  gryffindor2: { title: "Gryffindor 2.0", amount: 18000, deliveryMode: "offline" },
   premium: { title: "Ravenclaw", amount: 17500, deliveryMode: "online" },
   online: { title: "Hufflepuff", amount: 18000, deliveryMode: "offline" },
 };
@@ -18,12 +19,21 @@ const PARTIAL_PAYMENT_AMOUNT = 10000;
 
 const BATCH_PLAN_IDS = {
   Farmgate: "offline",
+  "Farmgate - Gryffindor 2.0": "gryffindor2",
   "Bailey Road": "online",
   Online: "premium",
 };
 
+const PLAN_DEFAULT_BATCH = {
+  offline: "Farmgate",
+  gryffindor2: "Farmgate - Gryffindor 2.0",
+  online: "Bailey Road",
+  premium: "Online",
+};
+
 const BATCH_OPTIONS = [
   { label: "Gryffindor", value: "Farmgate" },
+  { label: "Gryffindor 2.0", value: "Farmgate - Gryffindor 2.0" },
   { label: "Hufflepuff", value: "Bailey Road" },
   { label: "Ravenclaw", value: "Online" },
 ];
@@ -205,6 +215,7 @@ function PaymentDetailsContent() {
         email: current.email || user?.email || "",
         emailAddress: current.emailAddress || user?.email || "",
         yourName: current.yourName || user?.name || "",
+        preferredBatch: current.preferredBatch || PLAN_DEFAULT_BATCH[planId] || "",
       }));
     }, 0);
 

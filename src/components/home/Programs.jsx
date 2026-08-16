@@ -82,6 +82,39 @@ export default function ProgramsAndTestimonials() {
             buttonStyle: "bg-white/5 hover:bg-white/10 text-white border border-white/10"
         },
         {
+            id: "gryffindor2",
+            badge: "Offline - Farmgate",
+            title: "Gryffindor 2.0",
+            desc: "An offline batch taken at our Farmgate center, built for face-to-face mentorship and real-time exam simulations.",
+            imageSrc: "/gryffindor.jpeg",
+            imageAlt: "Gryffindor house crest",
+            location: {
+                text: "RH Home Center, Farmgate",
+                href: "https://maps.app.goo.gl/G6Qhf3stvisrsjXr6?g_st=ac"
+            },
+            schedule: {
+                days: "Saturday, Monday, Wednesday",
+                time: "2:00 - 4:00 pm"
+            },
+            features: [
+                "24+ Interactive Physical Lectures",
+                "Weekly Specialized Topic Tests",
+                "15+ Realistic Full Mock Exams",
+                "Direct 1-on-1 Doubt Solving"
+            ],
+            price: "BDT 18,000",
+            period: "/ full program",
+            borderClass: "border-[#F97316]/18 hover:border-[#F97316]/35",
+            bgClass: "bg-[#121017]",
+            badgeStyle: "bg-white/5 border-white/10 text-white/80",
+            iconStyle: "bg-white/5 text-white/80 border-[#F97316]/25",
+            accentGlowClass: "bg-[#F97316]/16",
+            accentLineClass: "from-transparent via-[#F97316]/45 to-transparent",
+            sparkleClass: "text-[#F97316]/45",
+            crestFrameClass: "shadow-[0_0_34px_rgba(249,115,22,0.18)]",
+            buttonStyle: "bg-white/5 hover:bg-white/10 text-white border border-white/10"
+        },
+        {
             id: "premium",
             badge: "Online Batch",
             title: "Ravenclaw",

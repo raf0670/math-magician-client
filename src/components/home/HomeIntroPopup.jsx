@@ -20,7 +20,17 @@ const programs = [
     badge: "Offline - Farmgate",
     title: "Gryffindor",
     detail: "Offline at RH Home Center, Farmgate",
-    schedule: "1:30 - 3:30 pm",
+    schedule: "Sunday, Tuesday, Thursday - 1:30 - 3:30 pm",
+    price: "BDT 18,000",
+    imageSrc: "/gryffindor.jpeg",
+    imageAlt: "Gryffindor house crest",
+  },
+  {
+    id: "gryffindor2",
+    badge: "Offline - Farmgate",
+    title: "Gryffindor 2.0",
+    detail: "Offline at RH Home Center, Farmgate",
+    schedule: "Saturday, Monday, Wednesday - 2:00 - 4:00 pm",
     price: "BDT 18,000",
     imageSrc: "/gryffindor.jpeg",
     imageAlt: "Gryffindor house crest",
@@ -30,7 +40,7 @@ const programs = [
     badge: "Online Batch",
     title: "Ravenclaw",
     detail: "Online live class from your study room",
-    schedule: "7:30 - 9:30 pm",
+    schedule: "Sunday, Tuesday, Thursday - 7:30 - 9:30 pm",
     price: "BDT 17,500",
     imageSrc: "/ravenclaw.jpeg",
     imageAlt: "Ravenclaw house crest",
@@ -41,7 +51,7 @@ const programs = [
     badge: "Offline - Bailey Road",
     title: "Hufflepuff",
     detail: "Offline at Siddheswari Road, Bailey Road",
-    schedule: "4:00 - 6:00 pm",
+    schedule: "Sunday, Tuesday, Thursday - 4:00 - 6:00 pm",
     price: "BDT 18,000",
     imageSrc: "/hufflepuff.jpeg",
     imageAlt: "Hufflepuff house crest",
@@ -298,7 +308,7 @@ export default function HomeIntroPopup() {
               </button>
             </div>
 
-            <div className="relative z-10 mt-8 grid grid-cols-1 gap-3 sm:mt-9 lg:grid-cols-3">
+            <div className="relative z-10 mt-8 grid grid-cols-1 gap-3 sm:mt-9 md:grid-cols-2 xl:grid-cols-4">
               {programs.map((program, index) => (
                 <motion.button
                   type="button"
