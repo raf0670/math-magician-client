@@ -5,7 +5,7 @@ import FormattedText from "@/components/shared/FormattedText";
 import { formatSubjectLabel } from "@/lib/rank";
 
 const OPTION_LABELS = ["A", "B", "C", "D", "E"];
-const SUBJECT_ORDER = ["English", "Maths", "Analytical"];
+const SUBJECT_ORDER = ["Maths", "English", "Analytical"];
 
 function getOptionList(options) {
     if (Array.isArray(options)) return options;

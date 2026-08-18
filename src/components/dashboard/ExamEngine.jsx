@@ -10,7 +10,7 @@ const SUBMISSION_REASONS = {
     TIMER_EXPIRED: "timer_expired",
     TAB_SWITCH: "tab_switch",
 };
-const SUBJECT_NAV_ORDER = ["English", "Maths", "Analytical"];
+const SUBJECT_NAV_ORDER = ["Maths", "English", "Analytical"];
 
 function getQuestionId(question, index) {
     const rawId = question?._id?.$oid || question?._id || question?.id;
