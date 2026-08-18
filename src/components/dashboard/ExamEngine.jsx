@@ -294,42 +294,42 @@ export default function ExamEngine({ examData, onComplete }) {
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-12">
-                <div className="flex flex-col gap-5 rounded-3xl border border-white/5 bg-[#121017] p-4 shadow-lg shadow-black/10 sm:p-6 lg:col-span-8">
-                    <div className="rounded-2xl border border-white/5 bg-[#1A1722]/55 p-3">
-                        <div className="mb-3 flex items-center justify-between gap-3">
-                            <span className="text-[10px] font-bold uppercase tracking-widest text-[#6B667B]">Question numbers</span>
-                            <span className="text-[10px] font-bold uppercase tracking-widest text-[#DFB15B]">
-                                {answeredCount}/{normalizedQuestions.length} answered
-                            </span>
+            <div className="rounded-3xl border border-white/5 bg-[#121017] p-4 shadow-lg shadow-black/10 sm:p-6">
+                <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-[#6B667B]">Question numbers</span>
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-[#DFB15B]">
+                        {answeredCount} answered / {skippedCount} skipped
+                    </span>
+                </div>
+                <div className="flex gap-3 overflow-x-auto pb-1">
+                    {questionGroups.map((group) => (
+                        <div key={group.subjectLabel} className="flex min-w-42 flex-1 flex-col gap-2">
+                            <div className="flex h-9 items-center justify-center rounded-xl border border-white/5 bg-[#1A1722]/70 px-4 text-sm font-black text-white">
+                                {group.subjectLabel}
+                            </div>
+                            <div className="grid grid-cols-3 gap-1.5">
+                                {group.questions.map(({ question, index }) => {
+                                    const isAnswered = answers[question.id] !== undefined;
+                                    const isCurrent = index === currentIndex;
+                                    return (
+                                        <button
+                                            key={question.id}
+                                            disabled={isSubmitting}
+                                            onClick={() => setCurrentIndex(index)}
+                                            className={`flex h-8 min-w-0 items-center justify-center rounded-lg border px-2 text-xs font-black transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${isCurrent ? "border-[#DFB15B] bg-[#DFB15B] text-black shadow-md shadow-[#DFB15B]/10" : isAnswered ? "border-emerald-400/20 bg-emerald-400/10 text-emerald-300" : "border-white/5 bg-[#1A1722] text-[#8E8A9F] hover:border-white/15 hover:text-white"}`}
+                                        >
+                                            {question.displayQuestionNo}
+                                        </button>
+                                    );
+                                })}
+                            </div>
                         </div>
-                        <div className="flex gap-3 overflow-x-auto pb-1">
-                            {questionGroups.map((group) => (
-                                <div key={group.subjectLabel} className="flex min-w-[10.5rem] flex-col gap-2">
-                                    <div className="flex h-9 items-center justify-center rounded-xl border border-white/5 bg-[#121017] px-4 text-sm font-black text-white">
-                                        {group.subjectLabel}
-                                    </div>
-                                    <div className="grid grid-cols-3 gap-1.5">
-                                        {group.questions.map(({ question, index }) => {
-                                            const isAnswered = answers[question.id] !== undefined;
-                                            const isCurrent = index === currentIndex;
-                                            return (
-                                                <button
-                                                    key={question.id}
-                                                    disabled={isSubmitting}
-                                                    onClick={() => setCurrentIndex(index)}
-                                                    className={`flex h-8 min-w-0 items-center justify-center rounded-lg border px-2 text-xs font-black transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${isCurrent ? "border-[#DFB15B] bg-[#DFB15B] text-black shadow-md shadow-[#DFB15B]/10" : isAnswered ? "border-emerald-400/20 bg-emerald-400/10 text-emerald-300" : "border-white/5 bg-[#121017] text-[#8E8A9F] hover:border-white/15 hover:text-white"}`}
-                                                >
-                                                    {question.displayQuestionNo}
-                                                </button>
-                                            );
-                                        })}
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
+                    ))}
+                </div>
+            </div>
 
+            <div className="flex flex-col gap-5 rounded-3xl border border-white/5 bg-[#121017] p-4 shadow-lg shadow-black/10 sm:p-6">
+                <div className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(22rem,0.9fr)]">
                     <div className="rounded-2xl border border-white/5 bg-[#17141F] p-5 sm:p-7">
                         <div className="flex flex-wrap items-center justify-between gap-3">
                             <span className="rounded-lg border border-indigo-500/20 bg-indigo-500/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-indigo-300">
@@ -345,8 +345,19 @@ export default function ExamEngine({ examData, onComplete }) {
                             value={currentQuestion.questionText}
                             className="mt-5 text-base font-semibold leading-relaxed tracking-wide text-white sm:text-lg"
                         />
+                    </div>
 
-                        <div className="mt-6 flex flex-col gap-3">
+                    <div className="rounded-2xl border border-white/5 bg-[#17141F] p-5 sm:p-7">
+                        <div className="flex min-h-8 flex-wrap items-center justify-between gap-3">
+                            <span className="text-[10px] font-bold uppercase tracking-widest text-[#6B667B]">Answer options</span>
+                            {answers[currentQuestion.id] !== undefined && (
+                                <button disabled={isSubmitting} onClick={handleClearSelection} className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-red-400 hover:underline disabled:cursor-not-allowed disabled:opacity-50">
+                                    <Eraser className="h-3.5 w-3.5" /> Clear
+                                </button>
+                            )}
+                        </div>
+
+                        <div className="mt-5 flex flex-col gap-3">
                             {Object.entries(currentQuestion.options).map(([key, value]) => {
                                 const optionIndex = OPTION_LABELS.indexOf(key);
                                 const isSelected = answers[currentQuestion.id] === optionIndex;
@@ -370,56 +381,23 @@ export default function ExamEngine({ examData, onComplete }) {
                             })}
                         </div>
                     </div>
-
-                    <div className="flex items-center justify-between rounded-2xl border border-white/5 bg-[#1A1722]/45 p-3">
-                        <button
-                            disabled={currentIndex === 0 || isSubmitting}
-                            onClick={() => setCurrentIndex((prev) => prev - 1)}
-                            className="flex items-center gap-1 rounded-xl border border-white/5 bg-[#121017] px-3 py-2 text-xs font-bold uppercase tracking-wide text-[#8E8A9F] transition-colors hover:text-white disabled:cursor-not-allowed disabled:opacity-20"
-                        >
-                            <ChevronLeft className="h-4 w-4" /> Prev
-                        </button>
-                        <button
-                            disabled={currentIndex === normalizedQuestions.length - 1 || isSubmitting}
-                            onClick={() => setCurrentIndex((prev) => prev + 1)}
-                            className="flex items-center gap-1 rounded-xl border border-white/5 bg-[#121017] px-3 py-2 text-xs font-bold uppercase tracking-wide text-[#8E8A9F] transition-colors hover:text-white disabled:cursor-not-allowed disabled:opacity-20"
-                        >
-                            Next <ChevronRight className="h-4 w-4" />
-                        </button>
-                    </div>
                 </div>
 
-                <div className="flex flex-col gap-5 rounded-3xl border border-white/5 bg-[#121017] p-5 shadow-lg shadow-black/10 sm:p-6 lg:col-span-4">
-                    <div className="grid grid-cols-2 gap-3">
-                        <div className="rounded-2xl border border-emerald-500/10 bg-emerald-500/5 p-4">
-                            <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-300">Answered</span>
-                            <span className="mt-1 block text-2xl font-bold text-white">{answeredCount}</span>
-                        </div>
-                        <div className="rounded-2xl border border-white/5 bg-[#1A1722]/60 p-4">
-                            <span className="text-[10px] font-bold uppercase tracking-widest text-[#8E8A9F]">Skipped</span>
-                            <span className="mt-1 block text-2xl font-bold text-white">{skippedCount}</span>
-                        </div>
-                    </div>
-
-                    <div className="flex items-center justify-between border-b border-white/5 pb-3">
-                        <span className="text-xs font-bold uppercase tracking-wider text-[#8E8A9F]">Current answer</span>
-                        {answers[currentQuestion.id] !== undefined && (
-                            <button disabled={isSubmitting} onClick={handleClearSelection} className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-red-400 hover:underline disabled:cursor-not-allowed disabled:opacity-50">
-                                <Eraser className="h-3.5 w-3.5" /> Clear
-                            </button>
-                        )}
-                    </div>
-
-                    <div className="rounded-2xl border border-[#DFB15B]/10 bg-[#DFB15B]/5 p-4">
-                        <span className="text-[10px] font-bold uppercase tracking-widest text-[#DFB15B]">Marked option</span>
-                        <span className="mt-2 block text-sm font-bold text-white">
-                            {answers[currentQuestion.id] === undefined ? "No option selected" : `Option ${OPTION_LABELS[answers[currentQuestion.id]]}`}
-                        </span>
-                        <p className="mt-2 text-[11px] font-medium leading-relaxed text-[#8E8A9F]">
-                            Skip has no penalty. Only an incorrect marked option subtracts marks.
-                        </p>
-                    </div>
-
+                <div className="flex items-center justify-between rounded-2xl border border-white/5 bg-[#1A1722]/45 p-3">
+                    <button
+                        disabled={currentIndex === 0 || isSubmitting}
+                        onClick={() => setCurrentIndex((prev) => prev - 1)}
+                        className="flex items-center gap-1 rounded-xl border border-white/5 bg-[#121017] px-3 py-2 text-xs font-bold uppercase tracking-wide text-[#8E8A9F] transition-colors hover:text-white disabled:cursor-not-allowed disabled:opacity-20"
+                    >
+                        <ChevronLeft className="h-4 w-4" /> Prev
+                    </button>
+                    <button
+                        disabled={currentIndex === normalizedQuestions.length - 1 || isSubmitting}
+                        onClick={() => setCurrentIndex((prev) => prev + 1)}
+                        className="flex items-center gap-1 rounded-xl border border-white/5 bg-[#121017] px-3 py-2 text-xs font-bold uppercase tracking-wide text-[#8E8A9F] transition-colors hover:text-white disabled:cursor-not-allowed disabled:opacity-20"
+                    >
+                        Next <ChevronRight className="h-4 w-4" />
+                    </button>
                 </div>
             </div>
         </div>

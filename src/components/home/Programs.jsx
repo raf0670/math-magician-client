@@ -386,7 +386,7 @@ export default function ProgramsAndTestimonials() {
                             >
                                 <div className={`pointer-events-none absolute -right-16 -top-16 h-44 w-44 rounded-full ${card.accentGlowClass} blur-3xl opacity-[0.55] transition-opacity duration-500 group-hover:opacity-90`} />
                                 <div className={`pointer-events-none absolute inset-x-8 top-0 h-px bg-linear-to-r ${card.accentLineClass} opacity-70`} />
-                                <div className="pointer-events-none absolute inset-0 bg-linear-to-br from-white/[0.055] via-transparent to-white/[0.025] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+                                <div className="pointer-events-none absolute inset-0 bg-linear-to-br from-white/5.5 via-transparent to-white/2.5 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
                                 <div className="pointer-events-none absolute bottom-6 right-6 h-24 w-24 rounded-full border border-white/5 opacity-[0.08] transition group-hover:scale-110" />
                                 {hasMounted && PROGRAM_ACCENT_MARKS.map((mark) => (
                                     <motion.span
@@ -410,7 +410,7 @@ export default function ProgramsAndTestimonials() {
                                     {/* Title Header Structure */}
                                     <div className="flex items-center gap-4 mb-4">
                                         <div className={`relative w-12 h-12 rounded-2xl flex items-center justify-center overflow-hidden border ${card.iconStyle} ${card.crestFrameClass}`}>
-                                            <div className={`absolute inset-[-10px] ${card.accentGlowClass} blur-xl opacity-[0.55] transition-opacity group-hover:opacity-95`} />
+                                            <div className={`absolute -inset-2.5 ${card.accentGlowClass} blur-xl opacity-[0.55] transition-opacity group-hover:opacity-95`} />
                                             {card.imageSrc ? (
                                                 <Image
                                                     src={card.imageSrc}

@@ -172,7 +172,7 @@ export default function HomeIntroPopup() {
           />
 
           <motion.div
-            className="absolute h-[44rem] w-[44rem] max-w-[120vw] rounded-full border border-[#DFB15B]/10 shadow-[0_0_90px_rgba(223,177,91,0.16),inset_0_0_80px_rgba(223,177,91,0.08)]"
+            className="absolute h-176 w-176 max-w-[120vw] rounded-full border border-[#DFB15B]/10 shadow-[0_0_90px_rgba(223,177,91,0.16),inset_0_0_80px_rgba(223,177,91,0.08)]"
             initial={{ opacity: 0, scale: 0.58, rotate: -14 }}
             animate={{
               opacity: prefersReducedMotion ? 0.35 : [0, 0.5, 0.34],
@@ -184,7 +184,7 @@ export default function HomeIntroPopup() {
           />
 
           <motion.div
-            className="absolute h-[1px] w-[92vw] max-w-5xl bg-linear-to-r from-transparent via-[#E8C56F] to-transparent shadow-[0_0_46px_rgba(232,197,111,0.9)]"
+            className="absolute h-px w-[92vw] max-w-5xl bg-linear-to-r from-transparent via-[#E8C56F] to-transparent shadow-[0_0_46px_rgba(232,197,111,0.9)]"
             initial={{ scaleX: 0, opacity: 0 }}
             animate={{ scaleX: prefersReducedMotion ? 0.82 : [0, 1, 0.72], opacity: prefersReducedMotion ? 0.45 : [0, 1, 0.48] }}
             exit={{ opacity: 0 }}
@@ -200,7 +200,7 @@ export default function HomeIntroPopup() {
               transition={{ duration: prefersReducedMotion ? 0.35 : 1.8, ease: [0.16, 1, 0.3, 1] }}
             >
               <motion.span
-                className="absolute inset-[-12px] rounded-full border border-[#DFB15B]/15"
+                className="absolute -inset-3 rounded-full border border-[#DFB15B]/15"
                 initial={{ opacity: 0, scale: 0.76 }}
                 animate={{ opacity: prefersReducedMotion ? 0.35 : [0, 0.7, 0.18], scale: prefersReducedMotion ? 1 : [0.76, 1.35, 1.62] }}
                 transition={{ delay: prefersReducedMotion ? 0 : 0.4, duration: prefersReducedMotion ? 0.3 : 2.2, ease: "easeOut" }}
