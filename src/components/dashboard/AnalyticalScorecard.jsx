@@ -2,8 +2,10 @@
 import { AlertTriangle, BookOpen, CheckCircle, XCircle } from "lucide-react";
 import Link from "next/link";
 import FormattedText from "@/components/shared/FormattedText";
+import { formatSubjectLabel } from "@/lib/rank";
 
 const OPTION_LABELS = ["A", "B", "C", "D", "E"];
+const SUBJECT_ORDER = ["English", "Maths", "Analytical"];
 
 function getOptionList(options) {
     if (Array.isArray(options)) return options;
@@ -43,6 +45,19 @@ function getEffectivePenalty(value) {
     return Number.isFinite(penalty) && penalty > 0 ? penalty : 0.25;
 }
 
+function sortSubjectBreakdown(left, right) {
+    const leftOrder = SUBJECT_ORDER.indexOf(left.subject);
+    const rightOrder = SUBJECT_ORDER.indexOf(right.subject);
+    const normalizedLeftOrder = leftOrder >= 0 ? leftOrder : SUBJECT_ORDER.length;
+    const normalizedRightOrder = rightOrder >= 0 ? rightOrder : SUBJECT_ORDER.length;
+
+    if (normalizedLeftOrder !== normalizedRightOrder) {
+        return normalizedLeftOrder - normalizedRightOrder;
+    }
+
+    return left.subject.localeCompare(right.subject);
+}
+
 export default function AnalyticalScorecard({ answers, examData, submissionResult, returnHref = "/dashboard/mock-tests", returnLabel = "Return to Practice" }) {
     const normalizedAnswers = Array.isArray(answers) ? answers : [];
     const questions = examData?.questions || [];
@@ -52,23 +67,46 @@ export default function AnalyticalScorecard({ answers, examData, submissionResul
     let correctCount = 0;
     let incorrectCount = 0;
     let skippedCount = 0;
+    const subjectStatsByName = new Map();
 
     questions.forEach((question, index) => {
         const userAnswer = normalizedAnswers[index];
         const correctAnswer = getCorrectOptionIndex(question, submissionResult?.review?.[index]);
+        const subject = formatSubjectLabel(question?.subject);
+        const stats = subjectStatsByName.get(subject) || {
+            subject,
+            score: 0,
+            totalMarks: 0,
+            correct: 0,
+            wrong: 0,
+            skipped: 0,
+            totalQuestions: 0,
+        };
+
+        stats.totalQuestions += 1;
+        stats.totalMarks += marksPerQuestion;
+
         if (userAnswer === undefined || userAnswer === null || userAnswer === -1) {
             skippedCount += 1;
+            stats.skipped += 1;
         } else if (userAnswer === correctAnswer) {
             correctCount += 1;
+            stats.correct += 1;
+            stats.score += marksPerQuestion;
         } else {
             incorrectCount += 1;
+            stats.wrong += 1;
+            stats.score -= penalty;
         }
+
+        subjectStatsByName.set(subject, stats);
     });
 
     const totalPenalty = incorrectCount * penalty;
     const calculatedScore = (correctCount * marksPerQuestion) - totalPenalty;
     const shownScore = Number(submissionResult?.score ?? calculatedScore);
     const maxPossibleScore = Number(examData?.totalMarks || questions.length);
+    const subjectBreakdown = [...subjectStatsByName.values()].sort(sortSubjectBreakdown);
 
     return (
         <div className="flex w-full select-none flex-col gap-8 px-3 text-left sm:px-4 lg:px-6">
@@ -111,6 +149,55 @@ export default function AnalyticalScorecard({ answers, examData, submissionResul
             {submissionResult ? (
                 <div className="rounded-2xl border border-emerald-500/10 bg-emerald-500/5 px-4 py-3 text-sm font-semibold text-emerald-300">
                     Backend submission received. Score: {Number(submissionResult.score).toFixed(2)} / {submissionResult.totalMarks}
+                </div>
+            ) : null}
+
+            {subjectBreakdown.length ? (
+                <div className="flex flex-col gap-4">
+                    <div>
+                        <h2 className="font-serif text-2xl font-medium tracking-wide text-white">Subject Breakdown</h2>
+                        <p className="mt-1 text-xs font-medium text-[#8E8A9F]">
+                            Score, accuracy, and skipped questions grouped by subject.
+                        </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
+                        {subjectBreakdown.map((subject) => (
+                            <div key={subject.subject} className="rounded-3xl border border-white/5 bg-[#121017] p-5 shadow-lg shadow-black/10">
+                                <div className="flex items-start justify-between gap-3">
+                                    <div>
+                                        <span className="text-[10px] font-bold uppercase tracking-widest text-[#DFB15B]">Subject</span>
+                                        <h3 className="mt-1 text-lg font-bold text-white">{subject.subject}</h3>
+                                    </div>
+                                    <span className="rounded-xl border border-white/5 bg-white/5 px-3 py-1.5 text-[10px] font-bold uppercase text-[#8E8A9F]">
+                                        {subject.totalQuestions} Q
+                                    </span>
+                                </div>
+
+                                <div className="mt-5 rounded-2xl border border-[#DFB15B]/12 bg-[#DFB15B]/5 p-4">
+                                    <span className="text-[10px] font-bold uppercase tracking-widest text-[#DFB15B]">Score</span>
+                                    <span className="mt-1 block text-2xl font-bold text-white">
+                                        {subject.score.toFixed(2)} / {subject.totalMarks.toFixed(2)}
+                                    </span>
+                                </div>
+
+                                <div className="mt-4 grid grid-cols-3 gap-2 text-center">
+                                    <div className="rounded-2xl border border-emerald-500/10 bg-emerald-500/5 px-3 py-3">
+                                        <span className="block text-[10px] font-bold uppercase text-emerald-300">Correct</span>
+                                        <span className="mt-1 block text-xl font-bold text-white">{subject.correct}</span>
+                                    </div>
+                                    <div className="rounded-2xl border border-red-500/10 bg-red-500/5 px-3 py-3">
+                                        <span className="block text-[10px] font-bold uppercase text-red-300">Wrong</span>
+                                        <span className="mt-1 block text-xl font-bold text-white">{subject.wrong}</span>
+                                    </div>
+                                    <div className="rounded-2xl border border-white/5 bg-[#1A1722]/70 px-3 py-3">
+                                        <span className="block text-[10px] font-bold uppercase text-[#8E8A9F]">Skipped</span>
+                                        <span className="mt-1 block text-xl font-bold text-white">{subject.skipped}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
                 </div>
             ) : null}
 
