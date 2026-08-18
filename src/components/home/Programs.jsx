@@ -48,6 +48,7 @@ export default function ProgramsAndTestimonials() {
 
     // --- Programs Data ---
     const cardsData = [
+        /*
         {
             id: "offline",
             badge: "Offline - Farmgate",
@@ -81,6 +82,7 @@ export default function ProgramsAndTestimonials() {
             crestFrameClass: "shadow-[0_0_34px_rgba(249,115,22,0.18)]",
             buttonStyle: "bg-white/5 hover:bg-white/10 text-white border border-white/10"
         },
+        */
         {
             id: "gryffindor2",
             badge: "Offline - Farmgate",

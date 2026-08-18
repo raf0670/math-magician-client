@@ -15,6 +15,7 @@ const cinzelDecorative = Cinzel_Decorative({
 });
 
 const programs = [
+  /*
   {
     id: "farmgate",
     badge: "Offline - Farmgate",
@@ -25,6 +26,7 @@ const programs = [
     imageSrc: "/gryffindor.jpeg",
     imageAlt: "Gryffindor house crest",
   },
+  */
   {
     id: "gryffindor2",
     badge: "Offline - Farmgate",
@@ -308,7 +310,7 @@ export default function HomeIntroPopup() {
               </button>
             </div>
 
-            <div className="relative z-10 mt-8 grid grid-cols-1 gap-3 sm:mt-9 md:grid-cols-2 xl:grid-cols-4">
+            <div className="relative z-10 mx-auto mt-8 grid max-w-4xl grid-cols-1 gap-3 sm:mt-9 md:grid-cols-3">
               {programs.map((program, index) => (
                 <motion.button
                   type="button"
