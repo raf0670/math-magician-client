@@ -37,6 +37,7 @@ const EMPTY_SCHEDULE = {
   competitionCategory: "daily",
   startTime: "",
   endTime: "",
+  passingMarks: "",
 };
 
 function formatSubmissionReason(value) {
@@ -243,6 +244,7 @@ export default function AdminLiveExamsPage() {
       competitionCategory: exam.competitionCategory || "daily",
       startTime: toDateTimeInputValue(exam.startTime),
       endTime: toDateTimeInputValue(exam.endTime),
+      passingMarks: Number.isFinite(Number(exam.passingMarks)) ? Number(exam.passingMarks).toString() : "",
     });
     setQuestions(exam.questions?.length ? exam.questions.map(getQuestionFromApi) : [makeQuestion()]);
     setSuccess("");
@@ -255,6 +257,7 @@ export default function AdminLiveExamsPage() {
     competitionCategory: schedule.competitionCategory,
     startTime: toApiDate(schedule.startTime),
     endTime: toApiDate(schedule.endTime),
+    passingMarks: schedule.passingMarks,
     questions: questions.map((question) => ({
       subject: question.subject,
       topic: "",
@@ -363,11 +366,19 @@ export default function AdminLiveExamsPage() {
         </div>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-          <div className="grid gap-4 lg:grid-cols-4">
+          <div className="grid gap-4 lg:grid-cols-5">
             <TextField label="Exam title" required value={schedule.title} onChange={(value) => updateSchedule("title", value)} placeholder="Example: Live Exam 01" icon={<FileQuestion className="h-4 w-4" />} />
             <SelectField label="Competition type" value={schedule.competitionCategory} onChange={(value) => updateSchedule("competitionCategory", value)} options={COMPETITION_CATEGORIES} />
             <TextField label="Start time" required type="datetime-local" value={schedule.startTime} onChange={(value) => updateSchedule("startTime", value)} icon={<CalendarClock className="h-4 w-4" />} />
             <TextField label="End time" required type="datetime-local" value={schedule.endTime} onChange={(value) => updateSchedule("endTime", value)} icon={<Clock3 className="h-4 w-4" />} />
+            <TextField
+              label="Passing marks"
+              type="number"
+              value={schedule.passingMarks}
+              onChange={(value) => updateSchedule("passingMarks", value)}
+              placeholder={`Default ${Math.floor(questions.length * 0.4)}`}
+              inputProps={{ min: 0, max: questions.length, step: 1 }}
+            />
           </div>
 
           <div className="flex flex-col gap-4">
@@ -461,6 +472,9 @@ export default function AdminLiveExamsPage() {
                     </p>
                     <p className="mt-2 text-sm font-semibold text-[#DFB15B]">
                       {(exam.competitionCategory || "daily").toUpperCase()} - {exam.questionCount || exam.questions?.length || 0} question{(exam.questionCount || exam.questions?.length || 0) === 1 ? "" : "s"} / {exam.totalMarks || 0} marks
+                    </p>
+                    <p className="mt-1 text-xs font-semibold text-[#8E8A9F]">
+                      Passing marks: {Number.isFinite(Number(exam.passingMarks)) ? Number(exam.passingMarks) : Math.floor(Number(exam.totalMarks || 0) * 0.4)}
                     </p>
                   </div>
 
@@ -689,7 +703,7 @@ function QuestionEditor({ question, index, canRemove, onChange, onOptionChange, 
   );
 }
 
-function TextField({ label, value, onChange, type = "text", placeholder = "", required = false, icon = <Save className="h-4 w-4" /> }) {
+function TextField({ label, value, onChange, type = "text", placeholder = "", required = false, icon = <Save className="h-4 w-4" />, inputProps = {} }) {
   return (
     <label className="block rounded-2xl border border-white/5 bg-[#0F0D15] px-4 py-3">
       <span className="flex items-center gap-2 text-sm font-semibold text-white">
@@ -702,6 +716,7 @@ function TextField({ label, value, onChange, type = "text", placeholder = "", re
         value={value}
         onChange={(event) => onChange(event.target.value)}
         placeholder={placeholder}
+        {...inputProps}
         className="mt-3 w-full border-0 border-b border-white/15 bg-transparent px-0 py-2 text-sm text-white outline-none transition placeholder:text-[#6B667B] focus:border-[#DFB15B]/50"
       />
     </label>

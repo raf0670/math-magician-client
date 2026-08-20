@@ -107,17 +107,35 @@ export default function AnalyticalScorecard({ answers, examData, submissionResul
     const shownScore = Number(submissionResult?.score ?? calculatedScore);
     const maxPossibleScore = Number(examData?.totalMarks || questions.length);
     const subjectBreakdown = [...subjectStatsByName.values()].sort(sortSubjectBreakdown);
+    const isOfficialLiveExam = Boolean(examData?.isLiveExam && (!examData.examType || examData.examType === "official"));
+    const hasPassStatus = isOfficialLiveExam && typeof submissionResult?.isPassed === "boolean" && Number.isFinite(Number(submissionResult?.passingMarks));
+    const passStatusClass = submissionResult?.isPassed
+        ? "border-emerald-400/20 bg-emerald-400/10 text-emerald-200"
+        : "border-red-400/20 bg-red-500/10 text-red-200";
 
     return (
         <div className="flex w-full select-none flex-col gap-8 px-3 text-left sm:px-4 lg:px-6">
             <div className="rounded-3xl border border-white/5 bg-[#121017] p-5 shadow-lg shadow-black/10 sm:p-7">
                 <div className="grid grid-cols-1 gap-4 lg:grid-cols-[260px_minmax(0,1fr)]">
                     <div className="flex flex-col justify-center rounded-2xl border border-[#DFB15B]/15 bg-[#DFB15B]/5 p-6">
-                        <span className="text-[10px] font-bold uppercase tracking-widest text-[#DFB15B]">Final Score</span>
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                            <span className="text-[10px] font-bold uppercase tracking-widest text-[#DFB15B]">Final Score</span>
+                            {hasPassStatus ? (
+                                <span className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider ${passStatusClass}`}>
+                                    {submissionResult.isPassed ? <CheckCircle className="h-3.5 w-3.5" /> : <XCircle className="h-3.5 w-3.5" />}
+                                    {submissionResult.isPassed ? "Passed" : "Failed"}
+                                </span>
+                            ) : null}
+                        </div>
                         <span className="mt-2 bg-linear-to-r from-emerald-300 to-teal-300 bg-clip-text font-serif text-5xl font-bold text-transparent">
                             {shownScore.toFixed(2)}
                         </span>
                         <span className="mt-1 text-xs font-semibold text-[#8E8A9F]">out of {maxPossibleScore.toFixed(2)}</span>
+                        {hasPassStatus ? (
+                            <span className="mt-2 text-xs font-semibold text-[#DFB15B]">
+                                Passing marks: {Number(submissionResult.passingMarks).toFixed(0)}
+                            </span>
+                        ) : null}
                     </div>
 
                     <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
