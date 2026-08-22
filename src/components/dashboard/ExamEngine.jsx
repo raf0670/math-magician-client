@@ -88,6 +88,7 @@ export default function ExamEngine({ examData, onComplete }) {
                 questionNo: question.question_no || question.questionNo || index + 1,
                 displayQuestionNo: index + 1,
                 questionText: question.questionText || question.question || "",
+                instruction: question.instruction || "",
                 options: getOptionMap(question.options),
                 subject: question.subject || "General",
                 topic: question.topic || question.chapter || "",
@@ -342,8 +343,14 @@ export default function ExamEngine({ examData, onComplete }) {
 
                         <FormattedText
                             as="p"
+                            value={currentQuestion.instruction}
+                            className={currentQuestion.instruction ? "mt-5 text-xs font-semibold leading-relaxed text-[#A9A3BA]" : "hidden"}
+                        />
+
+                        <FormattedText
+                            as="p"
                             value={currentQuestion.questionText}
-                            className="mt-5 text-base font-semibold leading-relaxed tracking-wide text-white sm:text-lg"
+                            className={`${currentQuestion.instruction ? "mt-3" : "mt-5"} text-base font-semibold leading-relaxed tracking-wide text-white sm:text-lg`}
                         />
                     </div>
 

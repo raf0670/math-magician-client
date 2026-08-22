@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { LayoutDashboard, Video, ClipboardCheck, BarChart3, User, LogOut, ShieldCheck, Brain, Archive, Radio, FileQuestion, Trophy, Sparkles } from "lucide-react";
+import { LayoutDashboard, Video, ClipboardCheck, BarChart3, User, LogOut, ShieldCheck, Brain, Archive, Radio, FileQuestion, Trophy, Sparkles, ClipboardList } from "lucide-react";
 import { clearAuthSession, getProfile, getStoredUser, saveAuthSession } from "@/lib/api";
 import BrandMark from "@/components/shared/BrandMark";
 import { getDefaultRankInfo, getRankInfo, getRankProgressPercent, getRankTone } from "@/lib/rank";
@@ -15,6 +15,7 @@ const NAV_ACCENTS = {
     "/dashboard/classes": "from-emerald-400/20 via-teal-400/8 to-transparent",
     "/dashboard/archived-classes": "from-cyan-300/18 via-sky-400/8 to-transparent",
     "/dashboard/live-exams": "from-red-400/20 via-rose-400/8 to-transparent",
+    "/dashboard/assignments": "from-amber-300/20 via-emerald-400/8 to-transparent",
     "/dashboard/assessment-test": "from-emerald-400/18 via-[#DFB15B]/10 to-transparent",
     "/dashboard/mock-tests": "from-[#7C3AED]/22 via-[#A78BFA]/9 to-transparent",
     "/dashboard/quiz": "from-fuchsia-400/18 via-[#7C3AED]/9 to-transparent",
@@ -23,6 +24,7 @@ const NAV_ACCENTS = {
     "/dashboard/admin/enrollments": "from-emerald-400/20 via-[#DFB15B]/8 to-transparent",
     "/dashboard/admin/classes": "from-cyan-300/18 via-[#7C3AED]/8 to-transparent",
     "/dashboard/admin/live-exams": "from-red-400/20 via-[#DFB15B]/8 to-transparent",
+    "/dashboard/admin/assignments": "from-amber-300/20 via-[#DFB15B]/8 to-transparent",
     "/dashboard/profile": "from-[#DFB15B]/22 via-[#7C3AED]/10 to-transparent",
 };
 
@@ -71,6 +73,7 @@ export default function DashboardSidebar() {
         { href: "/dashboard/classes", label: "Live Classes", icon: Video },
         { href: "/dashboard/archived-classes", label: "Archived Classes", icon: Archive },
         SHOW_STUDENT_LIVE_EXAMS_NAV ? { href: "/dashboard/live-exams", label: "Live Exams", icon: Radio } : null,
+        { href: "/dashboard/assignments", label: "Assignments", icon: ClipboardList },
         { href: "/dashboard/assessment-test", label: "Assessment Test", icon: FileQuestion },
         { href: "/dashboard/mock-tests", label: "Practice", icon: ClipboardCheck },
         { href: "/dashboard/quiz", label: "Quiz", icon: Brain },
@@ -79,6 +82,7 @@ export default function DashboardSidebar() {
         currentUser?.role === "admin" ? { href: "/dashboard/admin/enrollments", label: "Enrollments", icon: ShieldCheck } : null,
         currentUser?.role === "admin" ? { href: "/dashboard/admin/classes", label: "Class Admin", icon: Video } : null,
         currentUser?.role === "admin" ? { href: "/dashboard/admin/live-exams", label: "Live Exam Admin", icon: FileQuestion } : null,
+        currentUser?.role === "admin" ? { href: "/dashboard/admin/assignments", label: "Assignment Admin", icon: ClipboardList } : null,
         { href: "/dashboard/profile", label: "Profile", icon: User },
     ].filter(Boolean);
 

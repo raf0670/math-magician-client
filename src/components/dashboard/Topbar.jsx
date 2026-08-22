@@ -11,6 +11,7 @@ const SECTION_TITLES = {
     "/dashboard/classes": "Live Classes",
     "/dashboard/archived-classes": "Archived Classes",
     "/dashboard/live-exams": "Live Exams",
+    "/dashboard/assignments": "Assignments",
     "/dashboard/assessment-test": "Assessment Test",
     "/dashboard/mock-tests": "Practice",
     "/dashboard/quiz": "Quiz",
@@ -20,6 +21,7 @@ const SECTION_TITLES = {
     "/dashboard/admin/enrollments": "Enrollments",
     "/dashboard/admin/classes": "Class Admin",
     "/dashboard/admin/live-exams": "Live Exam Admin",
+    "/dashboard/admin/assignments": "Assignment Admin",
 };
 
 export default function DashboardTopbar() {

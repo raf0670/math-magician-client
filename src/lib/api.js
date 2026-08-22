@@ -311,8 +311,16 @@ export async function getLiveExams() {
   return request("/api/exams/live");
 }
 
+export async function getAssignments() {
+  return request("/api/exams/assignments");
+}
+
 export async function getAdminLiveExams() {
   return request("/api/exams/live/admin");
+}
+
+export async function getAdminAssignments() {
+  return request("/api/exams/assignments/admin");
 }
 
 export async function createAdminLiveExam(payload) {
@@ -322,8 +330,22 @@ export async function createAdminLiveExam(payload) {
   });
 }
 
+export async function createAdminAssignment(payload) {
+  return request("/api/exams/assignments/admin", {
+    method: "POST",
+    body: payload,
+  });
+}
+
 export async function updateAdminLiveExam(examId, payload) {
   return request(`/api/exams/live/admin/${examId}`, {
+    method: "PATCH",
+    body: payload,
+  });
+}
+
+export async function updateAdminAssignment(examId, payload) {
+  return request(`/api/exams/assignments/admin/${examId}`, {
     method: "PATCH",
     body: payload,
   });
@@ -361,6 +383,10 @@ export async function getCompetitionSummary() {
 
 export async function getAdminLiveExamSubmissions(examId) {
   return request(`/api/analytics/admin/live-exams/${examId}/submissions`);
+}
+
+export async function getAdminAssignmentSubmissions(examId) {
+  return request(`/api/analytics/admin/assignments/${examId}/submissions`);
 }
 
 export async function getAssessmentTest() {
