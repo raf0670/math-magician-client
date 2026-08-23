@@ -54,7 +54,7 @@ function BookedCheckoutContent() {
   const router = useRouter();
   const [booking, setBooking] = useState(null);
   const [loadingBooking, setLoadingBooking] = useState(true);
-  const [paymentChoice, setPaymentChoice] = useState("full");
+  const [paymentChoice, setPaymentChoice] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("bkash");
   const [referenceName, setReferenceName] = useState("");
   const [referenceEmail, setReferenceEmail] = useState("");
@@ -89,8 +89,9 @@ function BookedCheckoutContent() {
     return PLANS[booking?.planId] || { title: booking?.planTitle || "Booked program", amount: 0 };
   }, [booking]);
 
-  const amountDueNow = paymentChoice === "partial" ? PARTIAL_PAYMENT_AMOUNT : selectedPlan.amount || 0;
+  const amountDueNow = paymentChoice === "partial" ? PARTIAL_PAYMENT_AMOUNT : paymentChoice === "full" ? selectedPlan.amount || 0 : 0;
   const remainingAmount = Math.max((selectedPlan.amount || 0) - amountDueNow, 0);
+  const hasPaymentChoice = Boolean(paymentChoice);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -98,6 +99,11 @@ function BookedCheckoutContent() {
 
     if (referenceEmail.trim() && !isBasicEmail(referenceEmail)) {
       setError("Please enter a valid reference email address.");
+      return;
+    }
+
+    if (!paymentChoice) {
+      setError("Please choose full or partial payment before continuing.");
       return;
     }
 
@@ -224,8 +230,9 @@ function BookedCheckoutContent() {
                     <div className="flex items-center gap-3 rounded-2xl border border-[#DFB15B]/15 bg-[#DFB15B]/8 px-4 py-4 text-sm text-[#EBD39B]">
                       <CreditCard className="h-5 w-5 shrink-0 text-[#DFB15B]" />
                       <span className="font-medium">
-                        {selectedPlan.title} - pay {formatBDT(amountDueNow)} now
-                        {remainingAmount ? `, ${formatBDT(remainingAmount)} later` : ""}
+                        {hasPaymentChoice
+                          ? `${selectedPlan.title} - pay ${formatBDT(amountDueNow)} now${remainingAmount ? `, ${formatBDT(remainingAmount)} later` : ""}`
+                          : "Choose a payment option to see the amount due now."}
                       </span>
                     </div>
                     <ReferenceField

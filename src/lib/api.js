@@ -229,7 +229,7 @@ export async function getCourses() {
   return request("/api/courses");
 }
 
-export async function submitManualEnrollment(planId, formData, paymentChoice = "full", paymentMethod = "bkash") {
+export async function submitManualEnrollment(planId, formData, paymentChoice, paymentMethod = "bkash") {
   return request("/api/payments/manual-enrollment", {
     method: "POST",
     body: { planId, formData, paymentChoice, paymentMethod },

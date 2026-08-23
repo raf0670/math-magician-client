@@ -189,13 +189,13 @@ function PaymentDetailsContent() {
   const isBookingMode = searchParams.get("mode") === "book";
   const plan = PLANS[planId];
   const [form, setForm] = useState(INITIAL_FORM);
-  const [paymentChoice, setPaymentChoice] = useState("full");
+  const [paymentChoice, setPaymentChoice] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("bkash");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const selectedPlanId = BATCH_PLAN_IDS[form.preferredBatch] || planId;
   const selectedPlan = PLANS[selectedPlanId] || plan;
-  const amountDueNow = paymentChoice === "partial" ? PARTIAL_PAYMENT_AMOUNT : selectedPlan?.amount || 0;
+  const amountDueNow = paymentChoice === "partial" ? PARTIAL_PAYMENT_AMOUNT : paymentChoice === "full" ? selectedPlan?.amount || 0 : 0;
   const remainingAmount = Math.max((selectedPlan?.amount || 0) - amountDueNow, 0);
 
   useEffect(() => {
@@ -273,6 +273,11 @@ function PaymentDetailsContent() {
 
     if (form.referenceEmail.trim() && !isBasicEmail(form.referenceEmail)) {
       setError("Please enter a valid reference email address.");
+      return;
+    }
+
+    if (!isBookingMode && !paymentChoice) {
+      setError("Please choose full or partial payment before continuing.");
       return;
     }
 
@@ -624,7 +629,8 @@ function PaymentDetailsSection({
   trxError,
   onChange,
 }) {
-  const amountDueNow = paymentChoice === "partial" ? PARTIAL_PAYMENT_AMOUNT : selectedPlan?.amount || 0;
+  const hasPaymentChoice = Boolean(paymentChoice);
+  const amountDueNow = paymentChoice === "partial" ? PARTIAL_PAYMENT_AMOUNT : paymentChoice === "full" ? selectedPlan?.amount || 0 : 0;
   const remainingAmount = Math.max((selectedPlan?.amount || 0) - amountDueNow, 0);
 
   return (
@@ -696,8 +702,9 @@ function PaymentDetailsSection({
             <div className="flex items-center gap-3 rounded-2xl border border-[#DFB15B]/15 bg-[#DFB15B]/8 px-4 py-4 text-sm text-[#EBD39B]">
               <CreditCard className="h-5 w-5 shrink-0 text-[#DFB15B]" />
               <span className="font-medium">
-                {selectedPlan?.title || "Selected program"} - pay {formatBDT(amountDueNow)} now
-                {remainingAmount ? `, ${formatBDT(remainingAmount)} later` : ""}
+                {hasPaymentChoice
+                  ? `${selectedPlan?.title || "Selected program"} - pay ${formatBDT(amountDueNow)} now${remainingAmount ? `, ${formatBDT(remainingAmount)} later` : ""}`
+                  : "Choose a payment option to see the amount due now."}
               </span>
             </div>
             <TextField
@@ -772,11 +779,6 @@ function PaymentChoiceField({ selectedPlan, value, onChange }) {
               }`}>
                 {checked ? <Check className="h-4 w-4" /> : <CreditCard className="h-4 w-4" />}
               </span>
-              {option.id === "full" ? (
-                <span className="rounded-full border border-[#DFB15B]/30 bg-[#DFB15B]/12 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-[#DFB15B]">
-                  Preferable
-                </span>
-              ) : null}
             </span>
             <span className="mt-4 text-sm font-bold text-white">{option.title}</span>
             <span className="mt-2 font-serif text-2xl font-semibold text-white">{formatBDT(option.amount)}</span>

@@ -170,7 +170,7 @@ function AssignmentsContent() {
 
                 <div className="mt-5 grid grid-cols-2 gap-3 border-y border-white/5 py-4">
                   <Info label="Questions" value={assignment.questionCount || 0} />
-                  <Info label="Rank" value="+2 / 0 / -2" />
+                  <Info label="Rank" value="+2 / 0 / -5" />
                 </div>
 
                 <div className="mt-auto pt-5">
