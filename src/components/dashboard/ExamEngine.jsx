@@ -125,6 +125,7 @@ export default function ExamEngine({ examData, onComplete }) {
     const skippedCount = normalizedQuestions.length - answeredCount;
     const examTitle = getStudentFacingExamTitle(examData?.title);
     const hasTimedExam = remainingSeconds !== null;
+    const isAssignmentExam = examData?.examType === "assignment";
     const liveExamEndTimestamp = useMemo(() => getLiveExamEndTimestamp(examData), [examData]);
     const answerStorageKey = examData?._id ? `exam_archive_answers_${examData._id}` : "";
 
@@ -242,6 +243,8 @@ export default function ExamEngine({ examData, onComplete }) {
     }, [handleSubmit, hasTimedExam, liveExamEndTimestamp, remainingSeconds]);
 
     useEffect(() => {
+        if (isAssignmentExam) return undefined;
+
         const handleVisibilityChange = () => {
             if (
                 document.visibilityState !== "hidden"
@@ -258,7 +261,7 @@ export default function ExamEngine({ examData, onComplete }) {
 
         document.addEventListener("visibilitychange", handleVisibilityChange);
         return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
-    }, [handleSubmit, normalizedQuestions.length]);
+    }, [handleSubmit, isAssignmentExam, normalizedQuestions.length]);
 
     if (!currentQuestion) {
         return <p className="text-sm text-[#8E8A9F]">Preparing the exam...</p>;

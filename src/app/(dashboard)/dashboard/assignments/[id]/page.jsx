@@ -101,12 +101,6 @@ function PendingAssignmentResults({ receipt, examData }) {
           </div>
         </div>
 
-        {receipt?.submissionReason === "tab_switch" ? (
-          <div className="mt-5 rounded-2xl border border-red-400/20 bg-red-500/10 px-4 py-3 text-sm font-semibold text-red-100">
-            This assignment auto-submitted because the exam tab was hidden.
-          </div>
-        ) : null}
-
         <Link
           href="/dashboard/assignments"
           className="mt-6 inline-flex items-center justify-center rounded-2xl bg-[#DFB15B] px-5 py-3 text-sm font-bold uppercase tracking-wider text-black transition hover:brightness-110"
@@ -270,12 +264,6 @@ function AssignmentArenaContent() {
               Your assignment has been submitted and scored by the backend.
             </p>
           </div>
-
-          {submissionResult?.submissionReason === "tab_switch" ? (
-            <div className="rounded-2xl border border-red-400/20 bg-red-500/10 px-4 py-3 text-sm font-semibold text-red-100">
-              This assignment auto-submitted because the exam tab was hidden.
-            </div>
-          ) : null}
 
           <AnalyticalScorecard
             answers={userSelections}
