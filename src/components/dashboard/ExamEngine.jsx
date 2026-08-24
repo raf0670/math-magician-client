@@ -41,20 +41,31 @@ function getStudentFacingExamTitle(title, fallback = "Live Mock Test") {
 }
 
 function getInitialRemainingSeconds(examData) {
-    const liveExamEndTimestamp = getLiveExamEndTimestamp(examData);
-    if (liveExamEndTimestamp !== null) {
-        return getRemainingSecondsUntil(liveExamEndTimestamp);
+    const attemptDeadlineTimestamp = getExamAttemptDeadlineTimestamp(examData);
+    if (attemptDeadlineTimestamp !== null) {
+        return getRemainingSecondsUntil(attemptDeadlineTimestamp);
     }
 
     const duration = Number(examData?.duration);
     return Number.isFinite(duration) && duration > 0 ? Math.floor(duration * 60) : null;
 }
 
-function getLiveExamEndTimestamp(examData) {
+function getLiveExamHardEndTimestamp(examData) {
     if (!examData?.isLiveExam || !examData?.endTime) return null;
 
     const endTime = new Date(examData.endTime).getTime();
     return Number.isNaN(endTime) ? null : endTime;
+}
+
+function getExamAttemptDeadlineTimestamp(examData) {
+    const hardEndTimestamp = getLiveExamHardEndTimestamp(examData);
+    if (hardEndTimestamp === null) return null;
+    if (examData?.examType === "assignment") return hardEndTimestamp;
+
+    const duration = Number(examData?.duration);
+    if (!Number.isFinite(duration) || duration <= 0) return hardEndTimestamp;
+
+    return Math.min(Date.now() + Math.floor(duration * 60 * 1000), hardEndTimestamp);
 }
 
 function getRemainingSecondsUntil(timestamp) {
@@ -71,6 +82,7 @@ function formatRemainingTime(totalSeconds) {
 export default function ExamEngine({ examData, onComplete }) {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [answers, setAnswers] = useState({});
+    const [attemptDeadlineTimestamp] = useState(() => getExamAttemptDeadlineTimestamp(examData));
     const [remainingSeconds, setRemainingSeconds] = useState(() => getInitialRemainingSeconds(examData));
     const [isSubmitting, setIsSubmitting] = useState(false);
     const submissionStartedRef = useRef(false);
@@ -126,7 +138,6 @@ export default function ExamEngine({ examData, onComplete }) {
     const examTitle = getStudentFacingExamTitle(examData?.title);
     const hasTimedExam = remainingSeconds !== null;
     const isAssignmentExam = examData?.examType === "assignment";
-    const liveExamEndTimestamp = useMemo(() => getLiveExamEndTimestamp(examData), [examData]);
     const answerStorageKey = examData?._id ? `exam_archive_answers_${examData._id}` : "";
 
     useEffect(() => {
@@ -203,8 +214,8 @@ export default function ExamEngine({ examData, onComplete }) {
         if (!hasTimedExam) return undefined;
 
         const timerId = window.setInterval(() => {
-            if (liveExamEndTimestamp !== null) {
-                setRemainingSeconds(getRemainingSecondsUntil(liveExamEndTimestamp));
+            if (attemptDeadlineTimestamp !== null) {
+                setRemainingSeconds(getRemainingSecondsUntil(attemptDeadlineTimestamp));
                 return;
             }
 
@@ -215,13 +226,13 @@ export default function ExamEngine({ examData, onComplete }) {
         }, 1000);
 
         return () => window.clearInterval(timerId);
-    }, [hasTimedExam, liveExamEndTimestamp]);
+    }, [attemptDeadlineTimestamp, hasTimedExam]);
 
     useEffect(() => {
         if (!hasTimedExam || autoSubmitAttemptedRef.current) return undefined;
 
-        if (liveExamEndTimestamp !== null) {
-            const delay = Math.max(0, liveExamEndTimestamp - Date.now());
+        if (attemptDeadlineTimestamp !== null) {
+            const delay = Math.max(0, attemptDeadlineTimestamp - Date.now());
             const deadlineTimer = window.setTimeout(() => {
                 if (autoSubmitAttemptedRef.current) return;
                 autoSubmitAttemptedRef.current = true;
@@ -240,7 +251,7 @@ export default function ExamEngine({ examData, onComplete }) {
         }, 0);
 
         return () => window.clearTimeout(submitTimer);
-    }, [handleSubmit, hasTimedExam, liveExamEndTimestamp, remainingSeconds]);
+    }, [attemptDeadlineTimestamp, handleSubmit, hasTimedExam, remainingSeconds]);
 
     useEffect(() => {
         if (isAssignmentExam) return undefined;

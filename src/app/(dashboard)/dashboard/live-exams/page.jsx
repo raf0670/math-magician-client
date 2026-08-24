@@ -33,7 +33,7 @@ function getStatus(exam) {
 
   if (Number.isNaN(startsAt) || Number.isNaN(endsAt)) return "scheduled";
   if (now < startsAt) return "upcoming";
-  if (now <= endsAt) return "open";
+  if (now < endsAt) return "open";
   return "ended";
 }
 
