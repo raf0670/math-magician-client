@@ -8,7 +8,7 @@ import { clearAuthSession, getProfile, getStoredUser, saveAuthSession } from "@/
 import BrandMark from "@/components/shared/BrandMark";
 import { getDefaultRankInfo, getRankInfo, getRankProgressPercent, getRankTone } from "@/lib/rank";
 
-const SHOW_STUDENT_LIVE_EXAMS_NAV = true;
+const SHOW_STUDENT_LIVE_EXAMS_NAV = false;
 
 const NAV_ACCENTS = {
     "/dashboard": "from-[#DFB15B]/24 via-[#F6D98B]/10 to-transparent",
