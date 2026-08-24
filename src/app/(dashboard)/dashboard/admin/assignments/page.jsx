@@ -286,7 +286,7 @@ export default function AdminAssignmentsPage() {
           </p>
           <h1 className="mt-2 font-serif text-3xl font-medium tracking-wide text-white">Assignment Publisher</h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-[#8E8A9F]">
-            Paste a strict JSON array of assessment-style questions and publish it for a full Bangladesh calendar day.
+            Paste a strict JSON array of assessment-style questions and publish it for a 24-hour Bangladesh assignment window.
           </p>
         </div>
         <button
@@ -303,7 +303,7 @@ export default function AdminAssignmentsPage() {
         <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h2 className="font-serif text-2xl font-medium text-white">{editingId ? "Edit Assignment" : "Publish Assignment"}</h2>
-            <p className="mt-1 text-sm text-[#8E8A9F]">The selected date runs from 12:00 AM to 11:59 PM Bangladesh time.</p>
+            <p className="mt-1 text-sm text-[#8E8A9F]">The selected date runs from 4:00 PM to 3:59 PM the next day Bangladesh time.</p>
           </div>
           {editingId ? (
             <button

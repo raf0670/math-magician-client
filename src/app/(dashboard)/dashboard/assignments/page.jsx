@@ -100,7 +100,7 @@ function AssignmentsContent() {
           </p>
           <h1 className="mt-2 font-serif text-3xl font-medium tracking-wide text-white">Assignment Room</h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-[#8E8A9F]">
-            Submit assignments during their full-day window, then review solutions after the deadline.
+            Submit assignments from 4:00 PM on the selected date until 3:59 PM the next day, then review solutions after the deadline.
           </p>
         </div>
 
