@@ -6,14 +6,13 @@ import {
   CheckCircle2,
   Clock3,
   Edit3,
+  FileJson,
   FileQuestion,
   Gavel,
-  PlusCircle,
   RefreshCw,
   RotateCcw,
   Save,
   ShieldAlert,
-  Trash2,
   Users,
   X,
 } from "lucide-react";
@@ -29,9 +28,6 @@ import {
 import FlashyLoader, { LoadingButtonLabel } from "@/components/shared/FlashyLoader";
 import { getRankInfo, getRankTone } from "@/lib/rank";
 
-const SUBJECTS = ["Maths", "English", "Analytical"];
-const OPTION_LABELS = ["A", "B", "C", "D", "E"];
-
 const EMPTY_SCHEDULE = {
   title: "",
   competitionCategory: "daily",
@@ -40,6 +36,24 @@ const EMPTY_SCHEDULE = {
   endTime: "",
   passingMarks: "",
 };
+
+const SAMPLE_JSON = JSON.stringify([
+  {
+    subject: "Maths",
+    question_no: 1,
+    instruction: "Solve the math and choose which option is the perfect answer. If there answer is not given in the option then choose E.",
+    question: "Mr. Safwan from Chattogram invested in a life insurance policy. He paid the insurance company an annual premium of Tk. 25 for insurance of every thousand taka. His insurance coverage was Tk. 5,000. Mr. Safwan died after making 30 annual installments. The total sum paid by the insurance company was Tk. 9,200. By how much did the sum paid by the insurance company exceed the total amount of premium that Mr. Safwan had paid to the insurance company?",
+    options: [
+      "A) Tk. 5,450",
+      "B) Tk. 5,200",
+      "C) Tk. 5,750",
+      "D) Tk. 4,950",
+      "E) None of these"
+    ],
+    correct_answer: "A) Tk. 5,450",
+    explanation: "Annual premium = 25 x 5 = Tk. 125. Total premium = 125 x 30 = Tk. 3,750. Excess = 9,200 - 3,750 = Tk. 5,450."
+  }
+], null, 2);
 
 function formatSubmissionReason(value) {
   if (value === "tab_switch") return "Tab switch auto-submit";
@@ -58,20 +72,6 @@ const STATUS_STYLES = {
   ended: "border-white/8 bg-white/5 text-[#8E8A9F]",
   scheduled: "border-[#DFB15B]/25 bg-[#DFB15B]/10 text-[#DFB15B]",
 };
-
-function makeQuestion() {
-  return {
-    id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
-    subject: "Maths",
-    topic: "",
-    subTopic: "",
-    difficulty: "Medium",
-    question: "",
-    options: ["", "", "", "", ""],
-    correctOptionIndex: 0,
-    explanation: "",
-  };
-}
 
 function toDateTimeInputValue(value) {
   if (!value) return "";
@@ -117,27 +117,39 @@ function formatDateTime(value) {
   }).format(date);
 }
 
-function stripOptionLabel(value) {
-  return value?.toString().trim().replace(/^[A-E]\s*[\).:-]\s*/i, "").trim() || "";
+function getQuestionJsonFromApi(questions = []) {
+  return JSON.stringify(
+    questions.map((question, index) => ({
+      subject: question.subject || "Maths",
+      question_no: question.question_no || question.questionNo || index + 1,
+      instruction: question.instruction || "",
+      question: question.questionText || question.question || "",
+      options: Array.isArray(question.options) ? question.options : [],
+      correct_answer: question.correct_answer || question.correctAnswer || "",
+      explanation: question.explanation || "",
+      ...(question.topic ? { topic: question.topic } : {}),
+      ...(question.chapter ? { chapter: question.chapter } : {}),
+      ...(question.subTopic ? { subTopic: question.subTopic } : {}),
+      ...(question.difficulty ? { difficulty: question.difficulty } : {}),
+    })),
+    null,
+    2
+  );
 }
 
-function getQuestionFromApi(question) {
-  const options = Array.isArray(question.options) ? question.options.map(stripOptionLabel) : ["", "", "", "", ""];
-  const paddedOptions = [...options, "", "", "", "", ""].slice(0, 5);
-  const correctAnswer = stripOptionLabel(question.correctAnswer || question.correct_answer || "");
-  const correctOptionIndex = Math.max(0, paddedOptions.findIndex((option) => option.trim().toLowerCase() === correctAnswer.toLowerCase()));
+function parseQuestionJson(value) {
+  if (!value.trim()) return { questions: [], error: "" };
 
-  return {
-    id: question._id || `${Date.now()}-${Math.random().toString(16).slice(2)}`,
-    subject: question.subject || "Maths",
-    topic: question.topic || question.chapter || "",
-    subTopic: question.subTopic || "",
-    difficulty: question.difficulty || "Medium",
-    question: question.questionText || question.question || "",
-    options: paddedOptions,
-    correctOptionIndex,
-    explanation: question.explanation || "",
-  };
+  try {
+    const parsed = JSON.parse(value);
+    if (!Array.isArray(parsed)) {
+      return { questions: [], error: "Question JSON must be an array." };
+    }
+
+    return { questions: parsed, error: "" };
+  } catch (error) {
+    return { questions: [], error: error.message || "Question JSON is invalid." };
+  }
 }
 
 function getLiveStatus(exam) {
@@ -155,7 +167,7 @@ function getLiveStatus(exam) {
 export default function AdminLiveExamsPage() {
   const [items, setItems] = useState([]);
   const [schedule, setSchedule] = useState(EMPTY_SCHEDULE);
-  const [questions, setQuestions] = useState([makeQuestion()]);
+  const [questionJson, setQuestionJson] = useState(SAMPLE_JSON);
   const [editingId, setEditingId] = useState("");
   const [loading, setLoading] = useState(true);
   const [profileLoading, setProfileLoading] = useState(true);
@@ -164,6 +176,7 @@ export default function AdminLiveExamsPage() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
+  const parsed = useMemo(() => parseQuestionJson(questionJson), [questionJson]);
   const sortedItems = useMemo(() => {
     return [...items].sort((a, b) => new Date(b.startTime || 0) - new Date(a.startTime || 0));
   }, [items]);
@@ -221,7 +234,7 @@ export default function AdminLiveExamsPage() {
 
   const resetForm = (clearMessages = true) => {
     setSchedule(EMPTY_SCHEDULE);
-    setQuestions([makeQuestion()]);
+    setQuestionJson(SAMPLE_JSON);
     setEditingId("");
     if (clearMessages) {
       setError("");
@@ -231,29 +244,6 @@ export default function AdminLiveExamsPage() {
 
   const updateSchedule = (field, value) => {
     setSchedule((current) => ({ ...current, [field]: value }));
-  };
-
-  const updateQuestion = (questionId, field, value) => {
-    setQuestions((current) => current.map((question) => (
-      question.id === questionId ? { ...question, [field]: value } : question
-    )));
-  };
-
-  const updateOption = (questionId, optionIndex, value) => {
-    setQuestions((current) => current.map((question) => {
-      if (question.id !== questionId) return question;
-      const nextOptions = [...question.options];
-      nextOptions[optionIndex] = value;
-      return { ...question, options: nextOptions };
-    }));
-  };
-
-  const addQuestion = () => {
-    setQuestions((current) => [...current, makeQuestion()]);
-  };
-
-  const removeQuestion = (questionId) => {
-    setQuestions((current) => current.length === 1 ? current : current.filter((question) => question.id !== questionId));
   };
 
   const startEditing = (exam) => {
@@ -266,7 +256,7 @@ export default function AdminLiveExamsPage() {
       endTime: toDateTimeInputValue(exam.endTime),
       passingMarks: Number.isFinite(Number(exam.passingMarks)) ? Number(exam.passingMarks).toString() : "",
     });
-    setQuestions(exam.questions?.length ? exam.questions.map(getQuestionFromApi) : [makeQuestion()]);
+    setQuestionJson(getQuestionJsonFromApi(exam.questions || []));
     setSuccess("");
     setError("");
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -285,16 +275,7 @@ export default function AdminLiveExamsPage() {
             endTime: toApiDate(schedule.endTime),
           }),
       passingMarks: schedule.passingMarks,
-      questions: questions.map((question) => ({
-      subject: question.subject,
-      topic: "",
-      subTopic: "",
-      difficulty: "Medium",
-      question: question.question,
-      options: question.options,
-      correct_answer: question.options[question.correctOptionIndex] || "",
-      explanation: question.explanation,
-      })),
+      questions: parsed.questions,
     };
   };
 
@@ -302,6 +283,17 @@ export default function AdminLiveExamsPage() {
     event.preventDefault();
     setError("");
     setSuccess("");
+
+    if (parsed.error) {
+      setError(parsed.error);
+      return;
+    }
+
+    if (!parsed.questions.length) {
+      setError("Please paste at least one question object.");
+      return;
+    }
+
     setSaving(true);
 
     try {
@@ -360,9 +352,9 @@ export default function AdminLiveExamsPage() {
       <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div>
           <p className="text-xs font-bold uppercase tracking-[0.3em] text-[#DFB15B]">Live Exam Admin</p>
-          <h1 className="mt-2 font-serif text-3xl font-medium tracking-wide text-white">Live Exam Builder</h1>
+          <h1 className="mt-2 font-serif text-3xl font-medium tracking-wide text-white">Live Exam Publisher</h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-[#8E8A9F]">
-            Schedule one live exam and publish its complete question set for students.
+            Paste a strict JSON array of live exam questions and publish it for the scheduled exam window.
           </p>
         </div>
         <button
@@ -420,38 +412,34 @@ export default function AdminLiveExamsPage() {
               type="number"
               value={schedule.passingMarks}
               onChange={(value) => updateSchedule("passingMarks", value)}
-              placeholder={`Default ${Math.floor(questions.length * 0.4)}`}
-              inputProps={{ min: 0, max: questions.length, step: 1 }}
+              placeholder={`Default ${Math.floor(parsed.questions.length * 0.4)}`}
+              inputProps={{ min: 0, max: parsed.questions.length, step: 1 }}
             />
           </div>
 
-          <div className="flex flex-col gap-4">
-            {questions.map((question, index) => (
-              <QuestionEditor
-                key={question.id}
-                question={question}
-                index={index}
-                canRemove={questions.length > 1}
-                onChange={updateQuestion}
-                onOptionChange={updateOption}
-                onRemove={removeQuestion}
-              />
-            ))}
+          <label className="block rounded-2xl border border-white/5 bg-[#0F0D15] px-4 py-3">
+            <span className="flex items-center gap-2 text-sm font-semibold text-white">
+              <FileJson className="h-4 w-4 text-[#DFB15B]" />
+              Question JSON array
+            </span>
+            <textarea
+              required
+              value={questionJson}
+              onChange={(event) => setQuestionJson(event.target.value)}
+              rows={18}
+              spellCheck={false}
+              className="mt-3 w-full resize-y rounded-2xl border border-white/8 bg-[#0A090F] p-4 font-mono text-xs leading-6 text-white outline-none transition placeholder:text-[#6B667B] focus:border-[#DFB15B]/45"
+            />
+          </label>
+
+          <div className={`rounded-2xl border px-4 py-3 text-sm font-semibold ${parsed.error ? "border-red-500/20 bg-red-500/10 text-red-300" : "border-emerald-400/20 bg-emerald-400/10 text-emerald-200"}`}>
+            {parsed.error ? parsed.error : `${parsed.questions.length} question${parsed.questions.length === 1 ? "" : "s"} parsed from strict JSON.`}
           </div>
 
-          <div className="flex flex-col gap-3 border-t border-white/5 pt-5 sm:flex-row sm:items-center sm:justify-between">
-            <button
-              type="button"
-              onClick={addQuestion}
-              className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/8 bg-[#0F0D15] px-4 py-3 text-sm font-semibold text-white transition hover:border-[#DFB15B]/30 hover:text-[#DFB15B]"
-            >
-              <PlusCircle className="h-4 w-4" />
-              Add Question
-            </button>
-
+          <div className="flex flex-col gap-3 border-t border-white/5 pt-5 sm:flex-row sm:items-center sm:justify-end">
             <button
               type="submit"
-              disabled={saving}
+              disabled={saving || Boolean(parsed.error)}
               className="inline-flex items-center justify-center gap-2 rounded-2xl bg-[#DFB15B] px-5 py-3 text-sm font-bold uppercase tracking-wider text-black transition hover:brightness-110 disabled:cursor-wait disabled:opacity-70"
             >
               <LoadingButtonLabel
@@ -667,83 +655,6 @@ function SubmissionModerationPanel({ examId }) {
         </div>
       ) : null}
     </div>
-  );
-}
-
-function QuestionEditor({ question, index, canRemove, onChange, onOptionChange, onRemove }) {
-  return (
-    <section className="rounded-3xl border border-white/5 bg-[#0F0D15] p-4 sm:p-5">
-      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <h3 className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-white">
-          <FileQuestion className="h-4 w-4 text-[#DFB15B]" />
-          Question #{index + 1}
-        </h3>
-        <button
-          type="button"
-          disabled={!canRemove}
-          onClick={() => onRemove(question.id)}
-          className="inline-flex items-center justify-center gap-2 rounded-2xl border border-red-400/20 bg-red-500/10 px-3 py-2 text-xs font-bold uppercase tracking-wider text-red-200 transition hover:bg-red-500/20 disabled:cursor-not-allowed disabled:opacity-30"
-        >
-          <Trash2 className="h-4 w-4" />
-          Remove
-        </button>
-      </div>
-
-      <div className="grid gap-4 sm:grid-cols-[minmax(220px,320px)]">
-        <SelectField label="Subject" value={question.subject} onChange={(value) => onChange(question.id, "subject", value)} options={SUBJECTS} />
-      </div>
-
-      <label className="mt-4 block rounded-2xl border border-white/5 bg-[#121017] px-4 py-3">
-        <span className="text-sm font-semibold text-white">Question</span>
-        <textarea
-          required
-          value={question.question}
-          onChange={(event) => onChange(question.id, "question", event.target.value)}
-          rows={4}
-          placeholder="Write the full question stem"
-          className="mt-2 w-full resize-none border-0 bg-transparent text-sm text-white outline-none placeholder:text-[#6B667B]"
-        />
-      </label>
-
-      <div className="mt-4 grid gap-3 lg:grid-cols-5">
-        {OPTION_LABELS.map((label, optionIndex) => (
-          <label key={label} className="block rounded-2xl border border-white/5 bg-[#121017] px-4 py-3">
-            <span className="text-sm font-semibold text-white">Option {label}</span>
-            <input
-              required
-              value={question.options[optionIndex] || ""}
-              onChange={(event) => onOptionChange(question.id, optionIndex, event.target.value)}
-              placeholder={`${label}) answer text`}
-              className="mt-3 w-full border-0 border-b border-white/15 bg-transparent px-0 py-2 text-sm text-white outline-none transition placeholder:text-[#6B667B] focus:border-[#DFB15B]/50"
-            />
-          </label>
-        ))}
-      </div>
-
-      <div className="mt-4 grid gap-4 lg:grid-cols-[260px_minmax(0,1fr)]">
-        <SelectField
-          label="Correct answer"
-          value={question.correctOptionIndex.toString()}
-          onChange={(value) => onChange(question.id, "correctOptionIndex", Number(value))}
-          options={OPTION_LABELS.map((label, optionIndex) => ({
-            value: optionIndex.toString(),
-            label: `Option ${label}${question.options[optionIndex] ? ` - ${question.options[optionIndex]}` : ""}`,
-          }))}
-        />
-
-        <label className="block rounded-2xl border border-white/5 bg-[#121017] px-4 py-3">
-          <span className="text-sm font-semibold text-white">Explanation</span>
-          <textarea
-            required
-            value={question.explanation}
-            onChange={(event) => onChange(question.id, "explanation", event.target.value)}
-            rows={3}
-            placeholder="Show the reasoning students should review after the exam."
-            className="mt-2 w-full resize-none border-0 bg-transparent text-sm text-white outline-none placeholder:text-[#6B667B]"
-          />
-        </label>
-      </div>
-    </section>
   );
 }
 
