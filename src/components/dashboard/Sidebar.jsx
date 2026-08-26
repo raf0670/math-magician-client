@@ -71,7 +71,7 @@ export default function DashboardSidebar() {
     const navItems = [
         { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
         { href: "/dashboard/classes", label: "Live Classes", icon: Video },
-        { href: "/dashboard/archived-classes", label: "Archived Classes", icon: Archive },
+        { href: "/dashboard/archived-classes", label: "Recorded Classes", icon: Archive },
         SHOW_STUDENT_LIVE_EXAMS_NAV ? { href: "/dashboard/live-exams", label: "Live Exams", icon: Radio } : null,
         { href: "/dashboard/assignments", label: "Assignments", icon: ClipboardList },
         { href: "/dashboard/assessment-test", label: "Assessment Test", icon: FileQuestion },
