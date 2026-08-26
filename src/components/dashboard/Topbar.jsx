@@ -10,6 +10,7 @@ const SECTION_TITLES = {
     "/dashboard": "Overview",
     "/dashboard/classes": "Live Classes",
     "/dashboard/archived-classes": "Archived Classes",
+    "/dashboard/resources": "Resources",
     "/dashboard/live-exams": "Live Exams",
     "/dashboard/assignments": "Assignments",
     "/dashboard/assessment-test": "Assessment Test",

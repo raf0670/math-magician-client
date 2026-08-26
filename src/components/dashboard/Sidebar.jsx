@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { LayoutDashboard, Video, ClipboardCheck, BarChart3, User, LogOut, ShieldCheck, Brain, Archive, Radio, FileQuestion, Trophy, Sparkles, ClipboardList } from "lucide-react";
+import { LayoutDashboard, Video, ClipboardCheck, BarChart3, User, LogOut, ShieldCheck, Brain, Archive, Radio, FileQuestion, Trophy, Sparkles, ClipboardList, FolderOpen } from "lucide-react";
 import { clearAuthSession, getProfile, getStoredUser, saveAuthSession } from "@/lib/api";
 import BrandMark from "@/components/shared/BrandMark";
 import { getDefaultRankInfo, getRankInfo, getRankProgressPercent, getRankTone } from "@/lib/rank";
@@ -14,6 +14,7 @@ const NAV_ACCENTS = {
     "/dashboard": "from-[#DFB15B]/24 via-[#F6D98B]/10 to-transparent",
     "/dashboard/classes": "from-emerald-400/20 via-teal-400/8 to-transparent",
     "/dashboard/archived-classes": "from-cyan-300/18 via-sky-400/8 to-transparent",
+    "/dashboard/resources": "from-violet-400/18 via-[#DFB15B]/8 to-transparent",
     "/dashboard/live-exams": "from-red-400/20 via-rose-400/8 to-transparent",
     "/dashboard/assignments": "from-amber-300/20 via-emerald-400/8 to-transparent",
     "/dashboard/assessment-test": "from-emerald-400/18 via-[#DFB15B]/10 to-transparent",
@@ -72,6 +73,7 @@ export default function DashboardSidebar() {
         { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
         { href: "/dashboard/classes", label: "Live Classes", icon: Video },
         { href: "/dashboard/archived-classes", label: "Recorded Classes", icon: Archive },
+        { href: "/dashboard/resources", label: "Resources", icon: FolderOpen },
         SHOW_STUDENT_LIVE_EXAMS_NAV ? { href: "/dashboard/live-exams", label: "Live Exams", icon: Radio } : null,
         { href: "/dashboard/assignments", label: "Assignments", icon: ClipboardList },
         { href: "/dashboard/assessment-test", label: "Assessment Test", icon: FileQuestion },
