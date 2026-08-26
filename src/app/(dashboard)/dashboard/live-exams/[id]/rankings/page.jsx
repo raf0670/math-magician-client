@@ -105,14 +105,16 @@ function LiveExamRankingsContent() {
 
   if (loading) {
     return (
-      <FlashyLoader
-        eyebrow="Exam Rankings"
-        title="Loading leaderboard"
-        message="Scores and ranks for this live exam are being fetched."
-        iconName="analytics"
-        skeleton="cards"
-        className="min-h-105"
-      />
+      <RankingsPageShell>
+        <FlashyLoader
+          eyebrow="Exam Rankings"
+          title="Loading leaderboard"
+          message="Scores and ranks for this live exam are being fetched."
+          iconName="analytics"
+          skeleton="cards"
+          className="min-h-105"
+        />
+      </RankingsPageShell>
     );
   }
 
@@ -139,6 +141,7 @@ function LiveExamRankingsContent() {
   }
 
   return (
+    <RankingsPageShell>
     <div className="flex w-full flex-col gap-6 text-left">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div>
@@ -232,6 +235,17 @@ function LiveExamRankingsContent() {
         )}
       </section>
     </div>
+    </RankingsPageShell>
+  );
+}
+
+function RankingsPageShell({ children }) {
+  return (
+    <div className="min-h-screen w-full px-4 py-6 sm:px-6 lg:px-10">
+      <div className="mx-auto w-full max-w-7xl">
+        {children}
+      </div>
+    </div>
   );
 }
 
@@ -249,22 +263,24 @@ function SummaryTile({ label, value, icon: Icon }) {
 
 function RankingsMessage({ icon, eyebrow, title, message }) {
   return (
-    <div className="flex min-h-105 items-center justify-center rounded-3xl border border-white/5 bg-[#121017] px-6 py-12 text-center">
-      <div className="max-w-md">
-        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-3xl border border-white/8 bg-[#0F0D15]">
-          {icon}
+    <RankingsPageShell>
+      <div className="flex min-h-105 items-center justify-center rounded-3xl border border-white/5 bg-[#121017] px-6 py-12 text-center">
+        <div className="max-w-md">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-3xl border border-white/8 bg-[#0F0D15]">
+            {icon}
+          </div>
+          <p className="mt-5 text-xs font-bold uppercase tracking-[0.3em] text-[#DFB15B]">{eyebrow}</p>
+          <h1 className="mt-3 font-serif text-3xl font-medium text-white">{title}</h1>
+          <p className="mt-3 text-sm leading-6 text-[#8E8A9F]">{message}</p>
+          <Link
+            href="/dashboard/live-exams"
+            className="mt-6 inline-flex items-center justify-center gap-2 rounded-2xl bg-[#DFB15B] px-5 py-3 text-sm font-bold uppercase tracking-wider text-black transition hover:brightness-110"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Live Exams
+          </Link>
         </div>
-        <p className="mt-5 text-xs font-bold uppercase tracking-[0.3em] text-[#DFB15B]">{eyebrow}</p>
-        <h1 className="mt-3 font-serif text-3xl font-medium text-white">{title}</h1>
-        <p className="mt-3 text-sm leading-6 text-[#8E8A9F]">{message}</p>
-        <Link
-          href="/dashboard/live-exams"
-          className="mt-6 inline-flex items-center justify-center gap-2 rounded-2xl bg-[#DFB15B] px-5 py-3 text-sm font-bold uppercase tracking-wider text-black transition hover:brightness-110"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Live Exams
-        </Link>
       </div>
-    </div>
+    </RankingsPageShell>
   );
 }
