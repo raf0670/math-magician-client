@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { BarChart3, Crown, Medal, Shield, Sparkles, Target, Trophy, Users, Zap } from "lucide-react";
+import { BarChart3, Crown, Medal, Shield, Sparkles, Target, Trophy, Zap } from "lucide-react";
 import { getCompetitionSummary, getStoredUser } from "@/lib/api";
 import FlashyLoader from "@/components/shared/FlashyLoader";
 import { formatRankPoints, getRankInfo, getRankTone } from "@/lib/rank";
@@ -10,8 +10,67 @@ function formatNumber(value) {
     return Number(value || 0).toFixed(2);
 }
 
+const RANK_BASIS_OPTIONS = [
+    { value: "score", label: "Score", icon: Trophy },
+    { value: "rp", label: "RP", icon: Sparkles },
+];
+
 function getStudentId(value) {
     return value?._id?.toString?.() || value?.id?.toString?.() || value?.studentId?.toString?.() || "";
+}
+
+function getSafeTime(value) {
+    const time = new Date(value || 0).getTime();
+    return Number.isNaN(time) ? 0 : time;
+}
+
+function getEntryRankPoints(entry) {
+    return Number(getRankInfo(entry?.rankInfo).rankPoints || 0);
+}
+
+function sortRankPointEntries(first, second) {
+    const rankPointDelta = getEntryRankPoints(second) - getEntryRankPoints(first);
+    if (rankPointDelta !== 0) return rankPointDelta;
+
+    const totalScoreDelta = Number(second.totalScore || 0) - Number(first.totalScore || 0);
+    if (totalScoreDelta !== 0) return totalScoreDelta;
+
+    const bestScoreDelta = Number(second.bestScore || 0) - Number(first.bestScore || 0);
+    if (bestScoreDelta !== 0) return bestScoreDelta;
+
+    const submittedDelta = getSafeTime(second.lastSubmittedAt) - getSafeTime(first.lastSubmittedAt);
+    if (submittedDelta !== 0) return submittedDelta;
+
+    const nameDelta = (first.name || "").localeCompare(second.name || "");
+    if (nameDelta !== 0) return nameDelta;
+
+    return getStudentId(first).localeCompare(getStudentId(second));
+}
+
+function buildScoreLeaderboard(entries = []) {
+    return entries.map((entry, index) => ({
+        ...entry,
+        basisRank: entry.rank || index + 1,
+    }));
+}
+
+function buildRankPointLeaderboard(entries = []) {
+    let previousRankPoints = null;
+    let previousRank = 0;
+
+    return [...entries]
+        .sort(sortRankPointEntries)
+        .map((entry, index) => {
+            const rankPoints = getEntryRankPoints(entry);
+            const basisRank = previousRankPoints === rankPoints ? previousRank : index + 1;
+            previousRankPoints = rankPoints;
+            previousRank = basisRank;
+
+            return {
+                ...entry,
+                basisRank,
+            };
+        });
 }
 
 function RankBadge({ rank }) {
@@ -29,6 +88,7 @@ export default function LeaderboardPortal() {
     const [currentUser] = useState(() => getStoredUser());
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+    const [rankBasis, setRankBasis] = useState("score");
 
     useEffect(() => {
         let isMounted = true;
@@ -53,14 +113,22 @@ export default function LeaderboardPortal() {
     }, []);
 
     const leaderboard = useMemo(() => summary?.leaderboard || [], [summary?.leaderboard]);
+    const displayedLeaderboard = useMemo(() => {
+        return rankBasis === "rp" ? buildRankPointLeaderboard(leaderboard) : buildScoreLeaderboard(leaderboard);
+    }, [leaderboard, rankBasis]);
     const houses = useMemo(() => summary?.houses || [], [summary?.houses]);
     const champions = summary?.champions || {};
     const currentUserId = getStudentId(currentUser);
-    const currentUserEntry = useMemo(() => {
+    const baseCurrentUserEntry = useMemo(() => {
         return summary?.currentUserEntry || leaderboard.find((entry) => getStudentId(entry) === currentUserId) || null;
     }, [leaderboard, currentUserId, summary?.currentUserEntry]);
+    const currentUserEntry = useMemo(() => {
+        return displayedLeaderboard.find((entry) => getStudentId(entry) === currentUserId) || baseCurrentUserEntry;
+    }, [baseCurrentUserEntry, currentUserId, displayedLeaderboard]);
     const currentRankInfo = getRankInfo(currentUserEntry?.rankInfo);
     const currentRankTone = getRankTone(currentRankInfo);
+    const isRankPointMode = rankBasis === "rp";
+    const currentBasisRank = currentUserEntry?.basisRank || currentUserEntry?.rank;
 
     if (loading) {
         return (
@@ -92,14 +160,16 @@ export default function LeaderboardPortal() {
                             Your Standing
                         </div>
                         <h2 className={`mt-4 font-serif text-3xl font-semibold tracking-wide sm:text-4xl ${currentRankTone.name}`}>
-                            {currentUserEntry ? `Rank #${currentUserEntry.rank}` : "No Rank Yet"}
+                            {currentUserEntry ? `${isRankPointMode ? "RP" : "Score"} Rank #${currentBasisRank}` : "No Rank Yet"}
                         </h2>
                         <div className={`mt-3 inline-flex rounded-full border px-3 py-1 text-[10px] font-bold uppercase tracking-wider ${currentRankTone.badge}`}>
                             {currentRankInfo.rankName}
                         </div>
                         <p className="mt-3 max-w-xl text-sm font-medium leading-6 text-[#9D96B3]">
                             {currentUserEntry
-                                ? "Your exact position is based on live exam scores. Your tier badge is calculated from finalized daily and weekly exam points."
+                                ? isRankPointMode
+                                    ? "Your exact position is based on rank points from finalized rank-eligible work. House standings and champions remain score-based."
+                                    : "Your exact position is based on live exam scores. Your tier badge is calculated from finalized daily and weekly exam points."
                                 : "Submit a live exam to enter the competition leaderboard."}
                         </p>
                     </div>
@@ -194,26 +264,45 @@ export default function LeaderboardPortal() {
                     <div>
                         <h2 className="font-serif text-2xl font-medium tracking-wide text-white">Ranked Students</h2>
                         <p className="mt-1 text-xs font-medium text-[#6B667B]">
-                            Showing all {leaderboard.length} ranked student{leaderboard.length === 1 ? "" : "s"}.
+                            Showing all {displayedLeaderboard.length} ranked student{displayedLeaderboard.length === 1 ? "" : "s"} by {isRankPointMode ? "rank points" : "score"}.
                         </p>
                     </div>
-                    <div className="inline-flex w-fit items-center gap-2 rounded-full border border-white/8 bg-white/5 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-[#9D96B3]">
-                        <Users className="h-3.5 w-3.5 text-[#DFB15B]" />
-                        Exact Ranks
+                    <div className="inline-flex w-fit rounded-full border border-white/8 bg-white/5 p-1">
+                        {RANK_BASIS_OPTIONS.map((option) => {
+                            const Icon = option.icon;
+                            const isActive = rankBasis === option.value;
+
+                            return (
+                                <button
+                                    key={option.value}
+                                    type="button"
+                                    aria-pressed={isActive}
+                                    onClick={() => setRankBasis(option.value)}
+                                    className={`inline-flex h-8 items-center gap-1.5 rounded-full px-3 text-[10px] font-bold uppercase tracking-wider transition ${isActive ? "bg-[#DFB15B] text-black" : "text-[#9D96B3] hover:bg-white/7 hover:text-white"}`}
+                                >
+                                    <Icon className="h-3.5 w-3.5" />
+                                    {option.label}
+                                </button>
+                            );
+                        })}
                     </div>
                 </div>
 
-                {leaderboard.length === 0 ? (
+                {displayedLeaderboard.length === 0 ? (
                     <div className="rounded-2xl border border-white/5 bg-[#1A1722]/40 px-4 py-8 text-center text-sm font-medium text-[#8E8A9F]">
                         No leaderboard entries are available yet.
                     </div>
                 ) : (
                     <div className="flex flex-col gap-2">
-                        {leaderboard.map((entry, index) => {
-                            const rank = entry.rank || index + 1;
+                        {displayedLeaderboard.map((entry, index) => {
+                            const rank = entry.basisRank || entry.rank || index + 1;
                             const isCurrentUser = currentUserId && getStudentId(entry) === currentUserId;
                             const entryRankInfo = getRankInfo(entry.rankInfo);
                             const entryRankTone = getRankTone(entryRankInfo);
+                            const primaryMetricLabel = isRankPointMode ? "RP" : "score";
+                            const primaryMetricValue = isRankPointMode
+                                ? formatRankPoints(entryRankInfo.rankPoints)
+                                : formatNumber(entry.totalScore);
 
                             return (
                                 <motion.div
@@ -237,12 +326,12 @@ export default function LeaderboardPortal() {
                                             </span>
                                         </div>
                                         <div className="mt-0.5 text-[11px] font-medium text-[#8E8A9F]">
-                                            {entry.house || "No house"} - {entry.examsTaken || 0} live exams - {entry.badgeCount || 0} badges - Avg {formatNumber(entry.averageScore)} - RP {formatRankPoints(entryRankInfo.rankPoints)}
+                                            {entry.house || "No house"} - {entry.examsTaken || 0} live exams - {entry.badgeCount || 0} badges - Avg {formatNumber(entry.averageScore)} - {isRankPointMode ? `Score ${formatNumber(entry.totalScore)}` : `RP ${formatRankPoints(entryRankInfo.rankPoints)}`}
                                         </div>
                                     </div>
                                     <div className="col-span-2 flex items-center justify-between rounded-xl border border-white/5 bg-[#121017]/70 px-3 py-2 sm:col-span-1 sm:block sm:border-0 sm:bg-transparent sm:p-0 sm:text-right">
-                                        <span className="text-[10px] font-bold uppercase tracking-wide text-[#6B667B] sm:block">score</span>
-                                        <span className="text-sm font-bold text-[#DFB15B] sm:block">{formatNumber(entry.totalScore)}</span>
+                                        <span className="text-[10px] font-bold uppercase tracking-wide text-[#6B667B] sm:block">{primaryMetricLabel}</span>
+                                        <span className="text-sm font-bold text-[#DFB15B] sm:block">{primaryMetricValue}</span>
                                     </div>
                                 </motion.div>
                             );
