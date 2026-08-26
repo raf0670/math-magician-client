@@ -78,7 +78,7 @@ function RankBadge({ rank }) {
 
     return (
         <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border text-xs font-black ${isPodium ? "border-[#DFB15B]/25 bg-[#DFB15B]/10 text-[#DFB15B]" : "border-white/6 bg-[#121017] text-[#8E8A9F]"}`}>
-            {isPodium ? <Trophy className="h-4 w-4" /> : `#${rank}`}
+            {isPodium ? <Trophy className="h-4 w-4" /> : rank}
         </div>
     );
 }
@@ -160,7 +160,7 @@ export default function LeaderboardPortal() {
                             Your Standing
                         </div>
                         <h2 className={`mt-4 font-serif text-3xl font-semibold tracking-wide sm:text-4xl ${currentRankTone.name}`}>
-                            {currentUserEntry ? `${isRankPointMode ? "RP" : "Score"} Rank #${currentBasisRank}` : "No Rank Yet"}
+                            {currentUserEntry ? `${isRankPointMode ? "RP" : "Score"} Rank ${currentBasisRank}` : "No Rank Yet"}
                         </h2>
                         <div className={`mt-3 inline-flex rounded-full border px-3 py-1 text-[10px] font-bold uppercase tracking-wider ${currentRankTone.badge}`}>
                             {currentRankInfo.rankName}
@@ -216,7 +216,7 @@ export default function LeaderboardPortal() {
                                     <p className="text-sm font-bold text-white">{house.name}</p>
                                     <p className="mt-1 text-[11px] font-semibold uppercase tracking-wider text-[#8E8A9F]">{house.mode} - {house.location}</p>
                                 </div>
-                                <span className="rounded-xl border border-[#DFB15B]/20 bg-[#DFB15B]/10 px-2.5 py-1 text-xs font-black text-[#DFB15B]">#{index + 1}</span>
+                                <span className="rounded-xl border border-[#DFB15B]/20 bg-[#DFB15B]/10 px-2.5 py-1 text-xs font-black text-[#DFB15B]">{index + 1}</span>
                             </div>
                             <p className="mt-4 font-serif text-3xl font-bold text-white">{formatNumber(house.totalPoints)}</p>
                             <p className="mt-1 text-xs font-medium text-[#8E8A9F]">{house.examsCounted || 0} exams counted</p>

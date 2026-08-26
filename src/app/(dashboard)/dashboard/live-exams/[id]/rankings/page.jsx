@@ -34,7 +34,7 @@ function RankBadge({ rank }) {
 
   return (
     <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border text-xs font-black ${isPodium ? "border-[#DFB15B]/25 bg-[#DFB15B]/10 text-[#DFB15B]" : "border-white/6 bg-[#121017] text-[#8E8A9F]"}`}>
-      {isPodium ? <Trophy className="h-4 w-4" /> : `#${rank}`}
+      {isPodium ? <Trophy className="h-4 w-4" /> : rank}
     </div>
   );
 }
@@ -165,7 +165,7 @@ function LiveExamRankingsContent() {
 
       <section className="rounded-3xl border border-[#DFB15B]/15 bg-[#121017] p-5 shadow-[0_18px_60px_rgba(0,0,0,0.3)] sm:p-6">
         <div className="grid gap-3 sm:grid-cols-3">
-          <SummaryTile label="Your Rank" value={currentUserEntry ? `#${currentUserEntry.rank}` : "Not ranked"} icon={Trophy} />
+          <SummaryTile label="Your Rank" value={currentUserEntry ? currentUserEntry.rank : "Not ranked"} icon={Trophy} />
           <SummaryTile label="Submissions" value={payload?.count || 0} icon={Users} />
           <SummaryTile label="Total Marks" value={formatNumber(exam.totalMarks)} icon={Medal} />
         </div>
