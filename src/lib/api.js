@@ -377,6 +377,10 @@ export async function getLeaderboard() {
   return request("/api/analytics/leaderboard");
 }
 
+export async function getExamLeaderboard(examId) {
+  return request(`/api/analytics/leaderboard/${examId}`);
+}
+
 export async function getCompetitionSummary() {
   return request("/api/analytics/competition");
 }

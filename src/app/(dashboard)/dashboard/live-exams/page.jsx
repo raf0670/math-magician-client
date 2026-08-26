@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { CalendarClock, CheckCircle2, Clock3, Eye, LockKeyhole, Play, RefreshCw, Radio } from "lucide-react";
+import { CalendarClock, CheckCircle2, Clock3, Eye, LockKeyhole, Play, RefreshCw, Radio, Trophy } from "lucide-react";
 import { getLiveExams } from "@/lib/api";
 import ClassAccessGate from "@/components/dashboard/ClassAccessGate";
 import FlashyLoader from "@/components/shared/FlashyLoader";
@@ -181,13 +181,24 @@ function LiveExamsContent() {
                       Submitted - review after deadline
                     </div>
                   ) : isOpen || isEnded ? (
-                    <Link
-                      href={`/dashboard/live-exams/${exam._id}`}
-                      className={`inline-flex w-full items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-bold uppercase tracking-wider transition ${isOpen ? "bg-linear-to-r from-[#E6C687] to-[#AA7C11] text-black hover:brightness-110" : "border border-white/8 bg-[#0F0D15] text-white hover:border-[#DFB15B]/30 hover:text-[#DFB15B]"}`}
-                    >
-                      {isOpen ? <Play className="h-4 w-4 fill-current stroke-none" /> : <Eye className="h-4 w-4" />}
-                      {isOpen ? "Start Exam" : exam.hasSubmitted ? "View Results" : "Review Solutions"}
-                    </Link>
+                    <div className="flex flex-col gap-2">
+                      <Link
+                        href={`/dashboard/live-exams/${exam._id}`}
+                        className={`inline-flex w-full items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-bold uppercase tracking-wider transition ${isOpen ? "bg-linear-to-r from-[#E6C687] to-[#AA7C11] text-black hover:brightness-110" : "border border-white/8 bg-[#0F0D15] text-white hover:border-[#DFB15B]/30 hover:text-[#DFB15B]"}`}
+                      >
+                        {isOpen ? <Play className="h-4 w-4 fill-current stroke-none" /> : <Eye className="h-4 w-4" />}
+                        {isOpen ? "Start Exam" : exam.hasSubmitted ? "View Results" : "Review Solutions"}
+                      </Link>
+                      {isEnded ? (
+                        <Link
+                          href={`/dashboard/live-exams/${exam._id}/rankings`}
+                          className="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-[#DFB15B]/20 bg-[#DFB15B]/10 px-4 py-3 text-sm font-bold uppercase tracking-wider text-[#DFB15B] transition hover:border-[#DFB15B]/40 hover:bg-[#DFB15B]/15"
+                        >
+                          <Trophy className="h-4 w-4" />
+                          Exam Rankings
+                        </Link>
+                      ) : null}
+                    </div>
                   ) : (
                     <div className="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-white/8 bg-[#0F0D15] px-4 py-3 text-sm font-semibold text-[#8E8A9F]">
                       <LockKeyhole className="h-4 w-4" />
