@@ -319,6 +319,10 @@ export async function getAdminLiveExams() {
   return request("/api/exams/live/admin");
 }
 
+export async function getAdminLiveExamPreview(examId) {
+  return request(`/api/exams/live/admin/${examId}/preview`);
+}
+
 export async function getAdminAssignments() {
   return request("/api/exams/assignments/admin");
 }

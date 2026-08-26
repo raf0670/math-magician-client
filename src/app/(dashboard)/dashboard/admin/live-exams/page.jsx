@@ -1,11 +1,13 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import {
   CalendarClock,
   CheckCircle2,
   Clock3,
   Edit3,
+  Eye,
   FileJson,
   FileQuestion,
   Gavel,
@@ -510,14 +512,23 @@ export default function AdminLiveExamsPage() {
                     </p>
                   </div>
 
-                  <button
-                    type="button"
-                    onClick={() => startEditing(exam)}
-                    className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/8 bg-[#0F0D15] px-4 py-3 text-sm font-semibold text-white transition hover:border-[#DFB15B]/30 hover:text-[#DFB15B]"
-                  >
-                    <Edit3 className="h-4 w-4" />
-                    Edit
-                  </button>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Link
+                      href={`/dashboard/live-exams/${exam._id}?preview=admin`}
+                      className="inline-flex items-center justify-center gap-2 rounded-2xl border border-[#DFB15B]/25 bg-[#DFB15B]/10 px-4 py-3 text-sm font-semibold text-[#DFB15B] transition hover:border-[#DFB15B]/45 hover:bg-[#DFB15B]/15"
+                    >
+                      <Eye className="h-4 w-4" />
+                      Preview
+                    </Link>
+                    <button
+                      type="button"
+                      onClick={() => startEditing(exam)}
+                      className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/8 bg-[#0F0D15] px-4 py-3 text-sm font-semibold text-white transition hover:border-[#DFB15B]/30 hover:text-[#DFB15B]"
+                    >
+                      <Edit3 className="h-4 w-4" />
+                      Edit
+                    </button>
+                  </div>
                 </div>
                 <div className="mt-4 flex flex-wrap items-center gap-2 text-xs text-[#6B667B]">
                   <CheckCircle2 className="h-4 w-4 text-[#DFB15B]" />

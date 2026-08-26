@@ -2,14 +2,14 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { AlertTriangle, BookOpen, CalendarClock, CheckCircle, LockKeyhole, XCircle } from "lucide-react";
 import AnalyticalScorecard from "@/components/dashboard/AnalyticalScorecard";
 import ClassAccessGate from "@/components/dashboard/ClassAccessGate";
 import ExamEngine from "@/components/dashboard/ExamEngine";
 import FlashyLoader from "@/components/shared/FlashyLoader";
 import FormattedText from "@/components/shared/FormattedText";
-import { getExamById, submitExam } from "@/lib/api";
+import { getAdminLiveExamPreview, getExamById, submitExam } from "@/lib/api";
 
 const MONGO_OBJECT_ID_PATTERN = /^[a-f\d]{24}$/i;
 const OPTION_LABELS = ["A", "B", "C", "D", "E"];
@@ -129,7 +129,9 @@ export default function LiveExamArenaPage() {
 function LiveExamArenaContent() {
   const params = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const examId = params?.id;
+  const isAdminPreview = searchParams?.get("preview") === "admin";
   const [examData, setExamData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [blockedMessage, setBlockedMessage] = useState("");
@@ -161,7 +163,9 @@ function LiveExamArenaContent() {
       }
 
       try {
-        const payload = await getExamById(examId);
+        const payload = isAdminPreview
+          ? await getAdminLiveExamPreview(examId)
+          : await getExamById(examId);
         if (isMounted) {
           const nextExamData = payload?.data || null;
           setExamData(nextExamData);
@@ -191,7 +195,7 @@ function LiveExamArenaContent() {
     return () => {
       isMounted = false;
     };
-  }, [examId]);
+  }, [examId, isAdminPreview]);
 
   const status = useMemo(() => getStatus(examData), [examData]);
 
@@ -250,8 +254,10 @@ function LiveExamArenaContent() {
       <LiveExamMessage
         icon={<LockKeyhole className="h-10 w-10 text-[#DFB15B]" />}
         eyebrow="Locked"
-        title="This exam is not open yet"
+        title={isAdminPreview ? "Admin preview is unavailable" : "This exam is not open yet"}
         message={blockedMessage}
+        returnHref={isAdminPreview ? "/dashboard/admin/live-exams" : "/dashboard/live-exams"}
+        returnLabel={isAdminPreview ? "Return to Live Exam Admin" : "Return to Live Exams"}
       />
     );
   }
@@ -289,8 +295,15 @@ function LiveExamArenaContent() {
     );
   }
 
-  if (status === "ended") {
-    return <ReadOnlyLiveExamReview examData={examData} />;
+  if (isAdminPreview || status === "ended") {
+    return (
+      <ReadOnlyLiveExamReview
+        examData={examData}
+        isPreview={isAdminPreview}
+        returnHref={isAdminPreview ? "/dashboard/admin/live-exams" : "/dashboard/live-exams"}
+        returnLabel={isAdminPreview ? "Return to Live Exam Admin" : "Return to Live Exams"}
+      />
+    );
   }
 
   return (
@@ -307,7 +320,7 @@ function LiveExamArenaContent() {
   );
 }
 
-function LiveExamMessage({ icon, eyebrow, title, message }) {
+function LiveExamMessage({ icon, eyebrow, title, message, returnHref = "/dashboard/live-exams", returnLabel = "Return to Live Exams" }) {
   return (
     <div className="flex min-h-105 items-center justify-center rounded-3xl border border-white/5 bg-[#121017] px-6 py-12 text-center">
       <div className="max-w-md">
@@ -318,28 +331,28 @@ function LiveExamMessage({ icon, eyebrow, title, message }) {
         <h1 className="mt-3 font-serif text-3xl font-medium text-white">{title}</h1>
         <p className="mt-3 text-sm leading-6 text-[#8E8A9F]">{message}</p>
         <Link
-          href="/dashboard/live-exams"
+          href={returnHref}
           className="mt-6 inline-flex items-center justify-center rounded-2xl bg-[#DFB15B] px-5 py-3 text-sm font-bold uppercase tracking-wider text-black transition hover:brightness-110"
         >
-          Return to Live Exams
+          {returnLabel}
         </Link>
       </div>
     </div>
   );
 }
 
-function ReadOnlyLiveExamReview({ examData }) {
+function ReadOnlyLiveExamReview({ examData, isPreview = false, returnHref = "/dashboard/live-exams", returnLabel = "Return to Live Exams" }) {
   const questions = examData?.questions || [];
 
   return (
-    <div className="flex w-full flex-col gap-6 text-left">
+    <div className="flex w-full flex-col gap-6 px-4 py-6 text-left sm:px-6 lg:px-10">
       <div className="flex flex-col gap-1">
         <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.3em] text-[#DFB15B]">
-          <BookOpen className="h-4 w-4" /> Solution Review
+          <BookOpen className="h-4 w-4" /> {isPreview ? "Admin Preview" : "Solution Review"}
         </p>
         <h1 className="mt-2 font-serif text-3xl font-medium tracking-wide text-white">{examData?.title || "Live Exam"}</h1>
         <p className="text-sm text-[#8E8A9F]">
-          Ended {formatDateTime(examData?.endTime)}. Submissions are closed, but solutions are available for review.
+          {isPreview ? `Official window: ${formatDateTime(examData?.startTime)} to ${formatDateTime(examData?.endTime)}` : `Ended ${formatDateTime(examData?.endTime)}. Submissions are closed, but solutions are available for review.`}
         </p>
       </div>
 
@@ -413,10 +426,10 @@ function ReadOnlyLiveExamReview({ examData }) {
       )}
 
       <Link
-        href="/dashboard/live-exams"
+        href={returnHref}
         className="w-fit rounded-2xl bg-[#DFB15B] px-5 py-3 text-sm font-bold uppercase tracking-wider text-black transition hover:brightness-110"
       >
-        Return to Live Exams
+        {returnLabel}
       </Link>
     </div>
   );
