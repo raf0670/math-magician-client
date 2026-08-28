@@ -33,7 +33,6 @@ import { getRankInfo, getRankTone } from "@/lib/rank";
 const EMPTY_SCHEDULE = {
   title: "",
   competitionCategory: "daily",
-  examDate: "",
   startTime: "",
   endTime: "",
   passingMarks: "",
@@ -88,24 +87,6 @@ function toApiDate(value) {
   if (!value) return "";
   const date = new Date(value);
   return Number.isNaN(date.getTime()) ? "" : date.toISOString();
-}
-
-function toBangladeshDateInputValue(value) {
-  if (!value) return "";
-  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) return value;
-
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "";
-
-  const parts = new Intl.DateTimeFormat("en-US", {
-    timeZone: "Asia/Dhaka",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).formatToParts(date);
-  const partMap = Object.fromEntries(parts.map((part) => [part.type, part.value]));
-
-  return `${partMap.year}-${partMap.month}-${partMap.day}`;
 }
 
 function formatDateTime(value) {
@@ -253,7 +234,6 @@ export default function AdminLiveExamsPage() {
     setSchedule({
       title: exam.title || "",
       competitionCategory: exam.competitionCategory || "daily",
-      examDate: toBangladeshDateInputValue(exam.examDate || exam.startTime),
       startTime: toDateTimeInputValue(exam.startTime),
       endTime: toDateTimeInputValue(exam.endTime),
       passingMarks: Number.isFinite(Number(exam.passingMarks)) ? Number(exam.passingMarks).toString() : "",
@@ -265,17 +245,11 @@ export default function AdminLiveExamsPage() {
   };
 
   const buildPayload = () => {
-    const isDailyExam = schedule.competitionCategory === "daily";
-
     return {
       title: schedule.title,
       competitionCategory: schedule.competitionCategory,
-      ...(isDailyExam
-        ? { examDate: schedule.examDate }
-        : {
-            startTime: toApiDate(schedule.startTime),
-            endTime: toApiDate(schedule.endTime),
-          }),
+      startTime: toApiDate(schedule.startTime),
+      endTime: toApiDate(schedule.endTime),
       passingMarks: schedule.passingMarks,
       questions: parsed.questions,
     };
@@ -391,24 +365,8 @@ export default function AdminLiveExamsPage() {
           <div className="grid gap-4 lg:grid-cols-5">
             <TextField label="Exam title" required value={schedule.title} onChange={(value) => updateSchedule("title", value)} placeholder="Example: Live Exam 01" icon={<FileQuestion className="h-4 w-4" />} />
             <SelectField label="Competition type" value={schedule.competitionCategory} onChange={(value) => updateSchedule("competitionCategory", value)} options={COMPETITION_CATEGORIES} />
-            {schedule.competitionCategory === "daily" ? (
-              <>
-                <TextField label="Exam date" required type="date" value={schedule.examDate} onChange={(value) => updateSchedule("examDate", value)} icon={<CalendarClock className="h-4 w-4" />} />
-                <div className="rounded-2xl border border-[#DFB15B]/15 bg-[#DFB15B]/8 px-4 py-3 lg:col-span-2">
-                  <span className="flex items-center gap-2 text-sm font-semibold text-white">
-                    <Clock3 className="h-4 w-4 text-[#DFB15B]" />
-                    Fixed daily window
-                  </span>
-                  <p className="mt-3 text-sm font-semibold leading-6 text-[#DFB15B]">10:40 PM to 11:20 PM Bangladesh time</p>
-                  <p className="mt-1 text-xs font-medium leading-5 text-[#8E8A9F]">Each attempt lasts 15 minutes and closes at 11:20 PM.</p>
-                </div>
-              </>
-            ) : (
-              <>
-                <TextField label="Start time" required type="datetime-local" value={schedule.startTime} onChange={(value) => updateSchedule("startTime", value)} icon={<CalendarClock className="h-4 w-4" />} />
-                <TextField label="End time" required type="datetime-local" value={schedule.endTime} onChange={(value) => updateSchedule("endTime", value)} icon={<Clock3 className="h-4 w-4" />} />
-              </>
-            )}
+            <TextField label="Start time" required type="datetime-local" value={schedule.startTime} onChange={(value) => updateSchedule("startTime", value)} icon={<CalendarClock className="h-4 w-4" />} />
+            <TextField label="End time" required type="datetime-local" value={schedule.endTime} onChange={(value) => updateSchedule("endTime", value)} icon={<Clock3 className="h-4 w-4" />} />
             <TextField
               label="Passing marks"
               type="number"
