@@ -357,7 +357,7 @@ export default function ExamEngine({ examData, onComplete }) {
 
     return (
         <div className="flex w-full flex-col gap-6 text-left [font-family:var(--font-open-sans),sans-serif]">
-            <div className="flex w-full flex-col gap-4 rounded-2xl border border-white/5 bg-[#121017] p-4 shadow-lg shadow-black/10 sm:flex-row sm:items-center sm:justify-between">
+            <div className="sticky top-0 z-30 flex w-full flex-col gap-4 rounded-2xl border border-white/8 bg-[#121017]/95 p-4 shadow-2xl shadow-black/30 backdrop-blur sm:flex-row sm:items-center sm:justify-between">
                 <div>
                     <span className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-[#DFB15B]">
                         <Sparkles className="h-3.5 w-3.5" /> Active Examination Sheet
