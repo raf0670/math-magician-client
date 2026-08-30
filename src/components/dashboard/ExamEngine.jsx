@@ -1,6 +1,6 @@
 "use client";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { CheckCircle, ChevronLeft, ChevronRight, Clock3, Eraser, Infinity, Send, Sparkles } from "lucide-react";
+import { Ban, CheckCircle, ChevronLeft, ChevronRight, Clock3, Eraser, Infinity, Send, Sparkles } from "lucide-react";
 import FormattedText from "@/components/shared/FormattedText";
 import { formatSubjectLabel } from "@/lib/rank";
 
@@ -82,6 +82,7 @@ function formatRemainingTime(totalSeconds) {
 export default function ExamEngine({ examData, onComplete }) {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [answers, setAnswers] = useState({});
+    const [eliminatedOptions, setEliminatedOptions] = useState({});
     const [attemptDeadlineTimestamp] = useState(() => getExamAttemptDeadlineTimestamp(examData));
     const [remainingSeconds, setRemainingSeconds] = useState(() => getInitialRemainingSeconds(examData));
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -89,6 +90,7 @@ export default function ExamEngine({ examData, onComplete }) {
     const tabSwitchSubmittedRef = useRef(false);
     const autoSubmitAttemptedRef = useRef(false);
     const hasHydratedAnswersRef = useRef(false);
+    const hasHydratedEliminationsRef = useRef(false);
 
     const normalizedQuestions = useMemo(() => {
         if (!examData?.questions?.length) return [];
@@ -139,6 +141,7 @@ export default function ExamEngine({ examData, onComplete }) {
     const hasTimedExam = remainingSeconds !== null;
     const isAssignmentExam = examData?.examType === "assignment";
     const answerStorageKey = examData?._id ? `exam_archive_answers_${examData._id}` : "";
+    const eliminationStorageKey = examData?._id ? `exam_archive_eliminations_${examData._id}` : "";
 
     useEffect(() => {
         if (!answerStorageKey || !normalizedQuestions.length || hasHydratedAnswersRef.current) return;
@@ -184,9 +187,82 @@ export default function ExamEngine({ examData, onComplete }) {
         }
     }, [answerStorageKey, answers]);
 
+    useEffect(() => {
+        if (!eliminationStorageKey || !normalizedQuestions.length || hasHydratedEliminationsRef.current) return;
+
+        hasHydratedEliminationsRef.current = true;
+
+        try {
+            const storedEliminations = window.localStorage.getItem(eliminationStorageKey);
+            if (!storedEliminations) return;
+
+            const parsedEliminations = JSON.parse(storedEliminations);
+            if (!parsedEliminations || typeof parsedEliminations !== "object" || Array.isArray(parsedEliminations)) return;
+
+            const validQuestionIds = new Set(normalizedQuestions.map((question) => question.id));
+            const hydratedEliminations = Object.fromEntries(
+                Object.entries(parsedEliminations)
+                    .filter(([questionId, options]) => (
+                        validQuestionIds.has(questionId)
+                        && Array.isArray(options)
+                    ))
+                    .map(([questionId, options]) => [
+                        questionId,
+                        [...new Set(options)].filter((optionIndex) => (
+                            Number.isInteger(optionIndex)
+                            && optionIndex >= 0
+                            && optionIndex < OPTION_LABELS.length
+                        )),
+                    ])
+                    .filter(([, options]) => options.length)
+            );
+
+            if (Object.keys(hydratedEliminations).length) {
+                window.queueMicrotask(() => setEliminatedOptions(hydratedEliminations));
+            }
+        } catch {
+            window.localStorage.removeItem(eliminationStorageKey);
+        }
+    }, [eliminationStorageKey, normalizedQuestions]);
+
+    useEffect(() => {
+        if (!eliminationStorageKey || !hasHydratedEliminationsRef.current) return;
+
+        try {
+            if (Object.keys(eliminatedOptions).length) {
+                window.localStorage.setItem(eliminationStorageKey, JSON.stringify(eliminatedOptions));
+            } else {
+                window.localStorage.removeItem(eliminationStorageKey);
+            }
+        } catch {
+            // A full or blocked localStorage should not interrupt the exam.
+        }
+    }, [eliminationStorageKey, eliminatedOptions]);
+
     const handleSelectOption = (optionIndex) => {
         if (!currentQuestion || isSubmitting) return;
         setAnswers({ ...answers, [currentQuestion.id]: optionIndex });
+    };
+
+    const handleToggleElimination = (optionIndex) => {
+        if (!currentQuestion || isSubmitting) return;
+
+        setEliminatedOptions((currentEliminations) => {
+            const currentQuestionEliminations = currentEliminations[currentQuestion.id] || [];
+            const isAlreadyEliminated = currentQuestionEliminations.includes(optionIndex);
+            const nextQuestionEliminations = isAlreadyEliminated
+                ? currentQuestionEliminations.filter((currentOptionIndex) => currentOptionIndex !== optionIndex)
+                : [...currentQuestionEliminations, optionIndex].sort((a, b) => a - b);
+            const nextEliminations = { ...currentEliminations };
+
+            if (nextQuestionEliminations.length) {
+                nextEliminations[currentQuestion.id] = nextQuestionEliminations;
+            } else {
+                delete nextEliminations[currentQuestion.id];
+            }
+
+            return nextEliminations;
+        });
     };
 
     const handleClearSelection = () => {
@@ -204,11 +280,12 @@ export default function ExamEngine({ examData, onComplete }) {
         try {
             if (onComplete) await onComplete(submissionAnswers, examData, { submissionReason });
             if (answerStorageKey) window.localStorage.removeItem(answerStorageKey);
+            if (eliminationStorageKey) window.localStorage.removeItem(eliminationStorageKey);
         } catch {
             submissionStartedRef.current = false;
             setIsSubmitting(false);
         }
-    }, [answerStorageKey, answers, examData, isSubmitting, normalizedQuestions, onComplete]);
+    }, [answerStorageKey, answers, eliminationStorageKey, examData, isSubmitting, normalizedQuestions, onComplete]);
 
     useEffect(() => {
         if (!hasTimedExam) return undefined;
@@ -382,22 +459,39 @@ export default function ExamEngine({ examData, onComplete }) {
                             {Object.entries(currentQuestion.options).map(([key, value]) => {
                                 const optionIndex = OPTION_LABELS.indexOf(key);
                                 const isSelected = answers[currentQuestion.id] === optionIndex;
+                                const isEliminated = (eliminatedOptions[currentQuestion.id] || []).includes(optionIndex);
                                 return (
-                                    <button
+                                    <div
                                         key={key}
-                                        disabled={isSubmitting}
-                                        onClick={() => handleSelectOption(optionIndex)}
-                                        className={`group flex min-h-16 w-full items-center gap-3 rounded-2xl border p-4 text-left transition-all disabled:cursor-not-allowed disabled:opacity-70 ${isSelected ? "border-[#DFB15B] bg-[#DFB15B]/10 shadow-md shadow-[#DFB15B]/5" : "border-white/5 bg-[#121017]/80 hover:border-[#DFB15B]/25 hover:bg-[#1A1722]"}`}
+                                        className={`group flex min-h-16 w-full items-stretch gap-2 rounded-2xl border p-2 text-left transition-all ${isSubmitting ? "opacity-70" : ""} ${isSelected ? "border-[#DFB15B] bg-[#DFB15B]/10 shadow-md shadow-[#DFB15B]/5" : "border-white/5 bg-[#121017]/80 hover:border-[#DFB15B]/25 hover:bg-[#1A1722]"} ${isEliminated ? "opacity-55" : ""}`}
                                     >
-                                        <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border text-sm font-black ${isSelected ? "border-[#DFB15B] bg-[#DFB15B] text-black" : "border-white/5 bg-[#1A1722] text-[#8E8A9F] group-hover:border-[#DFB15B]/25 group-hover:text-[#DFB15B]"}`}>
-                                            {key}
-                                        </div>
-                                        <FormattedText
-                                            value={value}
-                                            className={`text-sm font-semibold leading-relaxed ${isSelected ? "text-white" : "text-[#C9C2D8]"}`}
-                                        />
-                                        {isSelected ? <CheckCircle className="ml-auto h-4 w-4 shrink-0 text-[#DFB15B]" /> : null}
-                                    </button>
+                                        <button
+                                            disabled={isSubmitting}
+                                            onClick={() => handleSelectOption(optionIndex)}
+                                            className="flex min-w-0 flex-1 items-center gap-3 rounded-xl p-2 text-left transition disabled:cursor-not-allowed"
+                                            aria-pressed={isSelected}
+                                        >
+                                            <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border text-sm font-black ${isSelected ? "border-[#DFB15B] bg-[#DFB15B] text-black" : "border-white/5 bg-[#1A1722] text-[#8E8A9F] group-hover:border-[#DFB15B]/25 group-hover:text-[#DFB15B]"}`}>
+                                                {key}
+                                            </div>
+                                            <FormattedText
+                                                value={value}
+                                                className={`min-w-0 flex-1 text-sm font-semibold leading-relaxed ${isSelected ? "text-white" : "text-[#C9C2D8]"} ${isEliminated ? "line-through decoration-2 decoration-red-300/80" : ""}`}
+                                            />
+                                            {isSelected ? <CheckCircle className="h-4 w-4 shrink-0 text-[#DFB15B]" /> : null}
+                                        </button>
+                                        <button
+                                            type="button"
+                                            disabled={isSubmitting}
+                                            onClick={() => handleToggleElimination(optionIndex)}
+                                            className={`my-auto flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border transition disabled:cursor-not-allowed disabled:opacity-50 ${isEliminated ? "border-red-300/30 bg-red-500/15 text-red-200" : "border-white/5 bg-[#1A1722] text-[#6B667B] hover:border-red-300/25 hover:text-red-200"}`}
+                                            aria-label={`${isEliminated ? "Restore" : "Eliminate"} option ${key}`}
+                                            aria-pressed={isEliminated}
+                                            title={`${isEliminated ? "Restore" : "Eliminate"} option ${key}`}
+                                        >
+                                            <Ban className="h-4 w-4" />
+                                        </button>
+                                    </div>
                                 );
                             })}
                         </div>
