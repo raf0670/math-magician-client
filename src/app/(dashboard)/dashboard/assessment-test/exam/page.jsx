@@ -2,8 +2,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { AlertTriangle, BookOpen, CheckCircle, LockKeyhole, XCircle } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { AlertTriangle, BookOpen, CheckCircle, LockKeyhole, RotateCcw, XCircle } from "lucide-react";
 import AnalyticalScorecard from "@/components/dashboard/AnalyticalScorecard";
 import ClassAccessGate from "@/components/dashboard/ClassAccessGate";
 import ExamEngine from "@/components/dashboard/ExamEngine";
@@ -58,6 +58,8 @@ export default function AssessmentExamPage() {
 
 function AssessmentExamContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const isRetakeMode = searchParams?.get("mode") === "retake";
   const [examData, setExamData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [blockedMessage, setBlockedMessage] = useState("");
@@ -79,7 +81,7 @@ function AssessmentExamContent() {
       setExamData(null);
 
       try {
-        const payload = await getAssessmentTestExam();
+        const payload = await getAssessmentTestExam({ isRetake: isRetakeMode });
         if (isMounted) setExamData(payload?.data || null);
       } catch (err) {
         if (!isMounted) return;
@@ -97,14 +99,17 @@ function AssessmentExamContent() {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [isRetakeMode]);
 
   const status = useMemo(() => getStatus(examData), [examData]);
   const isPreview = examData?.assessmentMode === "preview";
 
   const handleEvaluationTrigger = async (finalAnswers, examPayload, metadata = {}) => {
     try {
-      const payload = await submitAssessmentTest(finalAnswers, metadata);
+      const payload = await submitAssessmentTest(finalAnswers, {
+        ...metadata,
+        isRetake: isRetakeMode,
+      });
       const token = getStoredToken();
       const storedUser = getStoredUser();
       if (token && storedUser && payload?.rankInfo) {
@@ -114,7 +119,9 @@ function AssessmentExamContent() {
       setExamData(examPayload);
       setSubmissionResult(payload);
       setSubmissionError("");
-      router.replace("/dashboard/assessment-test");
+      if (!isRetakeMode) {
+        router.replace("/dashboard/assessment-test");
+      }
       return payload;
     } catch (err) {
       setSubmissionError(err.message || "We could not submit your answers right now. Please check your connection and try again.");
@@ -155,11 +162,22 @@ function AssessmentExamContent() {
       <div className="min-h-screen w-full px-4 py-6 sm:px-6 lg:px-10">
         <div className="mx-auto flex w-full max-w-7xl flex-col gap-6">
           <div className="flex flex-col items-start gap-1 text-left">
-            <h1 className="font-serif text-3xl font-medium tracking-wide text-white">Assessment Scorecard</h1>
+            <h1 className="font-serif text-3xl font-medium tracking-wide text-white">
+              {submissionResult?.isRetake ? "Assessment Retake Scorecard" : "Assessment Scorecard"}
+            </h1>
             <p className="text-xs font-medium text-[#8E8A9F] sm:text-sm">
-              Your answer sheet has been submitted and scored by the backend.
+              {submissionResult?.isRetake
+                ? "Your retake was scored for practice feedback only."
+                : "Your answer sheet has been submitted and scored by the backend."}
             </p>
           </div>
+
+          {submissionResult?.isRetake ? (
+            <div className="flex items-start gap-3 rounded-2xl border border-emerald-400/20 bg-emerald-400/10 px-4 py-3 text-sm font-semibold text-emerald-100">
+              <RotateCcw className="mt-0.5 h-4 w-4 shrink-0" />
+              <span>Retake attempt {submissionResult.attemptNumber || 2}. This score is not included in rankings or rank points.</span>
+            </div>
+          ) : null}
 
           {submissionResult?.submissionReason === "tab_switch" ? (
             <div className="rounded-2xl border border-red-400/20 bg-red-500/10 px-4 py-3 text-sm font-semibold text-red-100">
@@ -179,7 +197,7 @@ function AssessmentExamContent() {
     );
   }
 
-  if (isPreview || status === "ended") {
+  if (isPreview || (status === "ended" && !isRetakeMode)) {
     return <ReadOnlyAssessmentReview examData={examData} isPreview={isPreview} />;
   }
 
@@ -189,6 +207,12 @@ function AssessmentExamContent() {
         {submissionError ? (
           <div className="rounded-2xl border border-red-400/20 bg-red-500/10 px-4 py-3 text-sm font-semibold text-red-200">
             {submissionError}
+          </div>
+        ) : null}
+        {isRetakeMode ? (
+          <div className="flex items-start gap-3 rounded-2xl border border-emerald-400/20 bg-emerald-400/10 px-4 py-3 text-sm font-semibold text-emerald-100">
+            <RotateCcw className="mt-0.5 h-4 w-4 shrink-0" />
+            <span>Retake mode. This attempt is for practice feedback and will not affect rankings or rank points.</span>
           </div>
         ) : null}
         <ExamEngine key={examData?._id || "assessment-test"} examData={examData} onComplete={handleEvaluationTrigger} />

@@ -21,6 +21,37 @@ function buildUrl(path) {
   return `${base}${normalizedPath}`;
 }
 
+function buildQueryPath(path, query = {}) {
+  const params = new URLSearchParams();
+
+  Object.entries(query).forEach(([key, value]) => {
+    if (value === undefined || value === null || value === false || value === "") return;
+    params.set(key, value === true ? "true" : value.toString());
+  });
+
+  const queryString = params.toString();
+  return queryString ? `${path}?${queryString}` : path;
+}
+
+function createClientAttemptId() {
+  if (typeof crypto !== "undefined" && crypto.randomUUID) {
+    return crypto.randomUUID();
+  }
+
+  return `attempt-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+}
+
+function buildSubmissionBody(answers, metadata = {}) {
+  const body = { answers };
+  if (metadata?.submissionReason) body.submissionReason = metadata.submissionReason;
+  if (metadata?.isRetake) {
+    body.isRetake = true;
+    body.clientAttemptId = metadata.clientAttemptId || createClientAttemptId();
+  }
+
+  return body;
+}
+
 function emitAuthStateChange() {
   if (typeof window !== "undefined") {
     window.dispatchEvent(new Event("auth-state-changed"));
@@ -401,19 +432,22 @@ export async function getAssessmentTest() {
   return request("/api/assessment-test");
 }
 
-export async function getAssessmentTestExam() {
-  return request("/api/assessment-test/exam");
+export async function getAssessmentTestExam(metadata = {}) {
+  return request(buildQueryPath("/api/assessment-test/exam", { retake: metadata?.isRetake }));
 }
 
 export async function submitAssessmentTest(answers, metadata = {}) {
   const maxAttempts = 3;
-  const submissionReason = metadata?.submissionReason;
+  const body = buildSubmissionBody(answers, {
+    ...metadata,
+    clientAttemptId: metadata?.isRetake ? metadata.clientAttemptId || createClientAttemptId() : metadata?.clientAttemptId,
+  });
 
   for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
     try {
       return await request("/api/assessment-test/submit", {
         method: "POST",
-        body: submissionReason ? { answers, submissionReason } : { answers },
+        body,
       });
     } catch (error) {
       if (attempt === maxAttempts || !shouldRetryRequest(error)) {
@@ -432,19 +466,22 @@ export async function updateSubmissionModeration(submissionId, payload) {
   });
 }
 
-export async function getExamById(examId) {
-  return request(`/api/exams/${examId}`);
+export async function getExamById(examId, metadata = {}) {
+  return request(buildQueryPath(`/api/exams/${examId}`, { retake: metadata?.isRetake }));
 }
 
 export async function submitExam(examId, answers, metadata = {}) {
   const maxAttempts = 3;
-  const submissionReason = metadata?.submissionReason;
+  const body = buildSubmissionBody(answers, {
+    ...metadata,
+    clientAttemptId: metadata?.isRetake ? metadata.clientAttemptId || createClientAttemptId() : metadata?.clientAttemptId,
+  });
 
   for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
     try {
       return await request(`/api/exams/${examId}/submit`, {
         method: "POST",
-        body: submissionReason ? { answers, submissionReason } : { answers },
+        body,
       });
     } catch (error) {
       if (attempt === maxAttempts || !shouldRetryRequest(error)) {

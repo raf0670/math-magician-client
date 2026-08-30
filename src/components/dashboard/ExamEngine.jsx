@@ -51,6 +51,7 @@ function getInitialRemainingSeconds(examData) {
 }
 
 function getLiveExamHardEndTimestamp(examData) {
+    if (examData?.isRetakeMode) return null;
     if (!examData?.isLiveExam || !examData?.endTime) return null;
 
     const endTime = new Date(examData.endTime).getTime();

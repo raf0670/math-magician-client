@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
-import { AlertTriangle, BookOpen, CalendarClock, CheckCircle, LockKeyhole, XCircle } from "lucide-react";
+import { AlertTriangle, BookOpen, CalendarClock, CheckCircle, LockKeyhole, RotateCcw, XCircle } from "lucide-react";
 import AnalyticalScorecard from "@/components/dashboard/AnalyticalScorecard";
 import ClassAccessGate from "@/components/dashboard/ClassAccessGate";
 import ExamEngine from "@/components/dashboard/ExamEngine";
@@ -132,6 +132,7 @@ function LiveExamArenaContent() {
   const searchParams = useSearchParams();
   const examId = params?.id;
   const isAdminPreview = searchParams?.get("preview") === "admin";
+  const isRetakeMode = searchParams?.get("mode") === "retake";
   const [examData, setExamData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [blockedMessage, setBlockedMessage] = useState("");
@@ -165,15 +166,15 @@ function LiveExamArenaContent() {
       try {
         const payload = isAdminPreview
           ? await getAdminLiveExamPreview(examId)
-          : await getExamById(examId);
+          : await getExamById(examId, { isRetake: isRetakeMode });
         if (isMounted) {
           const nextExamData = payload?.data || null;
           setExamData(nextExamData);
 
-          if (nextExamData?.submissionResult) {
+          if (!isRetakeMode && nextExamData?.submissionResult) {
             setSubmissionResult(nextExamData.submissionResult);
             setUserSelections(Array.isArray(nextExamData.submissionResult.answers) ? nextExamData.submissionResult.answers : []);
-          } else if (nextExamData?.submissionReceipt) {
+          } else if (!isRetakeMode && nextExamData?.submissionReceipt) {
             setSubmissionReceipt(nextExamData.submissionReceipt);
           }
         }
@@ -195,13 +196,16 @@ function LiveExamArenaContent() {
     return () => {
       isMounted = false;
     };
-  }, [examId, isAdminPreview]);
+  }, [examId, isAdminPreview, isRetakeMode]);
 
   const status = useMemo(() => getStatus(examData), [examData]);
 
   const handleEvaluationTrigger = async (finalAnswers, examPayload, metadata = {}) => {
     try {
-      const payload = await submitExam(examId, finalAnswers, metadata);
+      const payload = await submitExam(examId, finalAnswers, {
+        ...metadata,
+        isRetake: isRetakeMode,
+      });
       setExamData(examPayload);
       if (payload?.resultsAvailable === false) {
         setSubmissionReceipt(payload);
@@ -213,7 +217,9 @@ function LiveExamArenaContent() {
         setSubmissionReceipt(null);
       }
       setSubmissionError("");
-      router.replace("/dashboard/live-exams");
+      if (!isRetakeMode) {
+        router.replace("/dashboard/live-exams");
+      }
       return payload;
     } catch (err) {
       setSubmissionError(err.message || "We could not submit your answers right now. Please check your connection and try again.");
@@ -271,11 +277,22 @@ function LiveExamArenaContent() {
       <div className="min-h-screen w-full px-4 py-6 sm:px-6 lg:px-10">
         <div className="mx-auto flex w-full max-w-7xl flex-col gap-6">
           <div className="flex flex-col items-start gap-1 text-left">
-            <h1 className="font-serif text-3xl font-medium tracking-wide text-white">Live Exam Scorecard</h1>
+            <h1 className="font-serif text-3xl font-medium tracking-wide text-white">
+              {submissionResult?.isRetake ? "Live Exam Retake Scorecard" : "Live Exam Scorecard"}
+            </h1>
             <p className="text-xs font-medium text-[#8E8A9F] sm:text-sm">
-              Your answer sheet has been submitted and scored by the backend.
+              {submissionResult?.isRetake
+                ? "Your retake was scored for practice feedback only."
+                : "Your answer sheet has been submitted and scored by the backend."}
             </p>
           </div>
+
+          {submissionResult?.isRetake ? (
+            <div className="flex items-start gap-3 rounded-2xl border border-emerald-400/20 bg-emerald-400/10 px-4 py-3 text-sm font-semibold text-emerald-100">
+              <RotateCcw className="mt-0.5 h-4 w-4 shrink-0" />
+              <span>Retake attempt {submissionResult.attemptNumber || 2}. This score is not included in rankings or rank points.</span>
+            </div>
+          ) : null}
 
           {submissionResult?.submissionReason === "tab_switch" ? (
             <div className="rounded-2xl border border-red-400/20 bg-red-500/10 px-4 py-3 text-sm font-semibold text-red-100">
@@ -295,7 +312,7 @@ function LiveExamArenaContent() {
     );
   }
 
-  if (isAdminPreview || status === "ended") {
+  if (isAdminPreview || (status === "ended" && !isRetakeMode)) {
     return (
       <ReadOnlyLiveExamReview
         examData={examData}
@@ -312,6 +329,12 @@ function LiveExamArenaContent() {
         {submissionError ? (
           <div className="rounded-2xl border border-red-400/20 bg-red-500/10 px-4 py-3 text-sm font-semibold text-red-200">
             {submissionError}
+          </div>
+        ) : null}
+        {isRetakeMode ? (
+          <div className="flex items-start gap-3 rounded-2xl border border-emerald-400/20 bg-emerald-400/10 px-4 py-3 text-sm font-semibold text-emerald-100">
+            <RotateCcw className="mt-0.5 h-4 w-4 shrink-0" />
+            <span>Retake mode. This attempt is for practice feedback and will not affect rankings or rank points.</span>
           </div>
         ) : null}
         <ExamEngine key={examData?._id || examId} examData={examData} onComplete={handleEvaluationTrigger} />

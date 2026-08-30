@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { CalendarClock, CheckCircle2, Clock3, Eye, LockKeyhole, Play, RefreshCw, Radio, Trophy } from "lucide-react";
+import { CalendarClock, CheckCircle2, Clock3, Eye, LockKeyhole, Play, RefreshCw, Radio, RotateCcw, Trophy } from "lucide-react";
 import { getLiveExams } from "@/lib/api";
 import ClassAccessGate from "@/components/dashboard/ClassAccessGate";
 import FlashyLoader from "@/components/shared/FlashyLoader";
@@ -189,6 +189,15 @@ function LiveExamsContent() {
                         {isOpen ? <Play className="h-4 w-4 fill-current stroke-none" /> : <Eye className="h-4 w-4" />}
                         {isOpen ? "Start Exam" : exam.hasSubmitted ? "View Results" : "Review Solutions"}
                       </Link>
+                      {isEnded && exam.canRetake ? (
+                        <Link
+                          href={`/dashboard/live-exams/${exam._id}?mode=retake`}
+                          className="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-emerald-400/20 bg-emerald-400/10 px-4 py-3 text-sm font-bold uppercase tracking-wider text-emerald-200 transition hover:border-emerald-300/40 hover:bg-emerald-400/15"
+                        >
+                          <RotateCcw className="h-4 w-4" />
+                          Retake
+                        </Link>
+                      ) : null}
                       {isEnded ? (
                         <Link
                           href={`/dashboard/live-exams/${exam._id}/rankings`}
