@@ -33,7 +33,7 @@ const PLAN_DEFAULT_BATCH = {
 };
 
 const BATCH_OPTIONS = [
-  // { label: "Gryffindor", value: "Farmgate" },
+  { label: "Gryffindor", value: "Farmgate" },
   { label: "Gryffindor 2.0", value: "Farmgate - Gryffindor 2.0" },
   { label: "Hufflepuff", value: "Bailey Road" },
   { label: "Ravenclaw", value: "Online" },

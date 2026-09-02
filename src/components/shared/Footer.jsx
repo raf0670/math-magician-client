@@ -43,7 +43,7 @@ export default function Footer() {
 
   const programLinks = [
     { name: "Ravenclaw", href: "/#programs-section" },
-    // { name: "Gryffindor", href: "/#programs-section" },
+    { name: "Gryffindor", href: "/#programs-section" },
     { name: "Gryffindor 2.0", href: "/#programs-section" },
     { name: "Hufflepuff", href: "/#programs-section" },
     { name: "Crash Course", href: "/#programs-section" },
