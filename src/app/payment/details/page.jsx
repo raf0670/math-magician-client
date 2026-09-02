@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 import { ArrowLeft, Check, CreditCard, LockKeyhole, WandSparkles } from "lucide-react";
 import { getStoredToken, getStoredUser, saveAuthSession, savePendingPaymentPlan, savePendingProgramAction, submitManualEnrollment, submitSeatBooking } from "@/lib/api";
 import FlashyLoader, { LoadingButtonLabel } from "@/components/shared/FlashyLoader";
+import PolicyAcceptance from "@/components/shared/PolicyAcceptance";
 
 const PLANS = {
   offline: { title: "Gryffindor", amount: 18000, deliveryMode: "offline" },
@@ -191,6 +192,7 @@ function PaymentDetailsContent() {
   const [form, setForm] = useState(INITIAL_FORM);
   const [paymentChoice, setPaymentChoice] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("bkash");
+  const [policiesAccepted, setPoliciesAccepted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const selectedPlanId = BATCH_PLAN_IDS[form.preferredBatch] || planId;
@@ -278,6 +280,11 @@ function PaymentDetailsContent() {
 
     if (!isBookingMode && !paymentChoice) {
       setError("Please choose full or partial payment before continuing.");
+      return;
+    }
+
+    if (!policiesAccepted) {
+      setError("Please accept the Terms & Conditions, Return & Refund Policy, and Privacy Policy before continuing.");
       return;
     }
 
@@ -541,6 +548,12 @@ function PaymentDetailsContent() {
                 />
               </>
             ) : null}
+
+            <PolicyAcceptance
+              checked={policiesAccepted}
+              onChange={setPoliciesAccepted}
+              error={error.includes("Please accept the Terms")}
+            />
 
             {error ? <p className="rounded-2xl border border-[#F2A7A7]/30 bg-[#F2A7A7]/10 px-4 py-3 text-sm font-medium text-[#F8C7C0]">{error}</p> : null}
 

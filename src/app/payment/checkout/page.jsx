@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 import { ArrowLeft, Check, CreditCard, LockKeyhole } from "lucide-react";
 import { getMyBooking, getStoredToken, submitBookedCheckout } from "@/lib/api";
 import FlashyLoader, { LoadingButtonLabel } from "@/components/shared/FlashyLoader";
+import PolicyAcceptance from "@/components/shared/PolicyAcceptance";
 
 const PLANS = {
   offline: { title: "Gryffindor", amount: 18000, deliveryMode: "offline" },
@@ -59,6 +60,7 @@ function BookedCheckoutContent() {
   const [referenceName, setReferenceName] = useState("");
   const [referenceEmail, setReferenceEmail] = useState("");
   const [trxID, setTrxID] = useState("");
+  const [policiesAccepted, setPoliciesAccepted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
@@ -109,6 +111,11 @@ function BookedCheckoutContent() {
 
     if (!trxID.trim()) {
       setError("Please enter the transaction ID or bank reference.");
+      return;
+    }
+
+    if (!policiesAccepted) {
+      setError("Please accept the Terms & Conditions, Return & Refund Policy, and Privacy Policy before continuing.");
       return;
     }
 
@@ -265,6 +272,12 @@ function BookedCheckoutContent() {
                 </div>
               </div>
             </FormSection>
+
+            <PolicyAcceptance
+              checked={policiesAccepted}
+              onChange={setPoliciesAccepted}
+              error={error.includes("Please accept the Terms")}
+            />
 
             {error ? <p className="rounded-2xl border border-[#F2A7A7]/30 bg-[#F2A7A7]/10 px-4 py-3 text-sm font-medium text-[#F8C7C0]">{error}</p> : null}
 

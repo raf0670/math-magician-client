@@ -85,7 +85,7 @@ export default function Loading() {
     <main
       role="status"
       aria-live="polite"
-      aria-label="Loading MathMagician's School"
+      aria-label="Loading Magician's School"
       className="relative flex min-h-[calc(100vh-73px)] items-center justify-center overflow-hidden bg-[#0D0B14] px-4 py-10 text-white sm:px-6"
     >
       <div className="pointer-events-none absolute inset-0">
@@ -205,7 +205,7 @@ export default function Loading() {
         </div>
 
         <h1 className="mt-4 max-w-2xl font-serif text-3xl font-medium leading-tight text-white sm:text-5xl">
-          MathMagician&apos;s School
+          Magician&apos;s School
         </h1>
         <p className="mt-3 max-w-xl text-sm leading-6 text-[#A9A3BA] sm:text-base">
           Preparing your learning portal with a little calculation and a lot of magic.

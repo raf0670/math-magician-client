@@ -132,7 +132,7 @@ export default function DashboardSidebar() {
                             <BrandMark className="h-7 w-7" />
                         </motion.div>
                         <div className="min-w-0 flex flex-col">
-                            <span className="font-serif text-base font-bold tracking-wide text-white">MathMagician</span>
+                            <span className="font-serif text-base font-bold tracking-wide text-white">Magician&apos;s School</span>
                             <span className="text-[9px] font-bold tracking-[0.26em] text-[#DFB15B] uppercase">IBA Portal</span>
                         </div>
                     </div>

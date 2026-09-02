@@ -19,7 +19,7 @@ const openSans = Open_Sans({
 });
 
 export const metadata = {
-  title: "MathMagician's School",
+  title: "Magician's School",
   description: "IBA Simplified",
 };
 

@@ -231,7 +231,7 @@ export default function Navbar() {
                     </motion.div>
                     <div className="min-w-0">
                         <span className="block truncate font-serif text-lg tracking-wide text-[#DFB15B] drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)] md:text-2xl">
-                            MathMagician&apos;s School
+                            Magician&apos;s School
                         </span>
                         <span className="hidden text-[9px] font-bold uppercase tracking-[0.28em] text-[#8E8A9F] md:block">
                             IBA Preparation Portal
