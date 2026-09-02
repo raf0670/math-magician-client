@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { CalendarClock, CheckCircle2, ClipboardList, Clock3, Eye, LockKeyhole, Play, RefreshCw } from "lucide-react";
+import { CalendarClock, CheckCircle2, ClipboardList, Clock3, Eye, LockKeyhole, Play, RefreshCw, RotateCcw } from "lucide-react";
 import { getAssignments } from "@/lib/api";
 import ClassAccessGate from "@/components/dashboard/ClassAccessGate";
 import FlashyLoader from "@/components/shared/FlashyLoader";
@@ -180,13 +180,24 @@ function AssignmentsContent() {
                       Submitted - review after deadline
                     </div>
                   ) : isOpen || isEnded ? (
-                    <Link
-                      href={`/dashboard/assignments/${assignment._id}`}
-                      className={`inline-flex w-full items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-bold uppercase tracking-wider transition ${isOpen ? "bg-linear-to-r from-[#E6C687] to-[#AA7C11] text-black hover:brightness-110" : "border border-white/8 bg-[#0F0D15] text-white hover:border-[#DFB15B]/30 hover:text-[#DFB15B]"}`}
-                    >
-                      {isOpen ? <Play className="h-4 w-4 fill-current stroke-none" /> : <Eye className="h-4 w-4" />}
-                      {isOpen ? "Start Assignment" : assignment.hasSubmitted ? "View Results" : "Review Solutions"}
-                    </Link>
+                    <div className="flex flex-col gap-2">
+                      <Link
+                        href={`/dashboard/assignments/${assignment._id}`}
+                        className={`inline-flex w-full items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-bold uppercase tracking-wider transition ${isOpen ? "bg-linear-to-r from-[#E6C687] to-[#AA7C11] text-black hover:brightness-110" : "border border-white/8 bg-[#0F0D15] text-white hover:border-[#DFB15B]/30 hover:text-[#DFB15B]"}`}
+                      >
+                        {isOpen ? <Play className="h-4 w-4 fill-current stroke-none" /> : <Eye className="h-4 w-4" />}
+                        {isOpen ? "Start Assignment" : assignment.hasSubmitted ? "View Results" : "Review Solutions"}
+                      </Link>
+                      {isEnded && assignment.canRetake ? (
+                        <Link
+                          href={`/dashboard/assignments/${assignment._id}?mode=retake`}
+                          className="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-emerald-400/20 bg-emerald-400/10 px-4 py-3 text-sm font-bold uppercase tracking-wider text-emerald-200 transition hover:border-emerald-300/40 hover:bg-emerald-400/15"
+                        >
+                          <RotateCcw className="h-4 w-4" />
+                          Retake
+                        </Link>
+                      ) : null}
+                    </div>
                   ) : (
                     <div className="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-white/8 bg-[#0F0D15] px-4 py-3 text-sm font-semibold text-[#8E8A9F]">
                       <LockKeyhole className="h-4 w-4" />
