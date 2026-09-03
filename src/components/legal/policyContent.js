@@ -4,7 +4,7 @@ export const businessInfo = {
   address: "RH Home Center, Farmgate, Dhaka",
   phone: "01894688018",
   email: "maharab.h.35@gmail.com",
-  tradeLicenseNumber: "To be updated",
+  tradeLicenseNumber: "20261911562900040",
   lastUpdated: "September 2, 2026",
 };
 
