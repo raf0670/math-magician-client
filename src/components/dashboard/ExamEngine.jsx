@@ -11,6 +11,7 @@ const SUBMISSION_REASONS = {
     TAB_SWITCH: "tab_switch",
 };
 const SUBJECT_NAV_ORDER = ["Maths", "English", "Analytical"];
+const ATTEMPT_DEADLINE_STORAGE_PREFIX = "exam_archive_attempt_deadline";
 
 function getQuestionId(question, index) {
     const rawId = question?._id?.$oid || question?._id || question?.id;
@@ -58,15 +59,100 @@ function getLiveExamHardEndTimestamp(examData) {
     return Number.isNaN(endTime) ? null : endTime;
 }
 
+function getExamEndTimeMetadataTimestamp(examData) {
+    if (!examData?.endTime) return null;
+
+    const endTime = new Date(examData.endTime).getTime();
+    return Number.isNaN(endTime) ? null : endTime;
+}
+
+function getDurationMs(examData) {
+    const duration = Number(examData?.duration);
+    return Number.isFinite(duration) && duration > 0 ? Math.floor(duration * 60 * 1000) : null;
+}
+
+function getExamId(examData) {
+    const rawId = examData?._id?.$oid || examData?._id || examData?.id;
+    return typeof rawId === "string" || typeof rawId === "number" ? rawId.toString() : "";
+}
+
+function getAttemptDeadlineStorageKey(examData) {
+    const examId = getExamId(examData);
+    if (!examId) return "";
+
+    const attemptMode = examData?.isRetakeMode ? "retake" : "primary";
+    return `${ATTEMPT_DEADLINE_STORAGE_PREFIX}_${examId}_${attemptMode}`;
+}
+
+function getAttemptDeadlineMetadata(examData) {
+    return {
+        duration: Number(examData?.duration) || 0,
+        endTime: getExamEndTimeMetadataTimestamp(examData),
+        isRetakeMode: Boolean(examData?.isRetakeMode),
+    };
+}
+
+function hasMatchingAttemptDeadlineMetadata(storedDeadline, metadata) {
+    return (
+        storedDeadline?.duration === metadata.duration
+        && storedDeadline?.endTime === metadata.endTime
+        && storedDeadline?.isRetakeMode === metadata.isRetakeMode
+    );
+}
+
+function getStoredAttemptDeadlineTimestamp(storageKey, metadata) {
+    if (!storageKey || typeof window === "undefined") return null;
+
+    try {
+        const storedDeadline = JSON.parse(window.localStorage.getItem(storageKey) || "null");
+        const deadlineTimestamp = Number(storedDeadline?.deadlineTimestamp);
+
+        if (
+            Number.isFinite(deadlineTimestamp)
+            && deadlineTimestamp > 0
+            && hasMatchingAttemptDeadlineMetadata(storedDeadline, metadata)
+        ) {
+            return deadlineTimestamp;
+        }
+
+        window.localStorage.removeItem(storageKey);
+    } catch {
+        window.localStorage.removeItem(storageKey);
+    }
+
+    return null;
+}
+
+function persistAttemptDeadlineTimestamp(storageKey, metadata, deadlineTimestamp) {
+    if (!storageKey || typeof window === "undefined" || !Number.isFinite(deadlineTimestamp)) return;
+
+    try {
+        window.localStorage.setItem(storageKey, JSON.stringify({
+            ...metadata,
+            deadlineTimestamp,
+        }));
+    } catch {
+        // A blocked localStorage should not interrupt the exam timer.
+    }
+}
+
 function getExamAttemptDeadlineTimestamp(examData) {
     const hardEndTimestamp = getLiveExamHardEndTimestamp(examData);
-    if (hardEndTimestamp === null) return null;
     if (examData?.examType === "assignment") return hardEndTimestamp;
 
-    const duration = Number(examData?.duration);
-    if (!Number.isFinite(duration) || duration <= 0) return hardEndTimestamp;
+    const durationMs = getDurationMs(examData);
+    if (durationMs === null) return hardEndTimestamp;
 
-    return Math.min(Date.now() + Math.floor(duration * 60 * 1000), hardEndTimestamp);
+    const metadata = getAttemptDeadlineMetadata(examData);
+    const storageKey = getAttemptDeadlineStorageKey(examData);
+    const storedDeadlineTimestamp = getStoredAttemptDeadlineTimestamp(storageKey, metadata);
+    const durationDeadlineTimestamp = storedDeadlineTimestamp || Date.now() + durationMs;
+    const deadlineTimestamp = hardEndTimestamp === null
+        ? durationDeadlineTimestamp
+        : Math.min(durationDeadlineTimestamp, hardEndTimestamp);
+
+    persistAttemptDeadlineTimestamp(storageKey, metadata, deadlineTimestamp);
+    return deadlineTimestamp;
 }
 
 function getRemainingSecondsUntil(timestamp) {
@@ -143,6 +229,7 @@ export default function ExamEngine({ examData, onComplete }) {
     const isAssignmentExam = examData?.examType === "assignment";
     const answerStorageKey = examData?._id ? `exam_archive_answers_${examData._id}` : "";
     const eliminationStorageKey = examData?._id ? `exam_archive_eliminations_${examData._id}` : "";
+    const attemptDeadlineStorageKey = getAttemptDeadlineStorageKey(examData);
 
     useEffect(() => {
         if (!answerStorageKey || !normalizedQuestions.length || hasHydratedAnswersRef.current) return;
@@ -282,11 +369,12 @@ export default function ExamEngine({ examData, onComplete }) {
             if (onComplete) await onComplete(submissionAnswers, examData, { submissionReason });
             if (answerStorageKey) window.localStorage.removeItem(answerStorageKey);
             if (eliminationStorageKey) window.localStorage.removeItem(eliminationStorageKey);
+            if (attemptDeadlineStorageKey) window.localStorage.removeItem(attemptDeadlineStorageKey);
         } catch {
             submissionStartedRef.current = false;
             setIsSubmitting(false);
         }
-    }, [answerStorageKey, answers, eliminationStorageKey, examData, isSubmitting, normalizedQuestions, onComplete]);
+    }, [answerStorageKey, answers, attemptDeadlineStorageKey, eliminationStorageKey, examData, isSubmitting, normalizedQuestions, onComplete]);
 
     useEffect(() => {
         if (!hasTimedExam) return undefined;
