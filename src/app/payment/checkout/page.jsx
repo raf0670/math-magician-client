@@ -18,29 +18,8 @@ const PLANS = {
 
 const PARTIAL_PAYMENT_AMOUNT = 10000;
 
-const BANK_ACCOUNTS = [
-  {
-    bank: "Prime Bank",
-    accountNumber: "3108211033174",
-    branch: "Dilkusha Branch",
-    accountName: "Mehrabur Rahaman",
-    routingNumber: "170272892",
-  },
-  {
-    bank: "City Bank",
-    accountNumber: "1781920008224",
-    branch: "Karwan Bazar Branch",
-    accountName: "Md. Mehrabur Rahaman",
-    routingNumber: "225272868",
-  },
-];
-
 function formatBDT(amount) {
   return `BDT ${Number(amount || 0).toLocaleString("en-US")}`;
-}
-
-function isBasicEmail(value) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value?.trim() || "");
 }
 
 export default function BookedCheckoutPage() {
@@ -56,10 +35,6 @@ function BookedCheckoutContent() {
   const [booking, setBooking] = useState(null);
   const [loadingBooking, setLoadingBooking] = useState(true);
   const [paymentChoice, setPaymentChoice] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState("bkash");
-  const [referenceName, setReferenceName] = useState("");
-  const [referenceEmail, setReferenceEmail] = useState("");
-  const [trxID, setTrxID] = useState("");
   const [policiesAccepted, setPoliciesAccepted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
@@ -99,18 +74,8 @@ function BookedCheckoutContent() {
     event.preventDefault();
     setError("");
 
-    if (referenceEmail.trim() && !isBasicEmail(referenceEmail)) {
-      setError("Please enter a valid reference email address.");
-      return;
-    }
-
     if (!paymentChoice) {
       setError("Please choose full or partial payment before continuing.");
-      return;
-    }
-
-    if (!trxID.trim()) {
-      setError("Please enter the transaction ID or bank reference.");
       return;
     }
 
@@ -123,26 +88,16 @@ function BookedCheckoutContent() {
       setSubmitting(true);
       const payload = await submitBookedCheckout({
         paymentChoice,
-        paymentMethod,
-        referenceName,
-        referenceEmail,
-        trxID,
       });
-      const paymentId = payload?.data?.paymentId;
+      const paymentUrl = payload?.data?.paymentUrl;
 
-      if (!paymentId) {
-        throw new Error("Unable to submit payment for review.");
+      if (!paymentUrl) {
+        throw new Error("Unable to open PayStation checkout.");
       }
 
-      const successParams = new URLSearchParams({
-        paymentId,
-        status: "pending",
-        paymentChoice,
-        remainingAmount: String(remainingAmount),
-      });
-      router.push(`/payment/success?${successParams.toString()}`);
+      window.location.assign(paymentUrl);
     } catch (err) {
-      setError(err.message || "Unable to submit payment for review.");
+      setError(err.message || "Unable to open PayStation checkout.");
       setSubmitting(false);
     }
   };
@@ -197,78 +152,35 @@ function BookedCheckoutContent() {
                 Proceed to Payment
               </h1>
               <p className="mt-3 max-w-xl text-sm leading-6 text-[#A9A3BA]">
-                Your seat is already booked for {selectedPlan.title}. Submit only the payment reference for admin review.
+                Your seat is already booked for {selectedPlan.title}. Continue to PayStation to complete the payment securely.
               </p>
             </div>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-8 px-4 py-6 sm:px-6 sm:py-8">
-            <FormSection title="Payment Option" description="Choose how much you are paying before submitting for review." index={1}>
+            <FormSection title="Payment Option" description="Choose how much you are paying before continuing to PayStation." index={1}>
               <PaymentChoiceField selectedPlan={selectedPlan} value={paymentChoice} onChange={setPaymentChoice} />
             </FormSection>
 
-            <FormSection title="Payment Details" description="Choose bKash or bank transfer, then enter the transaction ID or reference." index={2}>
-              <div className="space-y-5">
-                <div className="grid grid-cols-2 rounded-2xl border border-white/8 bg-[#0A090F]/70 p-1">
-                  {[
-                    { value: "bkash", label: "Bkash" },
-                    { value: "bank", label: "Bank" },
-                  ].map((method) => {
-                    const selected = paymentMethod === method.value;
-                    return (
-                      <button
-                        key={method.value}
-                        type="button"
-                        onClick={() => setPaymentMethod(method.value)}
-                        className={`rounded-xl px-4 py-3 text-sm font-bold transition ${
-                          selected ? "bg-[#DFB15B] text-black shadow-[0_10px_28px_rgba(223,177,91,0.2)]" : "text-[#A9A3BA] hover:bg-white/5 hover:text-white"
-                        }`}
-                        aria-pressed={selected}
-                      >
-                        {method.label}
-                      </button>
-                    );
-                  })}
+            <FormSection title="Secure Checkout" description="You will be redirected to PayStation to complete payment by card, MFS, wallet, or bank channel." index={2}>
+              <div className="grid gap-4 lg:grid-cols-[1fr_1.1fr]">
+                <div className="rounded-2xl border border-[#DFB15B]/15 bg-[#DFB15B]/8 px-4 py-4">
+                  <div className="flex items-center gap-3 text-[#DFB15B]">
+                    <CreditCard className="h-5 w-5" />
+                    <p className="text-xs font-bold uppercase tracking-[0.2em]">PayStation Hosted Checkout</p>
+                  </div>
+                  <p className="mt-4 text-sm font-medium leading-6 text-[#EBD39B]">
+                    Complete the payment on PayStation&apos;s secure page. Your class access unlocks automatically after the payment is verified.
+                  </p>
                 </div>
 
-                <div className="grid gap-5 lg:grid-cols-[minmax(320px,1.05fr)_minmax(0,1fr)] lg:items-start">
-                  <PaymentInstructions paymentMethod={paymentMethod} />
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-3 rounded-2xl border border-[#DFB15B]/15 bg-[#DFB15B]/8 px-4 py-4 text-sm text-[#EBD39B]">
-                      <CreditCard className="h-5 w-5 shrink-0 text-[#DFB15B]" />
-                      <span className="font-medium">
-                        {hasPaymentChoice
-                          ? `${selectedPlan.title} - pay ${formatBDT(amountDueNow)} now${remainingAmount ? `, ${formatBDT(remainingAmount)} later` : ""}`
-                          : "Choose a payment option to see the amount due now."}
-                      </span>
-                    </div>
-                    <ReferenceField
-                      label="Reference Name"
-                      value={referenceName}
-                      onChange={setReferenceName}
-                      placeholder="Who told you about this website?"
-                    />
-                    <ReferenceField
-                      label="Reference Email"
-                      type="email"
-                      value={referenceEmail}
-                      onChange={setReferenceEmail}
-                      placeholder="reference@example.com"
-                      error={referenceEmail.trim() && !isBasicEmail(referenceEmail)}
-                    />
-                    <label className={`block rounded-2xl border px-4 py-4 transition ${trxID.trim() ? "border-[#74D99F]/30 bg-[#102019]/55" : "border-white/5 bg-[#0F0D15]/70"}`}>
-                      <span className="text-sm font-semibold text-white">
-                        {paymentMethod === "bank" ? "Transaction ID / Reference" : "BkashTrxID"} <span className="text-[#DFB15B]">*</span>
-                      </span>
-                      <input
-                        type="text"
-                        value={trxID}
-                        onChange={(event) => setTrxID(event.target.value)}
-                        placeholder={paymentMethod === "bank" ? "Bank transaction ID or reference" : "Example: A1B2C3D4E5"}
-                        className="mt-3 w-full border-0 border-b border-white/20 bg-transparent px-0 py-2 text-sm text-white outline-none transition placeholder:text-[#6B667B] focus:border-[#DFB15B]"
-                      />
-                    </label>
-                  </div>
+                <div className="flex items-center gap-3 rounded-2xl border border-white/8 bg-[#0F0D15]/70 px-4 py-4 text-sm text-[#EBD39B]">
+                  <CreditCard className="h-5 w-5 shrink-0 text-[#DFB15B]" />
+                  <span className="font-medium">
+                    {hasPaymentChoice
+                      ? `${selectedPlan.title} - pay ${formatBDT(amountDueNow)} now${remainingAmount ? `, ${formatBDT(remainingAmount)} later` : ""}`
+                      : "Choose a payment option to see the amount due now."}
+                  </span>
                 </div>
               </div>
             </FormSection>
@@ -289,7 +201,7 @@ function BookedCheckoutContent() {
             >
               <div className="flex items-center gap-2 text-xs font-medium text-[#8E8A9F]">
                 <LockKeyhole className="h-4 w-4 text-[#DFB15B]" />
-                Your payment will stay pending until an admin approves the transaction ID.
+                You will complete payment on PayStation. Access unlocks after verification.
               </div>
               <motion.button
                 type="submit"
@@ -299,7 +211,7 @@ function BookedCheckoutContent() {
                 className="group relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-2xl bg-[#DFB15B] px-6 py-3 text-sm font-bold uppercase tracking-wider text-black shadow-[0_0_30px_rgba(223,177,91,0.22)] transition hover:brightness-110 disabled:cursor-wait disabled:opacity-70"
               >
                 <span className="absolute inset-y-0 -left-10 w-8 rotate-12 bg-white/40 blur-sm transition group-hover:left-full" />
-                <LoadingButtonLabel loading={submitting} idleText="Submit Payment" loadingText="Submitting..." iconName="credit" />
+                <LoadingButtonLabel loading={submitting} idleText="Continue to PayStation" loadingText="Opening PayStation..." iconName="credit" />
               </motion.button>
             </motion.div>
           </form>
@@ -346,37 +258,13 @@ function FormSection({ title, description, children, index }) {
   );
 }
 
-function ReferenceField({ label, value, onChange, type = "text", placeholder = "", error = false }) {
-  const complete = Boolean(value.trim());
-  const labelTone = error ? "text-[#F8C7C0]" : complete ? "text-[#B7F3D0]" : "text-white";
-  const inputBorder = error
-    ? "border-[#F2A7A7]"
-    : complete
-      ? "border-[#74D99F] focus:border-[#8EE6B2]"
-      : "border-white/20 focus:border-[#DFB15B]";
-
-  return (
-    <label className={`block rounded-2xl border px-4 py-4 transition ${error ? "border-[#F2A7A7]/35 bg-[#2A171B]/50" : complete ? "border-[#74D99F]/30 bg-[#102019]/55" : "border-white/5 bg-[#0F0D15]/70"}`}>
-      <span className={`text-sm font-semibold ${labelTone}`}>{label}</span>
-      <input
-        type={type}
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        placeholder={placeholder}
-        className={`mt-3 w-full border-0 border-b bg-transparent px-0 py-2 text-sm text-white outline-none transition placeholder:text-[#6B667B] ${inputBorder}`}
-      />
-      {error ? <p className="mt-2 text-xs font-semibold text-[#F8C7C0]">Please enter a valid reference email address.</p> : null}
-    </label>
-  );
-}
-
 function PaymentChoiceField({ selectedPlan, value, onChange }) {
   const options = [
     {
       id: "full",
       title: "Pay full amount now",
       amount: selectedPlan?.amount || 0,
-      note: "No remaining balance after admin approval.",
+      note: "No remaining balance after successful payment verification.",
     },
     {
       id: "partial",
@@ -412,48 +300,6 @@ function PaymentChoiceField({ selectedPlan, value, onChange }) {
           </motion.button>
         );
       })}
-    </div>
-  );
-}
-
-function PaymentInstructions({ paymentMethod }) {
-  if (paymentMethod === "bank") {
-    return (
-      <div className="space-y-3 rounded-3xl border border-[#DFB15B]/20 bg-[#DFB15B]/8 p-5">
-        <div className="flex items-center gap-3 text-[#DFB15B]">
-          <CreditCard className="h-5 w-5" />
-          <p className="text-xs font-bold uppercase tracking-[0.2em]">Bank Accounts</p>
-        </div>
-        <div className="space-y-3">
-          {BANK_ACCOUNTS.map((account) => (
-            <div key={account.accountNumber} className="rounded-2xl border border-white/8 bg-[#100E16]/70 px-4 py-3">
-              <p className="text-sm font-bold text-white">{account.bank}</p>
-              <p className="mt-2 font-mono text-lg font-bold text-white">{account.accountNumber}</p>
-              <div className="mt-3 space-y-1 text-xs font-semibold text-[#A9A3BA]">
-                <p>{account.branch}</p>
-                <p>{account.accountName}</p>
-                <p>Routing Number: {account.routingNumber}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="space-y-3 rounded-3xl border border-[#DFB15B]/20 bg-[#DFB15B]/8 p-5">
-      <div className="flex items-center gap-3 text-[#DFB15B]">
-        <CreditCard className="h-5 w-5" />
-        <p className="text-xs font-bold uppercase tracking-[0.2em]">bKash Number</p>
-      </div>
-      <div className="rounded-2xl border border-white/8 bg-[#100E16]/70 px-4 py-4">
-        <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#DFB15B]">Send Money Option</p>
-        <p className="mt-2 font-mono text-2xl font-bold text-white">01894688018</p>
-        <p className="mt-4 rounded-xl border border-[#DFB15B]/30 bg-[#DFB15B]/12 px-3 py-3 text-sm font-black uppercase leading-5 tracking-wide text-[#FFE7A3]">
-          DO NOT INCLUDE CASH OUT CHARGE ONLY PAY THE REQUIRED AMOUNT
-        </p>
-      </div>
     </div>
   );
 }

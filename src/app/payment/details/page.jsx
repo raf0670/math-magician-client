@@ -39,23 +39,6 @@ const BATCH_OPTIONS = [
   { label: "Ravenclaw", value: "Online" },
 ];
 
-const BANK_ACCOUNTS = [
-  {
-    bank: "Prime Bank",
-    accountNumber: "3108211033174",
-    branch: "Dilkusha Branch",
-    accountName: "Mehrabur Rahaman",
-    routingNumber: "170272892",
-  },
-  {
-    bank: "City Bank",
-    accountNumber: "1781920008224",
-    branch: "Karwan Bazar Branch",
-    accountName: "Md. Mehrabur Rahaman",
-    routingNumber: "225272868",
-  },
-];
-
 const INITIAL_FORM = {
   email: "",
   yourName: "",
@@ -73,9 +56,6 @@ const INITIAL_FORM = {
   strongestSection: "",
   weakestSection: "",
   preferredBatch: "",
-  referenceName: "",
-  referenceEmail: "",
-  bkashTrxID: "",
 };
 
 function formatBDT(amount) {
@@ -95,10 +75,9 @@ const REQUIRED_FIELDS = [
   "backupChoice",
   "admissionSystemIdea",
   "preferredBatch",
-  "bkashTrxID",
 ];
 
-const BOOKING_REQUIRED_FIELDS = REQUIRED_FIELDS.filter((field) => field !== "bkashTrxID");
+const BOOKING_REQUIRED_FIELDS = REQUIRED_FIELDS;
 
 function isFieldComplete(value) {
   return Array.isArray(value) ? value.length > 0 : Boolean(value?.trim());
@@ -116,10 +95,6 @@ function isFacebookProfileLink(value) {
   } catch {
     return false;
   }
-}
-
-function isBasicEmail(value) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value?.trim() || "");
 }
 
 const SECTION_VARIANTS = {
@@ -191,7 +166,6 @@ function PaymentDetailsContent() {
   const plan = PLANS[planId];
   const [form, setForm] = useState(INITIAL_FORM);
   const [paymentChoice, setPaymentChoice] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState("bkash");
   const [policiesAccepted, setPoliciesAccepted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -236,10 +210,6 @@ function PaymentDetailsContent() {
       missing.facebookProfile = "invalid";
     }
 
-    if (form.referenceEmail.trim() && !isBasicEmail(form.referenceEmail)) {
-      missing.referenceEmail = "invalid";
-    }
-
     return missing;
   }, [form, requiredFields]);
 
@@ -273,11 +243,6 @@ function PaymentDetailsContent() {
       return;
     }
 
-    if (form.referenceEmail.trim() && !isBasicEmail(form.referenceEmail)) {
-      setError("Please enter a valid reference email address.");
-      return;
-    }
-
     if (!isBookingMode && !paymentChoice) {
       setError("Please choose full or partial payment before continuing.");
       return;
@@ -291,11 +256,7 @@ function PaymentDetailsContent() {
     try {
       setLoading(true);
       if (isBookingMode) {
-        const bookingForm = { ...form };
-        delete bookingForm.bkashTrxID;
-        delete bookingForm.referenceName;
-        delete bookingForm.referenceEmail;
-        const payload = await submitSeatBooking(selectedPlanId, bookingForm);
+        const payload = await submitSeatBooking(selectedPlanId, form);
         const token = window.localStorage.getItem("exam_archive_token");
         if (token && payload?.data?.user) {
           saveAuthSession(token, payload.data.user);
@@ -309,22 +270,16 @@ function PaymentDetailsContent() {
         return;
       }
 
-      const payload = await submitManualEnrollment(selectedPlanId, form, paymentChoice, paymentMethod);
-      const paymentId = payload?.data?.paymentId;
+      const payload = await submitManualEnrollment(selectedPlanId, form, paymentChoice);
+      const paymentUrl = payload?.data?.paymentUrl;
 
-      if (!paymentId) {
-        throw new Error("Unable to submit enrollment for review.");
+      if (!paymentUrl) {
+        throw new Error("Unable to open PayStation checkout.");
       }
 
-      const successParams = new URLSearchParams({
-        paymentId,
-        status: "pending",
-        paymentChoice,
-        remainingAmount: String(remainingAmount),
-      });
-      router.push(`/payment/success?${successParams.toString()}`);
+      window.location.assign(paymentUrl);
     } catch (err) {
-      setError(err.message || "Unable to submit enrollment for review.");
+      setError(err.message || "Unable to open PayStation checkout.");
       setLoading(false);
     }
   };
@@ -464,7 +419,7 @@ function PaymentDetailsContent() {
                 <p className="mt-3 max-w-xl text-sm leading-6 text-[#A9A3BA]">
                   {isBookingMode
                     ? "Complete your student profile now. Payment can be submitted later from your dashboard."
-                    : "Complete your student profile, send the payment, and submit your transaction ID for admin approval."}
+                    : "Complete your student profile and continue to PayStation's secure checkout."}
                 </p>
               </div>
               {/* <motion.div
@@ -525,7 +480,7 @@ function PaymentDetailsContent() {
 
             {!isBookingMode ? (
               <>
-                <FormSection title="Payment Option" description="Choose how much you are paying before submitting this enrollment for review." index={5}>
+                <FormSection title="Payment Option" description="Choose how much you are paying before continuing to PayStation." index={5}>
                   <PaymentChoiceField
                     selectedPlan={selectedPlan}
                     value={paymentChoice}
@@ -537,14 +492,6 @@ function PaymentDetailsContent() {
                   index={6}
                   selectedPlan={selectedPlan}
                   paymentChoice={paymentChoice}
-                  paymentMethod={paymentMethod}
-                  setPaymentMethod={setPaymentMethod}
-                  referenceName={form.referenceName}
-                  referenceEmail={form.referenceEmail}
-                  referenceEmailError={fieldErrors.referenceEmail}
-                  trxValue={form.bkashTrxID}
-                  trxError={fieldErrors.bkashTrxID}
-                  onChange={updateField}
                 />
               </>
             ) : null}
@@ -566,8 +513,8 @@ function PaymentDetailsContent() {
               <div className="flex items-center gap-2 text-xs font-medium text-[#8E8A9F]">
                 <LockKeyhole className="h-4 w-4 text-[#DFB15B]" />
                 {isBookingMode
-                  ? "Your seat will be booked now. Class access stays locked until payment is approved."
-                  : "Your enrollment will stay pending until an admin approves the transaction ID."}
+                  ? "Your seat will be booked now. Class access stays locked until PayStation payment is verified."
+                  : "You will complete payment on PayStation. Access unlocks after verification."}
               </div>
               <motion.button
                 type="submit"
@@ -579,8 +526,8 @@ function PaymentDetailsContent() {
                 <span className="absolute inset-y-0 -left-10 w-8 rotate-12 bg-white/40 blur-sm transition group-hover:left-full" />
                 <LoadingButtonLabel
                   loading={loading}
-                  idleText={isBookingMode ? "Book Seat" : "Submit for Review"}
-                  loadingText={isBookingMode ? "Booking..." : "Submitting..."}
+                  idleText={isBookingMode ? "Book Seat" : "Continue to PayStation"}
+                  loadingText={isBookingMode ? "Booking..." : "Opening PayStation..."}
                   iconName={isBookingMode ? "check" : "credit"}
                 />
               </motion.button>
@@ -633,120 +580,31 @@ function PaymentDetailsSection({
   index = 2,
   selectedPlan,
   paymentChoice,
-  paymentMethod,
-  setPaymentMethod,
-  referenceName,
-  referenceEmail,
-  referenceEmailError,
-  trxValue,
-  trxError,
-  onChange,
 }) {
   const hasPaymentChoice = Boolean(paymentChoice);
   const amountDueNow = paymentChoice === "partial" ? PARTIAL_PAYMENT_AMOUNT : paymentChoice === "full" ? selectedPlan?.amount || 0 : 0;
   const remainingAmount = Math.max((selectedPlan?.amount || 0) - amountDueNow, 0);
 
   return (
-    <FormSection title="Payment Details" description="Choose bKash or bank transfer, then enter the transaction ID or reference for admin approval." index={index}>
-      <div className="space-y-5">
-        <div className="grid grid-cols-2 rounded-2xl border border-white/8 bg-[#0A090F]/70 p-1">
-          {[
-            { value: "bkash", label: "Bkash" },
-            { value: "bank", label: "Bank" },
-          ].map((method) => {
-            const selected = paymentMethod === method.value;
-
-            return (
-              <button
-                key={method.value}
-                type="button"
-                onClick={() => setPaymentMethod(method.value)}
-                className={`rounded-xl px-4 py-3 text-sm font-bold transition ${
-                  selected
-                    ? "bg-[#DFB15B] text-black shadow-[0_10px_28px_rgba(223,177,91,0.2)]"
-                    : "text-[#A9A3BA] hover:bg-white/5 hover:text-white"
-                }`}
-                aria-pressed={selected}
-              >
-                {method.label}
-              </button>
-            );
-          })}
+    <FormSection title="Secure Checkout" description="You will be redirected to PayStation to complete payment by card, MFS, wallet, or bank channel." index={index}>
+      <div className="grid gap-4 lg:grid-cols-[1fr_1.1fr]">
+        <div className="rounded-2xl border border-[#DFB15B]/15 bg-[#DFB15B]/8 px-4 py-4">
+          <div className="flex items-center gap-3 text-[#DFB15B]">
+            <CreditCard className="h-5 w-5" />
+            <p className="text-xs font-bold uppercase tracking-[0.2em]">PayStation Hosted Checkout</p>
+          </div>
+          <p className="mt-4 text-sm font-medium leading-6 text-[#EBD39B]">
+            Complete the payment on PayStation&apos;s secure page. Your class access unlocks automatically after the payment is verified.
+          </p>
         </div>
 
-        <div className="grid gap-5 lg:grid-cols-[minmax(320px,1.05fr)_minmax(0,1fr)] lg:items-start">
-          {paymentMethod === "bkash" ? (
-            <div className="space-y-3 rounded-3xl border border-[#DFB15B]/20 bg-[#DFB15B]/8 p-5">
-              <div className="flex items-center gap-3 text-[#DFB15B]">
-                <CreditCard className="h-5 w-5" />
-                <p className="text-xs font-bold uppercase tracking-[0.2em]">bKash Number</p>
-              </div>
-              <div className="rounded-2xl border border-white/8 bg-[#100E16]/70 px-4 py-4">
-                <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#DFB15B]">Send Money Option</p>
-                <p className="mt-2 font-mono text-2xl font-bold text-white">01894688018</p>
-                <p className="mt-4 rounded-xl border border-[#DFB15B]/30 bg-[#DFB15B]/12 px-3 py-3 text-sm font-black uppercase leading-5 tracking-wide text-[#FFE7A3]">
-                  DO NOT INCLUDE CASH OUT CHARGE ONLY PAY THE REQUIRED AMOUNT
-                </p>
-              </div>
-            </div>
-          ) : (
-            <div className="space-y-3 rounded-3xl border border-[#DFB15B]/20 bg-[#DFB15B]/8 p-5">
-              <div className="flex items-center gap-3 text-[#DFB15B]">
-                <CreditCard className="h-5 w-5" />
-                <p className="text-xs font-bold uppercase tracking-[0.2em]">Bank Accounts</p>
-              </div>
-              <div className="space-y-3">
-                {BANK_ACCOUNTS.map((account) => (
-                  <div key={account.accountNumber} className="rounded-2xl border border-white/8 bg-[#100E16]/70 px-4 py-3">
-                    <p className="text-sm font-bold text-white">{account.bank}</p>
-                    <p className="mt-2 font-mono text-lg font-bold text-white">{account.accountNumber}</p>
-                    <div className="mt-3 space-y-1 text-xs font-semibold text-[#A9A3BA]">
-                      <p>{account.branch}</p>
-                      <p>{account.accountName}</p>
-                      <p>Routing Number: {account.routingNumber}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          <div className="space-y-4">
-            <div className="flex items-center gap-3 rounded-2xl border border-[#DFB15B]/15 bg-[#DFB15B]/8 px-4 py-4 text-sm text-[#EBD39B]">
-              <CreditCard className="h-5 w-5 shrink-0 text-[#DFB15B]" />
-              <span className="font-medium">
-                {hasPaymentChoice
-                  ? `${selectedPlan?.title || "Selected program"} - pay ${formatBDT(amountDueNow)} now${remainingAmount ? `, ${formatBDT(remainingAmount)} later` : ""}`
-                  : "Choose a payment option to see the amount due now."}
-              </span>
-            </div>
-            <TextField
-              label="Reference Name"
-              field="referenceName"
-              value={referenceName}
-              onChange={onChange}
-              placeholder="Who told you about this website?"
-            />
-            <TextField
-              label="Reference Email"
-              field="referenceEmail"
-              type="email"
-              value={referenceEmail}
-              error={referenceEmailError}
-              errorMessage={referenceEmailError === "invalid" ? "Please enter a valid reference email address." : ""}
-              onChange={onChange}
-              placeholder="reference@example.com"
-            />
-            <TextField
-              label={paymentMethod === "bank" ? "Transaction ID / Reference" : "BkashTrxID"}
-              field="bkashTrxID"
-              required
-              value={trxValue}
-              error={trxError}
-              onChange={onChange}
-              placeholder={paymentMethod === "bank" ? "Bank transaction ID or reference" : "Example: A1B2C3D4E5"}
-            />
-          </div>
+        <div className="flex items-center gap-3 rounded-2xl border border-white/8 bg-[#0F0D15]/70 px-4 py-4 text-sm text-[#EBD39B]">
+          <CreditCard className="h-5 w-5 shrink-0 text-[#DFB15B]" />
+          <span className="font-medium">
+            {hasPaymentChoice
+              ? `${selectedPlan?.title || "Selected program"} - pay ${formatBDT(amountDueNow)} now${remainingAmount ? `, ${formatBDT(remainingAmount)} later` : ""}`
+              : "Choose a payment option to see the amount due now."}
+          </span>
         </div>
       </div>
     </FormSection>
@@ -759,7 +617,7 @@ function PaymentChoiceField({ selectedPlan, value, onChange }) {
       id: "full",
       title: "Pay full amount now",
       amount: selectedPlan?.amount || 0,
-      note: "No remaining balance after admin approval.",
+      note: "No remaining balance after successful payment verification.",
     },
     {
       id: "partial",

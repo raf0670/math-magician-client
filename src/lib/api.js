@@ -260,10 +260,10 @@ export async function getCourses() {
   return request("/api/courses");
 }
 
-export async function submitManualEnrollment(planId, formData, paymentChoice, paymentMethod = "bkash") {
+export async function submitManualEnrollment(planId, formData, paymentChoice) {
   return request("/api/payments/manual-enrollment", {
     method: "POST",
-    body: { planId, formData, paymentChoice, paymentMethod },
+    body: { planId, formData, paymentChoice },
   });
 }
 
