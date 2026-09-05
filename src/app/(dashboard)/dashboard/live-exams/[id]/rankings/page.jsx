@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useProgram } from "@/lib/program";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { AlertTriangle, ArrowLeft, CalendarClock, Medal, ShieldAlert, Trophy, Users } from "lucide-react";
@@ -48,6 +49,7 @@ export default function LiveExamRankingsPage() {
 }
 
 function LiveExamRankingsContent() {
+  const { examBasePath } = useProgram();
   const params = useParams();
   const examId = params?.id;
   const [currentUser] = useState(() => getStoredUser());
@@ -155,7 +157,7 @@ function LiveExamRankingsContent() {
         </div>
 
         <Link
-          href="/dashboard/live-exams"
+          href={examBasePath}
           className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/8 bg-[#121017] px-4 py-3 text-sm font-semibold text-white transition hover:border-[#DFB15B]/30 hover:text-[#DFB15B]"
         >
           <ArrowLeft className="h-4 w-4" />
@@ -216,7 +218,7 @@ function LiveExamRankingsContent() {
                       ) : null}
                     </div>
                     <div className="mt-0.5 text-[11px] font-medium text-[#8E8A9F]">
-                      {entry.house || "No house"} - Submitted {formatDateTime(entry.submittedAt)}
+                      {entry.house ? `${entry.house} - ` : ""}Submitted {formatDateTime(entry.submittedAt)}
                     </div>
                   </div>
                   <div className="col-span-2 flex items-center justify-between rounded-xl border border-white/5 bg-[#121017]/70 px-3 py-2 sm:col-span-1 sm:block sm:border-0 sm:bg-transparent sm:p-0 sm:text-right">
@@ -262,6 +264,7 @@ function SummaryTile({ label, value, icon: Icon }) {
 }
 
 function RankingsMessage({ icon, eyebrow, title, message }) {
+  const { examBasePath } = useProgram();
   return (
     <RankingsPageShell>
       <div className="flex min-h-105 items-center justify-center rounded-3xl border border-white/5 bg-[#121017] px-6 py-12 text-center">
@@ -273,7 +276,7 @@ function RankingsMessage({ icon, eyebrow, title, message }) {
           <h1 className="mt-3 font-serif text-3xl font-medium text-white">{title}</h1>
           <p className="mt-3 text-sm leading-6 text-[#8E8A9F]">{message}</p>
           <Link
-            href="/dashboard/live-exams"
+            href={examBasePath}
             className="mt-6 inline-flex items-center justify-center gap-2 rounded-2xl bg-[#DFB15B] px-5 py-3 text-sm font-bold uppercase tracking-wider text-black transition hover:brightness-110"
           >
             <ArrowLeft className="h-4 w-4" />

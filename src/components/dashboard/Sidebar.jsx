@@ -46,7 +46,7 @@ export default function DashboardSidebar() {
         const syncUser = () => {
             const storedUser = getStoredUser();
             setCurrentUser(storedUser);
-            setRankInfo(getRankInfo(storedUser?.rankInfo));
+            setRankInfo(getRankInfo(storedUser?.hasMathAccess && (!storedUser?.hasClassAccess || pathname.startsWith("/dashboard/math")) ? storedUser?.mathRankInfo : storedUser?.rankInfo));
         };
         const refreshProfile = async () => {
             const token = window.localStorage.getItem("exam_archive_token");
@@ -67,8 +67,10 @@ export default function DashboardSidebar() {
             window.removeEventListener("auth-state-changed", syncUser);
             window.removeEventListener("storage", syncUser);
         };
-    }, []);
+    }, [pathname]);
 
+    const showMath = currentUser?.hasMathAccess || currentUser?.role === "admin";
+    const mathOnly = currentUser?.hasMathAccess && !currentUser?.hasClassAccess && currentUser?.role !== "admin";
     const navItems = [
         { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
         { href: "/dashboard/classes", label: "Live Classes", icon: Video },
@@ -85,8 +87,16 @@ export default function DashboardSidebar() {
         currentUser?.role === "admin" ? { href: "/dashboard/admin/classes", label: "Class Admin", icon: Video } : null,
         currentUser?.role === "admin" ? { href: "/dashboard/admin/live-exams", label: "Live Exam Admin", icon: FileQuestion } : null,
         currentUser?.role === "admin" ? { href: "/dashboard/admin/assignments", label: "Assignment Admin", icon: ClipboardList } : null,
+        showMath ? { href: "/dashboard/math", label: "Math Overview", icon: Brain } : null,
+        showMath ? { href: "/dashboard/math/classes", label: "Math Live Classes", icon: Video } : null,
+        showMath ? { href: "/dashboard/math/archived-classes", label: "Math Recordings", icon: Archive } : null,
+        showMath ? { href: "/dashboard/math/live-exams", label: "Math Exams", icon: Radio } : null,
+        showMath ? { href: "/dashboard/math/leaderboard", label: "Math Leaderboard", icon: Trophy } : null,
+        currentUser?.hasClassAccess && !showMath ? { href: "/math-course", label: "Join Math Course", icon: Brain } : null,
+        mathOnly ? { href: "/payment/details?plan=slytherinUpgrade", label: "Join Slytherin", icon: Sparkles } : null,
+        currentUser?.role === "admin" ? { href: "/dashboard/admin/math/live-exams", label: "Math Exam Admin", icon: FileQuestion } : null,
         { href: "/dashboard/profile", label: "Profile", icon: User },
-    ].filter(Boolean);
+    ].filter(Boolean).filter(item => !mathOnly || item.href.startsWith("/dashboard/math") || item.href === "/dashboard/profile" || item.href.startsWith("/payment/"));
 
     const firstName = currentUser?.name?.trim().split(" ")[0] || "Student";
     const rankTone = getRankTone(rankInfo);
@@ -99,7 +109,7 @@ export default function DashboardSidebar() {
 
     return (
         <>
-            <aside className="hidden md:flex fixed inset-y-0 left-0 z-30 w-64 select-none flex-col justify-center overflow-hidden border-r border-[#DFB15B]/10 bg-[#0D0B14]/95 px-4 py-6 shadow-[22px_0_70px_rgba(0,0,0,0.28)]">
+            <aside className="hidden md:flex fixed inset-y-0 left-0 z-30 w-64 select-none flex-col justify-start overflow-y-auto border-r border-[#DFB15B]/10 bg-[#0D0B14]/95 px-4 py-6 shadow-[22px_0_70px_rgba(0,0,0,0.28)]">
                 <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(223,177,91,0.045)_1px,transparent_1px),linear-gradient(90deg,rgba(124,58,237,0.035)_1px,transparent_1px)] bg-size-[38px_38px]" />
                 <motion.div
                     className="pointer-events-none absolute -left-24 -top-24 h-64 w-64 rounded-full bg-[#DFB15B]/13 blur-3xl"

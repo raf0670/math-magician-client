@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { getContentCatalog } from "@/lib/api";
 import { AnimatePresence, motion } from "framer-motion";
 import {
     ArrowUpRight,
@@ -15,82 +16,23 @@ import {
     X,
 } from "lucide-react";
 
-const RESOURCE_CATEGORIES = [
-    {
-        label: "Analytical",
-        caption: "Puzzle sets, solutions and solving guidance",
-        description: "Browse analytical resources for puzzle practice, worked solutions, and focused puzzle suggestions.",
-        icon: Brain,
-        accent: "text-emerald-200",
-        surface: "border-emerald-400/15 bg-emerald-400/8",
-        resources: [
-            { label: "200 Puzzles", href: "https://drive.google.com/file/d/1M2XBVdlVqLgwwi6kFD95UVrlt7Cdb-Eb/view?usp=drive_link" },
-            { label: "Puzzles Solution", href: "https://drive.google.com/file/d/1MoJo_QTOSPik0wWtC94_JuwrQCZ4xk9N/view?usp=drive_link" },
-            { label: "Suggestions For Puzzle", href: "https://drive.google.com/file/d/1RW4f52yzU3rbItMrA2Jx_oBlLitZQsu0/view?usp=drive_link" },
-        ],
-    },
-    {
-        label: "English",
-        caption: "Vocabulary, grammar, SAT, GRE and TOEFL books",
-        description: "Browse English PDFs for grammar rules, vocabulary books, sentence completion, analogies, and reading prep.",
-        icon: Languages,
-        accent: "text-sky-200",
-        surface: "border-sky-400/15 bg-sky-400/8",
-        resources: [
-            { label: "Analogies", href: "https://drive.google.com/file/d/1ymI5j-ofMCRak0hc7a0nWlYh8_Nz6tb4/view?usp=drive_link" },
-            { label: "50 Grammar Rules 01", href: "https://drive.google.com/file/d/1oY7wUasWVjstXXCaLzVnXQoLRfpH1lkE/view?usp=drive_link" },
-            { label: "50 Grammar Rules 02", href: "https://drive.google.com/file/d/1htc2G0PVjkymHAFmOMIrxinUXQVNoPs_/view?usp=drive_link" },
-            { label: "501 Sentence Completion Questions", href: "https://drive.google.com/file/d/1wTbdA6q1Mgl-8TPeGBlISw-zRlUxpzHz/view?usp=drive_link" },
-            { label: "Barron's 800 HF Words", href: "https://drive.google.com/file/d/1xFKTJhBs5lTnlnoXKlwT-9URJR07R3Ly/view?usp=drive_link" },
-            { label: "Barron's SAT", href: "https://drive.google.com/file/d/1Vo4d-lGTWk95yJW16yCRcr7MawAzeWaI/view?usp=drive_link" },
-            { label: "Barron's 333 HF Words", href: "https://drive.google.com/file/d/1cHOsxCjgTsDWKrgkc1Rvw_D9SbqoO6wH/view?usp=drive_link" },
-            { label: "GRE Big Book", href: "https://drive.google.com/file/d/1d3IZz9Fy8TagqZ5E-DolQzkfWaHDpJfs/view?usp=drive_link" },
-            { label: "Cliffs TOEFL", href: "https://drive.google.com/file/d/1eFfGcseNmySSdkFnFhx9h9qd998I5ryK/view?usp=drive_link" },
-            { label: "Common Mistakes in English by T.J. Fitikides", href: "https://drive.google.com/file/d/1ZUmADigDdw1VqhlnwYr5zMCDknYTR27w/view?usp=drive_link" },
-            { label: "GRE Big Book Antonym Test", href: "https://drive.google.com/file/d/1t3qXAz1nQng5Sj_gRtUR8J19RMyPvFcA/view?usp=drive_link" },
-            { label: "GRE Sentence Completion", href: "https://drive.google.com/file/d/1LpErFvuyd4Z4mKDQeHMZdEaNafg62tO2/view?usp=drive_link" },
-            { label: "SAT Hit Parade", href: "https://drive.google.com/file/d/1VKI40EBrJ7JmvCH_2xKb5rLa_6Y_GjLB/view?usp=drive_link" },
-            { label: "SC Grail", href: "https://drive.google.com/file/d/1Ka3x7GrEX7psl1dh23pC34UuWJtq5Hkx/view?usp=drive_link" },
-            { label: "Word Smart 1", href: "https://drive.google.com/file/d/1gh8oskuz8PHYFSe0Jpi9PWMvFKevdCJz/view?usp=drive_link" },
-            { label: "Word Smart 2", href: "https://drive.google.com/file/d/1kaw-_e16Qq1bCcFhM7XRt_-8Odry8IL_/view?usp=drive_link" },
-            { label: "Word Smart 800", href: "https://drive.google.com/file/d/10T1CuwS5htEBiqipERQvKAuLp6OP_ve3/view?usp=drive_link" },
-        ],
-    },
-    {
-        label: "Maths",
-        caption: "Math guides, shortcuts and question banks",
-        description: "Browse Maths resources for quant concepts, marked practice, shortcuts, and question-bank drills.",
-        icon: Sigma,
-        accent: "text-[#DFB15B]",
-        surface: "border-[#DFB15B]/18 bg-[#DFB15B]/10",
-        resources: [
-            { label: "GRE Math Bible", href: "https://drive.google.com/file/d/11EGsyuQtP3ZISxGzCQX1AELR4KGaUmcH/view?usp=drive_link" },
-            { label: "ExamVeda Marked Maths", href: "https://drive.google.com/file/d/1LuMLj7eHQtwCpTT0b9f1VTHlBDkHHewG/view?usp=drive_link" },
-            { label: "Math Shortcuts", href: "https://drive.google.com/file/d/1fi7dZU6Ejhmj6Sq2uDaY9djenJTAPDmq/view?usp=drive_link" },
-            { label: "Mentors Math QBank", href: "https://drive.google.com/file/d/1OtIibAZphlmIagYTZByb_2LIDgn3KpNd/view?usp=drive_link" },
-        ],
-    },
-    {
-        label: "Miscellaneous",
-        caption: "IBA guides, university QBanks and model tests",
-        description: "Browse additional admission resources, model tests, and IBA-focused question banks.",
-        icon: LibraryBig,
-        accent: "text-violet-200",
-        surface: "border-violet-400/15 bg-violet-400/8",
-        resources: [
-            { label: "BUP FBS Model Test", href: "https://drive.google.com/file/d/1S8mR16e3KmiqByGAL0f6GjB4qqkbeOC6/view?usp=drive_link" },
-            { label: "DU IBA QBank", href: "https://drive.google.com/file/d/15mIHoS6xSf6IXCPYGLZebchGFBNphHfm/view?usp=drive_link" },
-            { label: "JU IBA QBank", href: "https://drive.google.com/file/d/1v9KbiZEWD6iRpr4twfh5qV7j1ytRbZoR/view?usp=drive_link" },
-            { label: "Mentors IBA BBA Guide", href: "https://drive.google.com/file/d/1YFBSF0vX6B_pSCBi_SpJBzMjyisWUCg_/view?usp=drive_link" },
-        ],
-    },
-];
+const CATALOG_ICONS = { Brain, Languages, Sigma, LibraryBig };
 
 function isDriveReady(href) {
     return Boolean(href?.trim());
 }
 
 export default function ResourcesVault() {
+    const [RESOURCE_CATEGORIES, setCatalog] = useState([]);
+    const [catalogError, setCatalogError] = useState('');
+    useEffect(() => {
+        let active = true;
+        getContentCatalog('resources').then(payload => {
+            if (active) setCatalog(payload.data.map(item => ({ ...item, icon: CATALOG_ICONS[item.icon] || FolderOpen })));
+        }).catch(error => { if (active) setCatalogError(error.message); });
+        return () => { active = false; };
+    }, []);
+
     const [selectedCategory, setSelectedCategory] = useState(null);
 
     useEffect(() => {
@@ -107,6 +49,8 @@ export default function ResourcesVault() {
     }, [selectedCategory]);
 
     const closeModal = () => setSelectedCategory(null);
+
+    if (catalogError) return <p role="alert" className="rounded-2xl border border-red-400/20 p-5 text-red-200">{catalogError}</p>;
 
     return (
         <>

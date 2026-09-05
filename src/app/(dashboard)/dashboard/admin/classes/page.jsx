@@ -24,6 +24,7 @@ import {
 import FlashyLoader, { LoadingButtonLabel } from "@/components/shared/FlashyLoader";
 
 const EMPTY_FORM = {
+  program: "general",
   title: "",
   zoomUrl: "",
   startsAt: "",
@@ -156,6 +157,7 @@ export default function AdminLiveClassesPage() {
   const startEditing = (item) => {
     setEditingId(item._id);
     setForm({
+      program: item.program || "general",
       title: item.title || "",
       zoomUrl: item.zoomUrl || "",
       startsAt: toDateTimeInputValue(item.startsAt),
@@ -174,6 +176,7 @@ export default function AdminLiveClassesPage() {
     const startsAt = toApiDate(form.startsAt);
     const endsAt = toApiDate(form.endsAt);
     const payload = {
+      program: form.program,
       title: form.title,
       zoomUrl: form.zoomUrl,
       startsAt,
@@ -274,6 +277,11 @@ export default function AdminLiveClassesPage() {
         </div>
 
         <form onSubmit={handleSubmit} className="grid gap-4">
+          <label className="text-sm text-white">Program
+            <select className="ml-3 rounded-xl bg-[#1A1722] p-3" value={form.program} onChange={event => updateField('program', event.target.value)}>
+              <option value="general">General website</option><option value="math">Math Course</option>
+            </select>
+          </label>
           <div className="grid gap-4 lg:grid-cols-2">
             <TextField label="Class title" required value={form.title} onChange={(value) => updateField("title", value)} placeholder="Example: Math Live Class 04" />
             <TextField label="Zoom link" required value={form.zoomUrl} onChange={(value) => updateField("zoomUrl", value)} placeholder="https://us02web.zoom.us/j/..." icon={<LinkIcon className="h-4 w-4" />} />
@@ -349,7 +357,7 @@ export default function AdminLiveClassesPage() {
                 <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                   <div className="min-w-0">
                     <div className="flex flex-wrap items-center gap-3">
-                      <h2 className="font-serif text-2xl font-medium text-white">{item.title}</h2>
+                      <h2 className="font-serif text-2xl font-medium text-white">{item.title}</h2><p className="text-xs text-emerald-200">{item.program === "math" ? "Math Course" : "General website"}</p>
                       <span className={`rounded-full border px-3 py-1 text-xs font-bold uppercase tracking-wider ${STATUS_STYLES[status]}`}>
                         {status}
                       </span>

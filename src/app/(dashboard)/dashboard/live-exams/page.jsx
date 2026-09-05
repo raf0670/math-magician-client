@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useProgram } from "@/lib/program";
 import Link from "next/link";
 import { CalendarClock, CheckCircle2, Clock3, Eye, LockKeyhole, Play, RefreshCw, Radio, RotateCcw, Trophy } from "lucide-react";
 import { getLiveExams } from "@/lib/api";
@@ -46,6 +47,7 @@ export default function LiveExamsPage() {
 }
 
 function LiveExamsContent() {
+  const { program, examBasePath } = useProgram();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [fatalError, setFatalError] = useState(null);
@@ -59,21 +61,21 @@ function LiveExamsContent() {
     setFatalError(null);
 
     try {
-      const payload = await getLiveExams();
+      const payload = await getLiveExams(program);
       setItems(payload?.data || []);
     } catch (err) {
       setFatalError(err);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [program]);
 
   useEffect(() => {
     let isMounted = true;
 
     async function fetchInitialLiveExams() {
       try {
-        const payload = await getLiveExams();
+        const payload = await getLiveExams(program);
         if (isMounted) setItems(payload?.data || []);
       } catch (err) {
         if (isMounted) setFatalError(err);
@@ -86,7 +88,7 @@ function LiveExamsContent() {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [program]);
 
   if (fatalError) {
     throw fatalError;
@@ -97,7 +99,7 @@ function LiveExamsContent() {
       <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div>
           <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.3em] text-[#DFB15B]">
-            <Radio className="h-4 w-4" /> Live Exams
+            <Radio className="h-4 w-4" /> {program === 'math' ? 'Math Exams' : 'Live Exams'}
           </p>
           <h1 className="mt-2 font-serif text-3xl font-medium tracking-wide text-white">Scheduled Exam Room</h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-[#8E8A9F]">
@@ -183,7 +185,7 @@ function LiveExamsContent() {
                   ) : isOpen || isEnded ? (
                     <div className="flex flex-col gap-2">
                       <Link
-                        href={`/dashboard/live-exams/${exam._id}`}
+                        href={`${examBasePath}/${exam._id}`}
                         className={`inline-flex w-full items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-bold uppercase tracking-wider transition ${isOpen ? "bg-linear-to-r from-[#E6C687] to-[#AA7C11] text-black hover:brightness-110" : "border border-white/8 bg-[#0F0D15] text-white hover:border-[#DFB15B]/30 hover:text-[#DFB15B]"}`}
                       >
                         {isOpen ? <Play className="h-4 w-4 fill-current stroke-none" /> : <Eye className="h-4 w-4" />}
@@ -191,7 +193,7 @@ function LiveExamsContent() {
                       </Link>
                       {isEnded && exam.canRetake ? (
                         <Link
-                          href={`/dashboard/live-exams/${exam._id}?mode=retake`}
+                          href={`${examBasePath}/${exam._id}?mode=retake`}
                           className="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-emerald-400/20 bg-emerald-400/10 px-4 py-3 text-sm font-bold uppercase tracking-wider text-emerald-200 transition hover:border-emerald-300/40 hover:bg-emerald-400/15"
                         >
                           <RotateCcw className="h-4 w-4" />
@@ -200,7 +202,7 @@ function LiveExamsContent() {
                       ) : null}
                       {isEnded ? (
                         <Link
-                          href={`/dashboard/live-exams/${exam._id}/rankings`}
+                          href={`${examBasePath}/${exam._id}/rankings`}
                           className="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-[#DFB15B]/20 bg-[#DFB15B]/10 px-4 py-3 text-sm font-bold uppercase tracking-wider text-[#DFB15B] transition hover:border-[#DFB15B]/40 hover:bg-[#DFB15B]/15"
                         >
                           <Trophy className="h-4 w-4" />

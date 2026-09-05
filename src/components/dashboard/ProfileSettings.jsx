@@ -66,7 +66,7 @@ export default function ProfileSettings() {
                     fullName: currentUser.name || prev.fullName,
                     email: currentUser.email || prev.email,
                     bio: currentUser.bio || prev.bio,
-                    rankInfo: getRankInfo(currentUser.rankInfo || prev.rankInfo),
+                    rankInfo: getRankInfo((currentUser.hasMathAccess && !currentUser.hasClassAccess ? currentUser.mathRankInfo : currentUser.rankInfo) || prev.rankInfo),
                 }));
                 setForm({
                     name: currentUser.name || "",
@@ -79,7 +79,8 @@ export default function ProfileSettings() {
         window.addEventListener("auth-state-changed", syncProfile);
         window.addEventListener("storage", syncProfile);
 
-        getMyStats()
+        const storedUser = getStoredUser();
+        getMyStats(storedUser?.hasMathAccess && !storedUser?.hasClassAccess ? 'math' : 'general')
             .then((payload) => {
                 const stats = payload?.stats || {};
                 const history = Array.isArray(payload?.history) ? payload.history : [];

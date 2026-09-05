@@ -180,28 +180,28 @@ export default function ProgramsAndTestimonials() {
             buttonStyle: "bg-white/5 hover:bg-white/10 text-white border border-white/10"
         },
         {
-            id: "mathAdvanced",
-            badge: "Math Advanced",
-            title: "Slytherin",
-            desc: "An advanced math program joining the house competition later. Details, schedule, and enrollment will open after the program is finalized.",
+            id: "math",
+            badge: "Dedicated Math Course",
+            title: "Math Course",
+            desc: "Build your foundation, learn smarter problem solving, and compete in math-only exams. Add Slytherin for full website access.",
             imageSrc: "/slytherin.jpg",
             imageAlt: "Slytherin house crest",
             location: {
-                text: "Coming Soon"
+                text: "Online"
             },
             schedule: {
                 days: "Schedule to be announced",
-                time: "Enrollment not open yet"
+                time: "Recorded + Live Classes"
             },
             features: [
-                "Advanced Math-Focused Track",
-                "Live Exam Competition Access",
-                "House Points Starting From Zero",
-                "Program Details Coming Soon"
+                "12 Basic + 12 Archive Classes",
+                "12 Live Special Classes",
+                "12 Daily + 3 Full-Length Math Exams",
+                "Optional Slytherin Membership"
             ],
-            price: "Coming Soon",
+            price: "BDT 5,999",
             period: "",
-            comingSoon: true,
+            mathCourse: true,
             borderClass: "border-emerald-400/18 hover:border-emerald-400/35",
             bgClass: "bg-[#121017]",
             badgeStyle: "bg-emerald-400/10 border-emerald-400/20 text-emerald-100",
@@ -210,7 +210,7 @@ export default function ProgramsAndTestimonials() {
             accentLineClass: "from-transparent via-emerald-400/40 to-transparent",
             sparkleClass: "text-emerald-300/45",
             crestFrameClass: "shadow-[0_0_34px_rgba(52,211,153,0.16)]",
-            buttonStyle: "bg-white/5 text-white/40 border border-white/10 cursor-not-allowed"
+            buttonStyle: "bg-white/5 text-emerald-100 border border-emerald-300/20 hover:bg-emerald-300/10"
         }
     ];
 
@@ -326,6 +326,7 @@ export default function ProgramsAndTestimonials() {
     };
 
     const handleProgramAction = (planId, action = "enroll") => {
+        if (planId === "math") { router.push("/math-course"); return; }
         setSelectedPlanId(planId);
         setSelectedProgramAction(action);
 
@@ -490,7 +491,7 @@ export default function ProgramsAndTestimonials() {
                                     </div>
 
                                     <div className="grid gap-2">
-                                        {card.comingSoon ? (
+                                        {card.mathCourse ? (<button type="button" onClick={() => router.push("/math-course")} className="w-full rounded-2xl bg-emerald-300 px-5 py-4 text-sm font-bold text-black">Explore Math Course</button>) : card.comingSoon ? (
                                             <button
                                                 type="button"
                                                 disabled

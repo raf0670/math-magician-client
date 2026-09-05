@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useProgram } from "@/lib/program";
 import Link from "next/link";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { AlertTriangle, BookOpen, CalendarClock, CheckCircle, LockKeyhole, RotateCcw, XCircle } from "lucide-react";
@@ -65,6 +66,7 @@ function getCorrectOptionIndex(question) {
 }
 
 function PendingLiveExamResults({ receipt, examData }) {
+  const { examBasePath } = useProgram();
   const unlockTime = receipt?.resultsAvailableAt || examData?.endTime;
   const [remainingLabel, setRemainingLabel] = useState(() => formatCountdown(unlockTime));
 
@@ -108,7 +110,7 @@ function PendingLiveExamResults({ receipt, examData }) {
         ) : null}
 
         <Link
-          href="/dashboard/live-exams"
+          href={examBasePath}
           className="mt-6 inline-flex items-center justify-center rounded-2xl bg-[#DFB15B] px-5 py-3 text-sm font-bold uppercase tracking-wider text-black transition hover:brightness-110"
         >
           Return to Live Exams
@@ -127,6 +129,7 @@ export default function LiveExamArenaPage() {
 }
 
 function LiveExamArenaContent() {
+  const { program, examBasePath, adminExamPath } = useProgram();
   const params = useParams();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -165,7 +168,7 @@ function LiveExamArenaContent() {
 
       try {
         const payload = isAdminPreview
-          ? await getAdminLiveExamPreview(examId)
+          ? await getAdminLiveExamPreview(examId, program)
           : await getExamById(examId, { isRetake: isRetakeMode });
         if (isMounted) {
           const nextExamData = payload?.data || null;
@@ -196,7 +199,7 @@ function LiveExamArenaContent() {
     return () => {
       isMounted = false;
     };
-  }, [examId, isAdminPreview, isRetakeMode]);
+  }, [examId, isAdminPreview, isRetakeMode, program]);
 
   const status = useMemo(() => getStatus(examData), [examData]);
 
@@ -218,7 +221,7 @@ function LiveExamArenaContent() {
       }
       setSubmissionError("");
       if (!isRetakeMode) {
-        router.replace("/dashboard/live-exams");
+        router.replace(examBasePath);
       }
       return payload;
     } catch (err) {
@@ -262,7 +265,7 @@ function LiveExamArenaContent() {
         eyebrow="Locked"
         title={isAdminPreview ? "Admin preview is unavailable" : "This exam is not open yet"}
         message={blockedMessage}
-        returnHref={isAdminPreview ? "/dashboard/admin/live-exams" : "/dashboard/live-exams"}
+        returnHref={isAdminPreview ? adminExamPath : examBasePath}
         returnLabel={isAdminPreview ? "Return to Live Exam Admin" : "Return to Live Exams"}
       />
     );
@@ -304,7 +307,7 @@ function LiveExamArenaContent() {
             answers={userSelections}
             examData={examData}
             submissionResult={submissionResult}
-            returnHref="/dashboard/live-exams"
+            returnHref={examBasePath}
             returnLabel="Return to Live Exams"
           />
         </div>
@@ -317,7 +320,7 @@ function LiveExamArenaContent() {
       <ReadOnlyLiveExamReview
         examData={examData}
         isPreview={isAdminPreview}
-        returnHref={isAdminPreview ? "/dashboard/admin/live-exams" : "/dashboard/live-exams"}
+        returnHref={isAdminPreview ? adminExamPath : examBasePath}
         returnLabel={isAdminPreview ? "Return to Live Exam Admin" : "Return to Live Exams"}
       />
     );

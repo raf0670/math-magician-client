@@ -15,6 +15,12 @@ import FlashyLoader, { LoadingButtonLabel } from "@/components/shared/FlashyLoad
 const PRE_BOOKING_STATUS = "pre-booking";
 
 const STATUS_TABS = [
+  { id: "", label: "All" },
+  { id: "paid", label: "PayStation Paid" },
+  { id: "initiated", label: "Checkout Started" },
+  { id: "processing", label: "Processing" },
+  { id: "failed", label: "Failed" },
+  { id: "refund", label: "Refunded" },
   { id: PRE_BOOKING_STATUS, label: "Pre-Booking" },
   { id: "pending", label: "Pending" },
   { id: "approved", label: "Approved" },
@@ -39,6 +45,7 @@ const PAYMENT_METHOD_STYLES = {
 };
 
 const PLAN_DISPLAY_NAMES = {
+  math: "Math Course", mathSlytherin: "Math + Slytherin", slytherinUpgrade: "Slytherin Upgrade",
   offline: "Gryffindor",
   gryffindor2: "Gryffindor 2.0",
   premium: "Ravenclaw",
@@ -97,7 +104,7 @@ function formatPaymentChoice(value) {
 }
 
 function formatPaymentMethod(value) {
-  return value === "bank" ? "Bank" : "bKash";
+  return value === "paystation" ? "PayStation" : value === "bank" ? "Bank" : "bKash";
 }
 
 function formatDeliveryMode(value) {
@@ -135,7 +142,7 @@ function getLoadingCopy(status) {
   return {
     eyebrow: "Enrollments",
     title: "Loading reviews",
-    message: "Pending bKash submissions are being fetched.",
+    message: "Enrollment and payment records are being fetched.",
   };
 }
 
@@ -149,13 +156,15 @@ function getEmptyCopy(status) {
 
   return {
     title: "No enrollment reviews found",
-    message: "New manual bKash submissions will appear here.",
+    message: "Enrollment and payment records will appear here.",
   };
 }
 
 export default function AdminEnrollmentReviewsPage() {
   const [status, setStatus] = useState("pending");
   const [items, setItems] = useState([]);
+  const [planFilter, setPlanFilter] = useState("");
+  const visibleItems = items.filter(item => !planFilter || item.planId === planFilter);
   const [reviewNotes, setReviewNotes] = useState({});
   const [finalTrxIDs, setFinalTrxIDs] = useState({});
   const [activeAction, setActiveAction] = useState("");
@@ -368,6 +377,7 @@ export default function AdminEnrollmentReviewsPage() {
         </button>
       </div>
 
+      <label className="text-sm">Program <select value={planFilter} onChange={event => setPlanFilter(event.target.value)} className="ml-3 rounded-xl bg-[#181420] p-3"><option value="">All programs</option>{['math', 'mathSlytherin', 'slytherinUpgrade', 'offline', 'gryffindor2', 'premium', 'online'].map(id => <option key={id} value={id}>{PLAN_DISPLAY_NAMES[id]}</option>)}</select></label>
       <div className="flex flex-wrap gap-2">
         {STATUS_TABS.map((tab) => (
           <button
@@ -403,7 +413,7 @@ export default function AdminEnrollmentReviewsPage() {
         />
       ) : null}
 
-      {!loading && !items.length ? (
+      {!loading && !visibleItems.length ? (
         <div className="rounded-3xl border border-white/5 bg-[#121017] px-6 py-12 text-center">
           <Clock3 className="mx-auto h-9 w-9 text-[#DFB15B]" />
           <h2 className="mt-4 font-serif text-2xl font-medium text-white">{emptyCopy.title}</h2>
@@ -411,9 +421,9 @@ export default function AdminEnrollmentReviewsPage() {
         </div>
       ) : null}
 
-      {!loading && items.length ? (
+      {!loading && visibleItems.length ? (
         <div className="grid gap-4">
-          {items.map((item) => {
+          {visibleItems.map((item) => {
             const paymentId = item.paymentId;
             const isPreBooking = item.status === PRE_BOOKING_STATUS;
             const itemKey = paymentId || item.bookingId;
@@ -460,6 +470,14 @@ export default function AdminEnrollmentReviewsPage() {
                 </div>
 
                 <div className="mt-5 grid gap-3 text-sm sm:grid-cols-2 lg:grid-cols-4">
+                  {item.originalAmount ? <Info label="Original Price" value={formatBDT(item.originalAmount)} /> : null}
+                  {item.discountAmount > 0 ? <Info label="Discount" value={`${formatBDT(item.discountAmount)} (${item.discountType === 'existingHouse' ? 'Existing house 25%' : item.couponCode})`} /> : null}
+                  <Info label="Address" value={item.enrollment?.address} />
+                  <Info label="Facebook" value={item.enrollment?.facebookProfile} />
+                  <Info label="Preparation methods" value={item.enrollment?.preparationMethods} />
+                  <Info label="Biggest math fear" value={item.enrollment?.mathFear} />
+                  <Info label="Math weaknesses" value={item.enrollment?.mathWeaknesses} />
+                  <Info label="Other math weakness" value={item.enrollment?.mathWeaknessOther} />
                   <Info label="Plan" value={formatPlanValue(item)} />
                   {!isPreBooking ? <Info label="Payment Type" value={formatPaymentChoice(item.paymentChoice)} /> : null}
                   {!isPreBooking ? <Info label="Payment Method" value={formatPaymentMethod(item.paymentMethod)} /> : null}

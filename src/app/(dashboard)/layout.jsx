@@ -40,6 +40,7 @@ export default function DashboardLayout({ children }) {
     const fullscreenExamPrefixes = [
         "/dashboard/mock-tests/",
         "/dashboard/live-exams/",
+        "/dashboard/math/live-exams/",
         "/dashboard/assignments/",
         "/dashboard/assessment-test/exam",
     ];

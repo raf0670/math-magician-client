@@ -12,6 +12,7 @@
 
 # testing
 /coverage
+/.math-browser/
 
 # next.js
 /.next/

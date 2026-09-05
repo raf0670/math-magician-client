@@ -18,6 +18,8 @@ function PaymentReviewSubmitted() {
   const searchParams = useSearchParams();
   const paymentId = searchParams.get("paymentId") || "";
   const invoice = searchParams.get("invoice") || "";
+  const plan = searchParams.get("plan") || "";
+  const isMathPurchase = ["math", "mathSlytherin", "slytherinUpgrade"].includes(plan);
   const status = searchParams.get("status") || "";
   const isBooking = searchParams.get("booking") === "1";
   const paymentChoice = searchParams.get("paymentChoice") || "full";
@@ -47,10 +49,10 @@ function PaymentReviewSubmitted() {
           </div>
         ) : null}
         <Link
-          href={isBooking ? "/dashboard" : "/dashboard/classes"}
+          href={isMathPurchase ? "/dashboard/math" : isBooking ? "/dashboard" : "/dashboard/classes"}
           className="mt-6 inline-flex rounded-2xl bg-[#DFB15B] px-5 py-3 text-sm font-bold uppercase tracking-wider text-black transition hover:brightness-110"
         >
-          {isBooking ? "Go to Dashboard" : "Go to Classes"}
+          {isMathPurchase ? "Open Math Course" : isBooking ? "Go to Dashboard" : "Go to Classes"}
         </Link>
       </div>
     </div>

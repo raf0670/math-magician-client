@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useProgram } from "@/lib/program";
 import Link from "next/link";
 import {
   CalendarClock,
@@ -148,6 +149,7 @@ function getLiveStatus(exam) {
 }
 
 export default function AdminLiveExamsPage() {
+  const { program, examBasePath } = useProgram();
   const [items, setItems] = useState([]);
   const [schedule, setSchedule] = useState(EMPTY_SCHEDULE);
   const [questionJson, setQuestionJson] = useState(SAMPLE_JSON);
@@ -170,14 +172,14 @@ export default function AdminLiveExamsPage() {
     setError("");
 
     try {
-      const payload = await getAdminLiveExams();
+      const payload = await getAdminLiveExams(program);
       setItems(payload?.data || []);
     } catch (err) {
       setError(err.message || "Unable to load live exams.");
     } finally {
       if (!silent) setLoading(false);
     }
-  }, []);
+  }, [program]);
 
   useEffect(() => {
     let isMounted = true;
@@ -275,8 +277,8 @@ export default function AdminLiveExamsPage() {
     try {
       const payload = buildPayload();
       const response = editingId
-        ? await updateAdminLiveExam(editingId, payload)
-        : await createAdminLiveExam(payload);
+        ? await updateAdminLiveExam(editingId, payload, program)
+        : await createAdminLiveExam(payload, program);
 
       const saved = response?.data;
       if (saved) {
@@ -327,10 +329,10 @@ export default function AdminLiveExamsPage() {
     <div className="flex w-full flex-col gap-6 text-left">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div>
-          <p className="text-xs font-bold uppercase tracking-[0.3em] text-[#DFB15B]">Live Exam Admin</p>
+          <p className="text-xs font-bold uppercase tracking-[0.3em] text-[#DFB15B]">{program === "math" ? "Math Exam Admin" : "Live Exam Admin"}</p>
           <h1 className="mt-2 font-serif text-3xl font-medium tracking-wide text-white">Live Exam Publisher</h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-[#8E8A9F]">
-            Paste a strict JSON array of live exam questions and publish it for the scheduled exam window.
+            {program === "math" ? "Paste a strict JSON array of math-only questions" : "Paste a strict JSON array of live exam questions"} and publish it for the scheduled exam window.
           </p>
         </div>
         <button
@@ -364,7 +366,7 @@ export default function AdminLiveExamsPage() {
         <form onSubmit={handleSubmit} className="flex flex-col gap-5">
           <div className="grid gap-4 lg:grid-cols-5">
             <TextField label="Exam title" required value={schedule.title} onChange={(value) => updateSchedule("title", value)} placeholder="Example: Live Exam 01" icon={<FileQuestion className="h-4 w-4" />} />
-            <SelectField label="Competition type" value={schedule.competitionCategory} onChange={(value) => updateSchedule("competitionCategory", value)} options={COMPETITION_CATEGORIES} />
+            <SelectField label="Competition type" value={schedule.competitionCategory} onChange={(value) => updateSchedule("competitionCategory", value)} options={program === "math" ? [{ value: "daily", label: "Daily Mock" }, { value: "weekly", label: "Full-Length Math" }] : COMPETITION_CATEGORIES} />
             <TextField label="Start time" required type="datetime-local" value={schedule.startTime} onChange={(value) => updateSchedule("startTime", value)} icon={<CalendarClock className="h-4 w-4" />} />
             <TextField label="End time" required type="datetime-local" value={schedule.endTime} onChange={(value) => updateSchedule("endTime", value)} icon={<Clock3 className="h-4 w-4" />} />
             <TextField
@@ -472,7 +474,7 @@ export default function AdminLiveExamsPage() {
 
                   <div className="flex flex-wrap items-center gap-2">
                     <Link
-                      href={`/dashboard/live-exams/${exam._id}?preview=admin`}
+                      href={`${examBasePath}/${exam._id}?preview=admin`}
                       className="inline-flex items-center justify-center gap-2 rounded-2xl border border-[#DFB15B]/25 bg-[#DFB15B]/10 px-4 py-3 text-sm font-semibold text-[#DFB15B] transition hover:border-[#DFB15B]/45 hover:bg-[#DFB15B]/15"
                     >
                       <Eye className="h-4 w-4" />

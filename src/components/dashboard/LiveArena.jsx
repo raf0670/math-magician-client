@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useProgram } from "@/lib/program";
 import { motion } from "framer-motion";
 import { Calendar, Clock3, ExternalLink, Video, VideoOff } from "lucide-react";
 import { getCurrentLiveClass } from "@/lib/api";
@@ -58,6 +59,7 @@ const STATUS_COPY = {
 };
 
 export default function LiveArena() {
+    const { program } = useProgram();
     const [liveClass, setLiveClass] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
@@ -66,7 +68,7 @@ export default function LiveArena() {
     useEffect(() => {
         let isMounted = true;
 
-        getCurrentLiveClass()
+        getCurrentLiveClass(program)
             .then((payload) => {
                 if (!isMounted) return;
                 const classData = payload?.data || null;
@@ -87,7 +89,7 @@ export default function LiveArena() {
         return () => {
             isMounted = false;
         };
-    }, []);
+    }, [program]);
 
     useEffect(() => {
         if (!liveClass) return undefined;

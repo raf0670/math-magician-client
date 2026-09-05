@@ -36,8 +36,8 @@ const houses = [
     },
     {
         name: "Slytherin",
-        mode: "Advanced",
-        location: "Coming Soon",
+        mode: "Online",
+        location: "Full Website Access",
         tone: "from-emerald-500/24 via-white/8 to-transparent",
         iconClass: "border-emerald-300/25 bg-emerald-500/12 text-emerald-200",
         imageSrc: "/slytherin.jpg",

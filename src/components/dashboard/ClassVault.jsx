@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { getContentCatalog } from "@/lib/api";
 import { AnimatePresence, motion } from "framer-motion";
 import {
     ArrowUpRight,
@@ -14,65 +15,23 @@ import {
     X,
 } from "lucide-react";
 
-const SUBJECTS = [
-    {
-        label: "English",
-        caption: "Grammar, vocabulary, reading and writing files",
-        description: "Browse English topic folders for class recordings, slides, worksheets, and companion resources.",
-        icon: Languages,
-        accent: "text-sky-200",
-        surface: "border-sky-400/15 bg-sky-400/8",
-        topics: [
-            { label: "Error Detection", href: "https://drive.google.com/drive/u/5/folders/1q-BziwHHHaOYfyQ4ygjhBTun102Fv7M_" },
-            { label: "Grammar 01", href: "https://drive.google.com/drive/u/5/folders/1zTdSW30nj30MDkhbwtpnrTPU9Bqdmz1R" },
-            { label: "Grammar 02", href: "https://drive.google.com/drive/u/5/folders/1SaywznTO4pGtJbJtcHcyOYmz2jZOHBeo" },
-            { label: "Grammar 03", href: "https://drive.google.com/drive/u/5/folders/1Hl9aoFsUqZL5GO2CpwYPLVlKNvTFuyBz" },
-            { label: "Reading Comprehension", href: "https://drive.google.com/drive/u/5/folders/1p1DcarqQdmdy8ZktDU3uPIYv8OYIS99D" },
-            { label: "Sentence Correction", href: "https://drive.google.com/drive/u/5/folders/1bnoxsafuF6zmlhskVTCVRNyz3Vai1MKU" },
-            { label: "Vocabulary", href: "https://drive.google.com/drive/u/5/folders/1RCGcS3WGfIUaRqK4Oa77S2Hl978qbKB7" },
-        ],
-    },
-    {
-        label: "Maths",
-        caption: "Quant practice, worksheets and class materials",
-        description: "Browse Maths topic folders for class recordings, worksheets, and quant practice resources.",
-        icon: Sigma,
-        accent: "text-[#DFB15B]",
-        surface: "border-[#DFB15B]/18 bg-[#DFB15B]/10",
-        topics: [
-            { label: "Number 1 & 2", href: "https://drive.google.com/drive/u/5/folders/1X5kekNccuoLzKND3IJ-BVqNilrtBKAc8" },
-            { label: "Percentage", href: "https://drive.google.com/drive/u/5/folders/1JSXtRVdZpdptDWDKA2LkZQuASL4eLOGM" },
-            { label: "Ratio & Proportion", href: "https://drive.google.com/drive/u/5/folders/1fiSoKsYEW9gxKyQZznBCzv7_TnK9apvF" },
-            { label: "Age & Average", href: "https://drive.google.com/drive/u/5/folders/1QOksEKtO7Jh_1qKicWXfT6LNIkyMZ-Xh" },
-            { label: "Profit & Loss", href: "https://drive.google.com/drive/u/5/folders/1WM5Rhqwi1kd34s_e69kg-NUF6cYpVjwt" },
-            { label: "Speed, Distance & Time", href: "https://drive.google.com/drive/u/5/folders/1GFwxu-9L7fLF6S-C2q0zWjKXp4RgKuWE" },
-            { label: "Set & Probability", href: "https://drive.google.com/drive/u/5/folders/1Dqrfj9JD3LIQq3801_b3eNq2Ya1uk7yk" },
-            { label: "Work Done", href: "https://drive.google.com/drive/u/5/folders/1Wrj2aQehTnK8GgXy5Y11h80ljG1kjl5H" },
-            { label: "Permutation Combination", href: "https://drive.google.com/drive/u/5/folders/1316nxWmRuSxIa8BOEtNZy3yC9Ii4yO7h" },
-            { label: "Triangle, Angle & Polygons", href: "https://drive.google.com/drive/u/5/folders/1QftcVjAjLBGP3A1AW3omEL6vXJbFPiYD" },
-            { label: "Circle", href: "https://drive.google.com/drive/u/5/folders/1ZykzuipZKaxk2dF1FLb9BTXkmlJJL8A_" },
-        ],
-    },
-    {
-        label: "Analytical Ability",
-        caption: "Logic sets, analytical drills and companion files",
-        description: "Browse analytical topic folders for logic practice, puzzles, and class files.",
-        icon: Brain,
-        accent: "text-emerald-200",
-        surface: "border-emerald-400/15 bg-emerald-400/8",
-        topics: [
-            { label: "Data Sufficiency", href: "https://drive.google.com/drive/u/5/folders/1Lc8QAC9gN4Y5tNNwm678B9HuNEvjjYZb" },
-            { label: "Puzzle 01", href: "https://drive.google.com/drive/u/5/folders/1RIcCfZVc5TTYY9jDhFEDadrSwHJYCi7v" },
-            { label: "Puzzle 02", href: "https://drive.google.com/drive/u/5/folders/1O0XWWsdjBuA6BlcrboF2jAmHPujqTSdH" },
-        ],
-    },
-];
+const CATALOG_ICONS = { Languages, Sigma, Brain };
 
 function isDriveReady(href) {
     return Boolean(href?.trim());
 }
 
 export default function ClassVault() {
+    const [SUBJECTS, setCatalog] = useState([]);
+    const [catalogError, setCatalogError] = useState('');
+    useEffect(() => {
+        let active = true;
+        getContentCatalog('recordings').then(payload => {
+            if (active) setCatalog(payload.data.map(item => ({ ...item, icon: CATALOG_ICONS[item.icon] || FolderOpen })));
+        }).catch(error => { if (active) setCatalogError(error.message); });
+        return () => { active = false; };
+    }, []);
+
     const [selectedSubject, setSelectedSubject] = useState(null);
 
     useEffect(() => {
@@ -89,6 +48,8 @@ export default function ClassVault() {
     }, [selectedSubject]);
 
     const closeModal = () => setSelectedSubject(null);
+
+    if (catalogError) return <p role="alert" className="rounded-2xl border border-red-400/20 p-5 text-red-200">{catalogError}</p>;
 
     return (
         <>

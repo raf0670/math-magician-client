@@ -1,5 +1,6 @@
 "use client";
 
+import { useProgram } from "@/lib/program";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { LockKeyhole, Sparkles } from "lucide-react";
@@ -45,8 +46,10 @@ const ACCESS_COPY = {
 };
 
 export default function ClassAccessGate({ children, section = "classes", presentation = "panel" }) {
+    const { program } = useProgram();
     const [loading, setLoading] = useState(true);
     const [hasAccess, setHasAccess] = useState(false);
+    const [verifiedProgram, setVerifiedProgram] = useState(null);
     const copy = ACCESS_COPY[section] || ACCESS_COPY.classes;
     const isScreenPresentation = presentation === "screen";
 
@@ -55,10 +58,11 @@ export default function ClassAccessGate({ children, section = "classes", present
 
         getPaymentAccess()
             .then(async (payload) => {
-                const allowed = Boolean(payload?.data?.hasClassAccess);
+                const allowed = Boolean(program === 'math' ? payload?.data?.hasMathAccess : payload?.data?.hasClassAccess);
                 if (!isMounted) return;
 
                 setHasAccess(allowed);
+                setVerifiedProgram(program);
 
                 if (allowed) {
                     const profile = await getProfile().catch(() => null);
@@ -69,7 +73,7 @@ export default function ClassAccessGate({ children, section = "classes", present
                 }
             })
             .catch(() => {
-                if (isMounted) setHasAccess(false);
+                if (isMounted) { setHasAccess(false); setVerifiedProgram(program); }
             })
             .finally(() => {
                 if (isMounted) setLoading(false);
@@ -78,9 +82,9 @@ export default function ClassAccessGate({ children, section = "classes", present
         return () => {
             isMounted = false;
         };
-    }, []);
+    }, [program]);
 
-    if (loading) {
+    if (loading || verifiedProgram !== program) {
         return (
             <FlashyLoader
                 eyebrow={copy.loadingEyebrow}

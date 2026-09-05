@@ -1,5 +1,6 @@
 "use client";
 
+import MathEnrollment from "@/components/math/MathEnrollment";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useMemo, useState } from "react";
@@ -153,9 +154,16 @@ const FLOATING_GLYPHS = [
 export default function PaymentDetailsPage() {
   return (
     <Suspense fallback={<PaymentDetailsLoading />}>
-      <PaymentDetailsContent />
+      <PaymentDetailsRouter />
     </Suspense>
   );
+}
+
+function PaymentDetailsRouter() {
+  const searchParams = useSearchParams();
+  const planId = searchParams.get('plan');
+  if (['math', 'mathSlytherin', 'slytherinUpgrade'].includes(planId)) return <MathEnrollment key={planId} initialPlan={planId} />;
+  return <PaymentDetailsContent />;
 }
 
 function PaymentDetailsContent() {

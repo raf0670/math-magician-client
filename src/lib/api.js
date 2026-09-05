@@ -260,10 +260,10 @@ export async function getCourses() {
   return request("/api/courses");
 }
 
-export async function submitManualEnrollment(planId, formData, paymentChoice) {
+export async function submitManualEnrollment(planId, formData, paymentChoice, couponCode = '', expectedAmount) {
   return request("/api/payments/manual-enrollment", {
     method: "POST",
-    body: { planId, formData, paymentChoice },
+    body: { planId, formData, paymentChoice, couponCode, expectedAmount },
   });
 }
 
@@ -312,8 +312,8 @@ export async function markAdminEnrollmentFullyPaid(paymentId, finalTrxID) {
   });
 }
 
-export async function getCurrentLiveClass() {
-  return request("/api/classes/current");
+export async function getCurrentLiveClass(program = 'general') {
+  return request(buildQueryPath("/api/classes/current", { program }));
 }
 
 export async function getAdminLiveClasses() {
@@ -338,28 +338,28 @@ export async function getExams() {
   return request("/api/exams");
 }
 
-export async function getLiveExams() {
-  return request("/api/exams/live");
+export async function getLiveExams(program = 'general') {
+  return request(buildQueryPath("/api/exams/live", { program }));
 }
 
 export async function getAssignments() {
   return request("/api/exams/assignments");
 }
 
-export async function getAdminLiveExams() {
-  return request("/api/exams/live/admin");
+export async function getAdminLiveExams(program = 'general') {
+  return request(buildQueryPath("/api/exams/live/admin", { program }));
 }
 
-export async function getAdminLiveExamPreview(examId) {
-  return request(`/api/exams/live/admin/${examId}/preview`);
+export async function getAdminLiveExamPreview(examId, program = 'general') {
+  return request(buildQueryPath(`/api/exams/live/admin/${examId}/preview`, { program }));
 }
 
 export async function getAdminAssignments() {
   return request("/api/exams/assignments/admin");
 }
 
-export async function createAdminLiveExam(payload) {
-  return request("/api/exams/live/admin", {
+export async function createAdminLiveExam(payload, program = 'general') {
+  return request(buildQueryPath("/api/exams/live/admin", { program }), {
     method: "POST",
     body: payload,
   });
@@ -372,8 +372,8 @@ export async function createAdminAssignment(payload) {
   });
 }
 
-export async function updateAdminLiveExam(examId, payload) {
-  return request(`/api/exams/live/admin/${examId}`, {
+export async function updateAdminLiveExam(examId, payload, program = 'general') {
+  return request(buildQueryPath(`/api/exams/live/admin/${examId}`, { program }), {
     method: "PATCH",
     body: payload,
   });
@@ -404,8 +404,8 @@ export async function startQuizExam(payload) {
   });
 }
 
-export async function getMyStats() {
-  return request("/api/analytics/my-stats");
+export async function getMyStats(program = 'general') {
+  return request(buildQueryPath("/api/analytics/my-stats", { program }));
 }
 
 export async function getLeaderboard() {
@@ -416,8 +416,8 @@ export async function getExamLeaderboard(examId) {
   return request(`/api/analytics/leaderboard/${examId}`);
 }
 
-export async function getCompetitionSummary() {
-  return request("/api/analytics/competition");
+export async function getCompetitionSummary(program = 'general') {
+  return request(buildQueryPath("/api/analytics/competition", { program }));
 }
 
 export async function getAdminLiveExamSubmissions(examId) {
@@ -492,3 +492,11 @@ export async function submitExam(examId, answers, metadata = {}) {
     }
   }
 }
+
+export function getContentCatalog(kind = 'recordings', program = 'general') {
+  return request(buildQueryPath('/api/classes/catalog', { kind, program }));
+}
+export function getPaymentQuote(planId, couponCode = '') {
+  return request('/api/payments/quote', { method: 'POST', body: { planId, couponCode } });
+}
+export function getMathEnrollmentContext() { return request('/api/payments/math-context'); }
