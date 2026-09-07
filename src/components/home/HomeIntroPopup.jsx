@@ -16,6 +16,17 @@ const cinzelDecorative = Cinzel_Decorative({
 
 const programs = [
   {
+    id: "math",
+    badge: "New Batch - Math Course",
+    title: "Math Course",
+    detail: "Dedicated online math preparation",
+    schedule: "Recorded + Live Classes",
+    price: "BDT 5,999",
+    imageSrc: "/slytherin.jpg",
+    imageAlt: "Slytherin house crest",
+    featured: true,
+  },
+  {
     id: "farmgate",
     badge: "Offline - Farmgate",
     title: "Gryffindor",
@@ -44,7 +55,6 @@ const programs = [
     price: "BDT 17,500",
     imageSrc: "/ravenclaw.jpeg",
     imageAlt: "Ravenclaw house crest",
-    featured: true,
   },
   {
     id: "bailey-road",
@@ -316,7 +326,7 @@ export default function HomeIntroPopup() {
                   onClick={scrollToPrograms}
                   className={`group flex min-h-40 flex-col rounded-2xl border p-5 text-left transition hover:-translate-y-1 hover:shadow-[0_16px_36px_rgba(0,0,0,0.35)] ${
                     program.featured
-                      ? "border-[#DFB15B]/30 bg-[#DFB15B]/10"
+                      ? "md:col-span-2 xl:col-span-4 border-emerald-300/55 bg-linear-to-br from-emerald-400/18 via-[#DFB15B]/12 to-white/5 shadow-[0_0_48px_rgba(52,211,153,0.18)]"
                       : "border-white/8 bg-white/4 hover:border-[#DFB15B]/20"
                   }`}
                   initial={{ opacity: 0, y: 18 }}
@@ -324,10 +334,18 @@ export default function HomeIntroPopup() {
                   transition={{ delay: 0.18 + index * 0.08, duration: 0.35 }}
                 >
                   <span className="flex items-start justify-between gap-3">
-                    <span className="rounded-md border border-white/10 bg-black/15 px-2.5 py-1 text-[9px] font-bold uppercase tracking-wider text-[#DFB15B]">
+                    <span className={`rounded-md border px-2.5 py-1 text-[9px] font-bold uppercase tracking-wider ${
+                      program.featured
+                        ? "border-emerald-300/35 bg-emerald-300/14 text-emerald-100"
+                        : "border-white/10 bg-black/15 text-[#DFB15B]"
+                    }`}>
                       {program.badge}
                     </span>
-                    <span className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-[#DFB15B]/20 bg-[#DFB15B]/10 text-[#DFB15B]">
+                    <span className={`flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-xl border ${
+                      program.featured
+                        ? "border-emerald-300/45 bg-emerald-300/16 text-emerald-100 shadow-[0_0_24px_rgba(52,211,153,0.28)]"
+                        : "border-[#DFB15B]/20 bg-[#DFB15B]/10 text-[#DFB15B]"
+                    }`}>
                       <Image
                         src={program.imageSrc}
                         alt={program.imageAlt}
@@ -338,18 +356,26 @@ export default function HomeIntroPopup() {
                     </span>
                   </span>
 
-                  <span className="mt-5 font-serif text-xl font-semibold tracking-wide text-white">
+                  <span className={`mt-5 font-serif font-semibold tracking-wide text-white ${
+                    program.featured ? "text-2xl sm:text-3xl" : "text-xl"
+                  }`}>
                     {program.title}
                   </span>
-                  <span className="mt-2 text-xs font-semibold leading-5 text-[#8E8A9F]">
+                  <span className={`mt-2 text-xs font-semibold leading-5 ${
+                    program.featured ? "text-emerald-50/75" : "text-[#8E8A9F]"
+                  }`}>
                     {program.detail} - {program.schedule}
                   </span>
 
                   <span className="mt-auto flex items-end justify-between gap-4 pt-5">
-                    <span className="font-serif text-2xl font-bold text-white">
+                    <span className={`font-serif font-bold text-white ${
+                      program.featured ? "text-3xl drop-shadow-[0_0_16px_rgba(52,211,153,0.26)]" : "text-2xl"
+                    }`}>
                       {program.price}
                     </span>
-                    <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-[#DFB15B]">
+                    <span className={`inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider ${
+                      program.featured ? "text-emerald-100" : "text-[#DFB15B]"
+                    }`}>
                       View Program
                       <ArrowRight className="h-3.5 w-3.5 transition group-hover:translate-x-0.5" />
                     </span>

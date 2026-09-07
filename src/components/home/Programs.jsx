@@ -49,6 +49,40 @@ export default function ProgramsAndTestimonials() {
     // --- Programs Data ---
     const cardsData = [
         {
+            id: "math",
+            badge: "New Batch - Math Course",
+            title: "Math Course",
+            desc: "Build your foundation, learn smarter problem solving, and compete in math-only exams. Add Slytherin for full website access.",
+            imageSrc: "/slytherin.jpg",
+            imageAlt: "Slytherin house crest",
+            location: {
+                text: "Online"
+            },
+            schedule: {
+                days: "Schedule to be announced",
+                time: "Recorded + Live Classes"
+            },
+            features: [
+                "12 Basic + 12 Archive Classes",
+                "12 Live Special Classes",
+                "12 Daily + 3 Full-Length Math Exams",
+                "Optional Slytherin Membership"
+            ],
+            price: "BDT 5,999",
+            period: "",
+            mathCourse: true,
+            featured: true,
+            borderClass: "border-emerald-300/55 hover:border-[#DFB15B]/70 shadow-[0_0_60px_rgba(52,211,153,0.18)]",
+            bgClass: "bg-linear-to-br from-emerald-400/16 via-[#17131A] to-[#DFB15B]/10",
+            badgeStyle: "bg-emerald-300/14 border-emerald-300/35 text-emerald-100",
+            iconStyle: "bg-emerald-300/14 text-emerald-100 border-emerald-300/35",
+            accentGlowClass: "bg-emerald-300/22",
+            accentLineClass: "from-transparent via-[#DFB15B]/70 to-transparent",
+            sparkleClass: "text-emerald-200/70",
+            crestFrameClass: "shadow-[0_0_42px_rgba(52,211,153,0.32)]",
+            buttonStyle: "bg-emerald-300 text-black border border-emerald-200/70 hover:bg-[#DFB15B]"
+        },
+        {
             id: "offline",
             badge: "Offline - Farmgate",
             title: "Gryffindor",
@@ -178,39 +212,6 @@ export default function ProgramsAndTestimonials() {
             sparkleClass: "text-[#FACC15]/45",
             crestFrameClass: "shadow-[0_0_34px_rgba(250,204,21,0.16)]",
             buttonStyle: "bg-white/5 hover:bg-white/10 text-white border border-white/10"
-        },
-        {
-            id: "math",
-            badge: "Dedicated Math Course",
-            title: "Math Course",
-            desc: "Build your foundation, learn smarter problem solving, and compete in math-only exams. Add Slytherin for full website access.",
-            imageSrc: "/slytherin.jpg",
-            imageAlt: "Slytherin house crest",
-            location: {
-                text: "Online"
-            },
-            schedule: {
-                days: "Schedule to be announced",
-                time: "Recorded + Live Classes"
-            },
-            features: [
-                "12 Basic + 12 Archive Classes",
-                "12 Live Special Classes",
-                "12 Daily + 3 Full-Length Math Exams",
-                "Optional Slytherin Membership"
-            ],
-            price: "BDT 5,999",
-            period: "",
-            mathCourse: true,
-            borderClass: "border-emerald-400/18 hover:border-emerald-400/35",
-            bgClass: "bg-[#121017]",
-            badgeStyle: "bg-emerald-400/10 border-emerald-400/20 text-emerald-100",
-            iconStyle: "bg-emerald-400/10 text-emerald-100 border-emerald-400/25",
-            accentGlowClass: "bg-emerald-400/14",
-            accentLineClass: "from-transparent via-emerald-400/40 to-transparent",
-            sparkleClass: "text-emerald-300/45",
-            crestFrameClass: "shadow-[0_0_34px_rgba(52,211,153,0.16)]",
-            buttonStyle: "bg-white/5 text-emerald-100 border border-emerald-300/20 hover:bg-emerald-300/10"
         }
     ];
 
@@ -378,19 +379,19 @@ export default function ProgramsAndTestimonials() {
                     {cardsData.map((card, index) => {
                         return (
                             <motion.div
-                                key={index}
+                                key={card.id}
                                 variants={itemVariants}
                                 whileHover={{ y: -6 }}
-                                className={`${card.bgClass} ${card.borderClass} rounded-3xl p-8 flex flex-col justify-between transition-all duration-300 relative group overflow-hidden hover:shadow-[0_12px_40px_rgba(0,0,0,0.5)]`}
+                                className={`${card.bgClass} ${card.borderClass} ${card.featured ? "lg:col-span-2 ring-1 ring-emerald-200/10" : ""} rounded-3xl p-8 flex flex-col justify-between transition-all duration-300 relative group overflow-hidden hover:shadow-[0_12px_40px_rgba(0,0,0,0.5)]`}
                             >
-                                <div className={`pointer-events-none absolute -right-16 -top-16 h-44 w-44 rounded-full ${card.accentGlowClass} blur-3xl opacity-[0.55] transition-opacity duration-500 group-hover:opacity-90`} />
-                                <div className={`pointer-events-none absolute inset-x-8 top-0 h-px bg-linear-to-r ${card.accentLineClass} opacity-70`} />
+                                <div className={`pointer-events-none absolute -right-16 -top-16 ${card.featured ? "h-56 w-56 opacity-80" : "h-44 w-44 opacity-[0.55]"} rounded-full ${card.accentGlowClass} blur-3xl transition-opacity duration-500 group-hover:opacity-90`} />
+                                <div className={`pointer-events-none absolute inset-x-8 top-0 h-px bg-linear-to-r ${card.accentLineClass} ${card.featured ? "opacity-100" : "opacity-70"}`} />
                                 <div className="pointer-events-none absolute inset-0 bg-linear-to-br from-white/5.5 via-transparent to-white/2.5 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-                                <div className="pointer-events-none absolute bottom-6 right-6 h-24 w-24 rounded-full border border-white/5 opacity-[0.08] transition group-hover:scale-110" />
+                                <div className={`pointer-events-none absolute bottom-6 right-6 rounded-full border transition group-hover:scale-110 ${card.featured ? "h-32 w-32 border-emerald-200/10 opacity-[0.14]" : "h-24 w-24 border-white/5 opacity-[0.08]"}`} />
                                 {hasMounted && PROGRAM_ACCENT_MARKS.map((mark) => (
                                     <motion.span
                                         key={mark.className}
-                                        className={`pointer-events-none absolute ${mark.className} ${card.sparkleClass} opacity-0 transition-opacity duration-500 group-hover:opacity-100`}
+                                        className={`pointer-events-none absolute ${mark.className} ${card.sparkleClass} transition-opacity duration-500 ${card.featured ? "opacity-70" : "opacity-0 group-hover:opacity-100"}`}
                                         animate={{ scale: [0.92, 1.15, 0.92], rotate: [0, 12, 0] }}
                                         transition={{ duration: 3.4, repeat: Infinity, ease: "easeInOut", delay: mark.delay + index * 0.08 }}
                                     >
@@ -422,20 +423,20 @@ export default function ProgramsAndTestimonials() {
                                                 <Shield className="relative h-6 w-6" />
                                             )}
                                         </div>
-                                        <h3 className="font-serif text-xl font-semibold text-white tracking-wide">
+                                        <h3 className={`font-serif font-semibold text-white tracking-wide ${card.featured ? "text-2xl md:text-3xl" : "text-xl"}`}>
                                             {card.title}
                                         </h3>
                                     </div>
 
-                                    <p className="text-[#6B667B] text-xs leading-relaxed font-medium mb-6">
+                                    <p className={`${card.featured ? "text-emerald-50/70" : "text-[#6B667B]"} text-xs leading-relaxed font-medium mb-6`}>
                                         {card.desc}
                                     </p>
 
                                     {/* Core Features Checklists */}
                                     <ul className="flex flex-col gap-3 border-t border-white/3 pt-6 mb-8">
                                         {card.features.map((feat, fIdx) => (
-                                            <li key={fIdx} className="flex items-start gap-2.5 text-xs font-semibold text-[#8E8A9F]">
-                                                <Plus className="w-3.5 h-3.5 text-[#DFB15B] shrink-0 mt-0.5 opacity-70" />
+                                            <li key={fIdx} className={`flex items-start gap-2.5 text-xs font-semibold ${card.featured ? "text-white/80" : "text-[#8E8A9F]"}`}>
+                                                <Plus className={`w-3.5 h-3.5 shrink-0 mt-0.5 opacity-70 ${card.featured ? "text-emerald-200" : "text-[#DFB15B]"}`} />
                                                 <span>{feat}</span>
                                             </li>
                                         ))}
@@ -491,7 +492,7 @@ export default function ProgramsAndTestimonials() {
                                     </div>
 
                                     <div className="grid gap-2">
-                                        {card.mathCourse ? (<button type="button" onClick={() => router.push("/math-course")} className="w-full rounded-2xl bg-emerald-300 px-5 py-4 text-sm font-bold text-black">Explore Math Course</button>) : card.comingSoon ? (
+                                        {card.mathCourse ? (<button type="button" onClick={() => router.push("/math-course")} className="w-full rounded-2xl bg-emerald-300 px-5 py-4 text-sm font-bold text-black shadow-[0_14px_36px_rgba(52,211,153,0.24)] transition hover:bg-[#DFB15B] hover:shadow-[0_14px_40px_rgba(223,177,91,0.2)] active:scale-[0.98]">Explore Math Course</button>) : card.comingSoon ? (
                                             <button
                                                 type="button"
                                                 disabled
