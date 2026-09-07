@@ -49,7 +49,8 @@ export default function LiveExamRankingsPage() {
 }
 
 function LiveExamRankingsContent() {
-  const { examBasePath } = useProgram();
+  const { program, examBasePath } = useProgram();
+  const isMath = program === "math";
   const params = useParams();
   const examId = params?.id;
   const [currentUser] = useState(() => getStoredUser());
@@ -109,9 +110,9 @@ function LiveExamRankingsContent() {
     return (
       <RankingsPageShell>
         <FlashyLoader
-          eyebrow="Exam Rankings"
-          title="Loading leaderboard"
-          message="Scores and ranks for this live exam are being fetched."
+          eyebrow={isMath ? "Math Exam Rankings" : "Exam Rankings"}
+          title={isMath ? "Loading math rankings" : "Loading leaderboard"}
+          message={isMath ? "Scores and ranks for this math exam are being fetched." : "Scores and ranks for this live exam are being fetched."}
           iconName="analytics"
           skeleton="cards"
           className="min-h-105"
@@ -148,11 +149,11 @@ function LiveExamRankingsContent() {
       <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div>
           <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.3em] text-[#DFB15B]">
-            <Medal className="h-4 w-4" /> Exam Rankings
+            <Medal className="h-4 w-4" /> {isMath ? "Math Exam Rankings" : "Exam Rankings"}
           </p>
           <h1 className="mt-2 font-serif text-3xl font-medium tracking-wide text-white">{exam.title || "Live Exam"}</h1>
           <p className="mt-2 text-sm leading-6 text-[#8E8A9F]">
-            Ended {formatDateTime(exam.endTime)}. Rankings are based on this exam&apos;s marks only.
+            Ended {formatDateTime(exam.endTime)}. Rankings are based on this {isMath ? "math exam" : "exam"}&apos;s marks only.
           </p>
         </div>
 
@@ -161,11 +162,11 @@ function LiveExamRankingsContent() {
           className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/8 bg-[#121017] px-4 py-3 text-sm font-semibold text-white transition hover:border-[#DFB15B]/30 hover:text-[#DFB15B]"
         >
           <ArrowLeft className="h-4 w-4" />
-          Live Exams
+          {isMath ? "Math Exams" : "Live Exams"}
         </Link>
       </div>
 
-      <section className="rounded-3xl border border-[#DFB15B]/15 bg-[#121017] p-5 shadow-[0_18px_60px_rgba(0,0,0,0.3)] sm:p-6">
+      <section className={`rounded-3xl border bg-[#121017] p-5 shadow-[0_18px_60px_rgba(0,0,0,0.3)] sm:p-6 ${isMath ? "border-emerald-300/18" : "border-[#DFB15B]/15"}`}>
         <div className="grid gap-3 sm:grid-cols-3">
           <SummaryTile label="Your Rank" value={currentUserEntry ? currentUserEntry.rank : "Not ranked"} icon={Trophy} />
           <SummaryTile label="Submissions" value={payload?.count || 0} icon={Users} />
@@ -182,8 +183,8 @@ function LiveExamRankingsContent() {
             </p>
           </div>
           <div className="inline-flex w-fit items-center gap-2 rounded-full border border-white/8 bg-white/5 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-[#9D96B3]">
-            <Trophy className="h-3.5 w-3.5 text-[#DFB15B]" />
-            Exam Marks
+            <Trophy className={`h-3.5 w-3.5 ${isMath ? "text-emerald-200" : "text-[#DFB15B]"}`} />
+            {isMath ? "Math Marks" : "Exam Marks"}
           </div>
         </div>
 
@@ -199,14 +200,14 @@ function LiveExamRankingsContent() {
               return (
                 <div
                   key={`${entry.studentId || entry.studentName}-${entry.submittedAt}`}
-                  className={`grid grid-cols-[auto_1fr] gap-3 rounded-2xl border px-4 py-3 sm:grid-cols-[auto_1fr_auto] sm:items-center ${isCurrentUser ? "border-[#DFB15B]/30 bg-[#DFB15B]/10 shadow-[0_0_28px_rgba(223,177,91,0.08)]" : "border-white/5 bg-[#1A1722]/40"}`}
+                  className={`grid grid-cols-[auto_1fr] gap-3 rounded-2xl border px-4 py-3 sm:grid-cols-[auto_1fr_auto] sm:items-center ${isCurrentUser ? (isMath ? "border-emerald-300/30 bg-emerald-300/10 shadow-[0_0_28px_rgba(52,211,153,0.08)]" : "border-[#DFB15B]/30 bg-[#DFB15B]/10 shadow-[0_0_28px_rgba(223,177,91,0.08)]") : "border-white/5 bg-[#1A1722]/40"}`}
                 >
                   <RankBadge rank={entry.rank} />
                   <div className="min-w-0">
                     <div className="flex min-w-0 flex-wrap items-center gap-2">
                       <span className="truncate text-sm font-semibold text-white">{entry.studentName || "Student"}</span>
                       {isCurrentUser ? (
-                        <span className="rounded-full border border-[#DFB15B]/20 bg-[#DFB15B]/10 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-[#DFB15B]">
+                        <span className={`rounded-full border px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider ${isMath ? "border-emerald-300/20 bg-emerald-300/10 text-emerald-200" : "border-[#DFB15B]/20 bg-[#DFB15B]/10 text-[#DFB15B]"}`}>
                           You
                         </span>
                       ) : null}
@@ -223,7 +224,7 @@ function LiveExamRankingsContent() {
                   </div>
                   <div className="col-span-2 flex items-center justify-between rounded-xl border border-white/5 bg-[#121017]/70 px-3 py-2 sm:col-span-1 sm:block sm:border-0 sm:bg-transparent sm:p-0 sm:text-right">
                     <span className="text-[10px] font-bold uppercase tracking-wide text-[#6B667B] sm:block">score</span>
-                    <span className="text-sm font-bold text-[#DFB15B] sm:block">
+                    <span className={`text-sm font-bold sm:block ${isMath ? "text-emerald-200" : "text-[#DFB15B]"}`}>
                       {formatNumber(entry.score)}
                       {entry.isDisqualified ? (
                         <span className="ml-2 text-[10px] font-semibold text-red-200 line-through">{formatNumber(entry.originalScore)}</span>
@@ -264,12 +265,13 @@ function SummaryTile({ label, value, icon: Icon }) {
 }
 
 function RankingsMessage({ icon, eyebrow, title, message }) {
-  const { examBasePath } = useProgram();
+  const { program, examBasePath } = useProgram();
+  const isMath = program === "math";
   return (
     <RankingsPageShell>
-      <div className="flex min-h-105 items-center justify-center rounded-3xl border border-white/5 bg-[#121017] px-6 py-12 text-center">
+      <div className={`flex min-h-105 items-center justify-center rounded-3xl border bg-[#121017] px-6 py-12 text-center ${isMath ? "border-emerald-300/12" : "border-white/5"}`}>
         <div className="max-w-md">
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-3xl border border-white/8 bg-[#0F0D15]">
+          <div className={`mx-auto flex h-16 w-16 items-center justify-center rounded-3xl border bg-[#0F0D15] ${isMath ? "border-emerald-300/16" : "border-white/8"}`}>
             {icon}
           </div>
           <p className="mt-5 text-xs font-bold uppercase tracking-[0.3em] text-[#DFB15B]">{eyebrow}</p>
@@ -280,7 +282,7 @@ function RankingsMessage({ icon, eyebrow, title, message }) {
             className="mt-6 inline-flex items-center justify-center gap-2 rounded-2xl bg-[#DFB15B] px-5 py-3 text-sm font-bold uppercase tracking-wider text-black transition hover:brightness-110"
           >
             <ArrowLeft className="h-4 w-4" />
-            Live Exams
+            {isMath ? "Math Exams" : "Live Exams"}
           </Link>
         </div>
       </div>

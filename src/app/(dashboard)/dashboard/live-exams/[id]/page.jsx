@@ -66,7 +66,8 @@ function getCorrectOptionIndex(question) {
 }
 
 function PendingLiveExamResults({ receipt, examData }) {
-  const { examBasePath } = useProgram();
+  const { program, examBasePath } = useProgram();
+  const isMath = program === "math";
   const unlockTime = receipt?.resultsAvailableAt || examData?.endTime;
   const [remainingLabel, setRemainingLabel] = useState(() => formatCountdown(unlockTime));
 
@@ -80,12 +81,12 @@ function PendingLiveExamResults({ receipt, examData }) {
 
   return (
     <div className="flex min-h-screen w-full items-center justify-center px-4 py-6 sm:px-6 lg:px-10">
-      <div className="w-full max-w-2xl rounded-3xl border border-emerald-400/15 bg-[#121017] p-6 text-center shadow-lg shadow-black/20 sm:p-8">
-        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-3xl border border-emerald-400/20 bg-emerald-400/10">
+      <div className={`w-full max-w-2xl overflow-hidden rounded-3xl border bg-[#121017] p-6 text-center shadow-lg shadow-black/20 sm:p-8 ${isMath ? "border-emerald-300/20 shadow-[0_24px_80px_rgba(52,211,153,0.08)]" : "border-emerald-400/15"}`}>
+        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-3xl border border-emerald-400/20 bg-emerald-400/10 shadow-[0_0_28px_rgba(52,211,153,0.14)]">
           <CheckCircle className="h-9 w-9 text-emerald-300" />
         </div>
-        <p className="mt-5 text-xs font-bold uppercase tracking-[0.3em] text-[#DFB15B]">Answer Sheet Submitted</p>
-        <h1 className="mt-3 font-serif text-3xl font-medium text-white">Results unlock after the deadline</h1>
+        <p className="mt-5 text-xs font-bold uppercase tracking-[0.3em] text-[#DFB15B]">{isMath ? "Math Answer Sheet Submitted" : "Answer Sheet Submitted"}</p>
+        <h1 className="mt-3 font-serif text-3xl font-medium text-white">{isMath ? "Math results unlock after the deadline" : "Results unlock after the deadline"}</h1>
         <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-[#8E8A9F]">
           Your submission has been recorded. Scores, rankings, correct answers, and explanations will become available after {formatDateTime(unlockTime)}.
         </p>
@@ -113,7 +114,7 @@ function PendingLiveExamResults({ receipt, examData }) {
           href={examBasePath}
           className="mt-6 inline-flex items-center justify-center rounded-2xl bg-[#DFB15B] px-5 py-3 text-sm font-bold uppercase tracking-wider text-black transition hover:brightness-110"
         >
-          Return to Live Exams
+          {isMath ? "Return to Math Exams" : "Return to Live Exams"}
         </Link>
       </div>
     </div>
@@ -130,6 +131,7 @@ export default function LiveExamArenaPage() {
 
 function LiveExamArenaContent() {
   const { program, examBasePath, adminExamPath } = useProgram();
+  const isMath = program === "math";
   const params = useParams();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -237,9 +239,9 @@ function LiveExamArenaContent() {
   if (loading) {
     return (
       <FlashyLoader
-        eyebrow="Live Exam"
-        title="Loading exam room"
-        message="Schedule, questions, and access rules are being prepared."
+        eyebrow={isMath ? "Math Exam" : "Live Exam"}
+        title={isMath ? "Loading math exam room" : "Loading exam room"}
+        message={isMath ? "Math questions, schedule, and access rules are being prepared." : "Schedule, questions, and access rules are being prepared."}
         iconName="brain"
         skeleton="exam"
         surface="screen"
@@ -266,7 +268,7 @@ function LiveExamArenaContent() {
         title={isAdminPreview ? "Admin preview is unavailable" : "This exam is not open yet"}
         message={blockedMessage}
         returnHref={isAdminPreview ? adminExamPath : examBasePath}
-        returnLabel={isAdminPreview ? "Return to Live Exam Admin" : "Return to Live Exams"}
+        returnLabel={isAdminPreview ? (isMath ? "Return to Math Exam Admin" : "Return to Live Exam Admin") : (isMath ? "Return to Math Exams" : "Return to Live Exams")}
       />
     );
   }
@@ -281,7 +283,7 @@ function LiveExamArenaContent() {
         <div className="mx-auto flex w-full max-w-7xl flex-col gap-6">
           <div className="flex flex-col items-start gap-1 text-left">
             <h1 className="font-serif text-3xl font-medium tracking-wide text-white">
-              {submissionResult?.isRetake ? "Live Exam Retake Scorecard" : "Live Exam Scorecard"}
+              {submissionResult?.isRetake ? (isMath ? "Math Exam Retake Scorecard" : "Live Exam Retake Scorecard") : (isMath ? "Math Exam Scorecard" : "Live Exam Scorecard")}
             </h1>
             <p className="text-xs font-medium text-[#8E8A9F] sm:text-sm">
               {submissionResult?.isRetake
@@ -308,7 +310,7 @@ function LiveExamArenaContent() {
             examData={examData}
             submissionResult={submissionResult}
             returnHref={examBasePath}
-            returnLabel="Return to Live Exams"
+            returnLabel={isMath ? "Return to Math Exams" : "Return to Live Exams"}
           />
         </div>
       </div>
@@ -320,8 +322,9 @@ function LiveExamArenaContent() {
       <ReadOnlyLiveExamReview
         examData={examData}
         isPreview={isAdminPreview}
+        isMath={isMath}
         returnHref={isAdminPreview ? adminExamPath : examBasePath}
-        returnLabel={isAdminPreview ? "Return to Live Exam Admin" : "Return to Live Exams"}
+        returnLabel={isAdminPreview ? (isMath ? "Return to Math Exam Admin" : "Return to Live Exam Admin") : (isMath ? "Return to Math Exams" : "Return to Live Exams")}
       />
     );
   }
@@ -347,34 +350,39 @@ function LiveExamArenaContent() {
 }
 
 function LiveExamMessage({ icon, eyebrow, title, message, returnHref = "/dashboard/live-exams", returnLabel = "Return to Live Exams" }) {
+  const { program, examBasePath } = useProgram();
+  const isMath = program === "math";
+  const resolvedReturnHref = returnHref === "/dashboard/live-exams" && isMath ? examBasePath : returnHref;
+  const resolvedReturnLabel = returnLabel === "Return to Live Exams" && isMath ? "Return to Math Exams" : returnLabel;
+
   return (
-    <div className="flex min-h-105 items-center justify-center rounded-3xl border border-white/5 bg-[#121017] px-6 py-12 text-center">
+    <div className={`flex min-h-105 items-center justify-center rounded-3xl border bg-[#121017] px-6 py-12 text-center ${isMath ? "border-emerald-300/12 shadow-[0_18px_60px_rgba(52,211,153,0.06)]" : "border-white/5"}`}>
       <div className="max-w-md">
-        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-3xl border border-white/8 bg-[#0F0D15]">
+        <div className={`mx-auto flex h-16 w-16 items-center justify-center rounded-3xl border bg-[#0F0D15] ${isMath ? "border-emerald-300/16" : "border-white/8"}`}>
           {icon}
         </div>
         <p className="mt-5 text-xs font-bold uppercase tracking-[0.3em] text-[#DFB15B]">{eyebrow}</p>
         <h1 className="mt-3 font-serif text-3xl font-medium text-white">{title}</h1>
         <p className="mt-3 text-sm leading-6 text-[#8E8A9F]">{message}</p>
         <Link
-          href={returnHref}
+          href={resolvedReturnHref}
           className="mt-6 inline-flex items-center justify-center rounded-2xl bg-[#DFB15B] px-5 py-3 text-sm font-bold uppercase tracking-wider text-black transition hover:brightness-110"
         >
-          {returnLabel}
+          {resolvedReturnLabel}
         </Link>
       </div>
     </div>
   );
 }
 
-function ReadOnlyLiveExamReview({ examData, isPreview = false, returnHref = "/dashboard/live-exams", returnLabel = "Return to Live Exams" }) {
+function ReadOnlyLiveExamReview({ examData, isPreview = false, isMath = false, returnHref = "/dashboard/live-exams", returnLabel = "Return to Live Exams" }) {
   const questions = examData?.questions || [];
 
   return (
     <div className="flex w-full flex-col gap-6 px-4 py-6 text-left sm:px-6 lg:px-10">
       <div className="flex flex-col gap-1">
-        <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.3em] text-[#DFB15B]">
-          <BookOpen className="h-4 w-4" /> {isPreview ? "Admin Preview" : "Solution Review"}
+        <p className={`flex items-center gap-2 text-xs font-bold uppercase tracking-[0.3em] ${isMath ? "text-emerald-200" : "text-[#DFB15B]"}`}>
+          <BookOpen className="h-4 w-4" /> {isPreview ? (isMath ? "Math Admin Preview" : "Admin Preview") : (isMath ? "Math Solution Review" : "Solution Review")}
         </p>
         <h1 className="mt-2 font-serif text-3xl font-medium tracking-wide text-white">{examData?.title || "Live Exam"}</h1>
         <p className="text-sm text-[#8E8A9F]">
@@ -389,7 +397,7 @@ function ReadOnlyLiveExamReview({ examData, isPreview = false, returnHref = "/da
           const correctOptionIndex = getCorrectOptionIndex(question);
 
           return (
-            <section key={question._id || index} className="rounded-3xl border border-white/5 bg-[#121017] p-5 sm:p-6">
+            <section key={question._id || index} className={`rounded-3xl border bg-[#121017] p-5 sm:p-6 ${isMath ? "border-emerald-300/10 shadow-[0_14px_45px_rgba(0,0,0,0.24)]" : "border-white/5"}`}>
               <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
                 <div>
                   <p className="text-[10px] font-bold uppercase tracking-widest text-[#DFB15B]">Question #{index + 1}</p>

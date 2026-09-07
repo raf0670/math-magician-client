@@ -7,6 +7,7 @@ import { CalendarClock, CheckCircle2, Clock3, Eye, LockKeyhole, Play, RefreshCw,
 import { getLiveExams } from "@/lib/api";
 import ClassAccessGate from "@/components/dashboard/ClassAccessGate";
 import FlashyLoader from "@/components/shared/FlashyLoader";
+import { MathHero, MathPageShell } from "@/components/math/MathDashboardUI";
 
 const STATUS_STYLES = {
   upcoming: "border-sky-400/25 bg-sky-400/10 text-sky-200",
@@ -51,10 +52,14 @@ function LiveExamsContent() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [fatalError, setFatalError] = useState(null);
+  const isMath = program === "math";
 
   const sortedItems = useMemo(() => {
     return [...items].sort((a, b) => new Date(b.startTime || 0) - new Date(a.startTime || 0));
   }, [items]);
+
+  const openCount = useMemo(() => sortedItems.filter((exam) => getStatus(exam) === "open").length, [sortedItems]);
+  const upcomingCount = useMemo(() => sortedItems.filter((exam) => getStatus(exam) === "upcoming").length, [sortedItems]);
 
   const loadLiveExams = useCallback(async () => {
     setLoading(true);
@@ -94,34 +99,28 @@ function LiveExamsContent() {
     throw fatalError;
   }
 
-  return (
-    <div className="flex w-full flex-col gap-6 text-left">
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-        <div>
-          <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.3em] text-[#DFB15B]">
-            <Radio className="h-4 w-4" /> {program === 'math' ? 'Math Exams' : 'Live Exams'}
-          </p>
-          <h1 className="mt-2 font-serif text-3xl font-medium tracking-wide text-white">Scheduled Exam Room</h1>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-[#8E8A9F]">
-            Join active live exams during their official time window, or review solutions after the deadline.
-          </p>
-        </div>
+  const refreshButton = (
+    <button
+      type="button"
+      onClick={loadLiveExams}
+      className={`inline-flex items-center justify-center gap-2 rounded-2xl border px-4 py-3 text-sm font-semibold transition ${
+        isMath
+          ? "border-emerald-300/20 bg-emerald-300/10 text-emerald-100 hover:border-[#DFB15B]/45 hover:text-[#DFB15B]"
+          : "border-white/8 bg-[#121017] text-white hover:border-[#DFB15B]/30 hover:text-[#DFB15B]"
+      }`}
+    >
+      <RefreshCw className="h-4 w-4" />
+      Refresh
+    </button>
+  );
 
-        <button
-          type="button"
-          onClick={loadLiveExams}
-          className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/8 bg-[#121017] px-4 py-3 text-sm font-semibold text-white transition hover:border-[#DFB15B]/30 hover:text-[#DFB15B]"
-        >
-          <RefreshCw className="h-4 w-4" />
-          Refresh
-        </button>
-      </div>
-
+  const examContent = (
+    <>
       {loading ? (
         <FlashyLoader
-          eyebrow="Live Exams"
-          title="Loading scheduled exams"
-          message="Exam windows and availability are being fetched."
+          eyebrow={isMath ? "Math Exams" : "Live Exams"}
+          title={isMath ? "Loading math exam windows" : "Loading scheduled exams"}
+          message={isMath ? "Daily mocks and full-length math papers are being fetched." : "Exam windows and availability are being fetched."}
           iconName="clipboard"
           skeleton="cards"
           className="min-h-90"
@@ -129,10 +128,10 @@ function LiveExamsContent() {
       ) : null}
 
       {!loading && !sortedItems.length ? (
-        <div className="rounded-3xl border border-white/5 bg-[#121017] px-6 py-12 text-center">
-          <CalendarClock className="mx-auto h-10 w-10 text-[#DFB15B]" />
-          <h2 className="mt-4 font-serif text-2xl font-medium text-white">No live exams posted yet</h2>
-          <p className="mt-2 text-sm text-[#8E8A9F]">New scheduled exams will appear here once an admin publishes them.</p>
+        <div className={`rounded-3xl border px-6 py-12 text-center ${isMath ? "border-emerald-300/12 bg-[#121017] shadow-[0_18px_55px_rgba(0,0,0,0.28)]" : "border-white/5 bg-[#121017]"}`}>
+          <CalendarClock className={`mx-auto h-10 w-10 ${isMath ? "text-emerald-200" : "text-[#DFB15B]"}`} />
+          <h2 className="mt-4 font-serif text-2xl font-medium text-white">{isMath ? "No math exams posted yet" : "No live exams posted yet"}</h2>
+          <p className="mt-2 text-sm text-[#8E8A9F]">{isMath ? "Daily mocks and full-length math exams will appear here once an admin publishes them." : "New scheduled exams will appear here once an admin publishes them."}</p>
         </div>
       ) : null}
 
@@ -144,7 +143,7 @@ function LiveExamsContent() {
             const isEnded = status === "ended";
 
             return (
-              <section key={exam._id} className="flex min-h-64 flex-col rounded-3xl border border-white/6 bg-[#121017] p-5">
+              <section key={exam._id} className={`flex min-h-64 flex-col rounded-3xl border p-5 shadow-[0_14px_40px_rgba(0,0,0,0.22)] ${isMath ? "border-emerald-300/10 bg-[#121017]" : "border-white/6 bg-[#121017]"}`}>
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="min-w-0">
                     <span className={`inline-flex rounded-full border px-3 py-1 text-[10px] font-bold uppercase tracking-wider ${STATUS_STYLES[status] || STATUS_STYLES.scheduled}`}>
@@ -162,11 +161,11 @@ function LiveExamsContent() {
 
                 <div className="mt-5 grid gap-3 text-sm text-[#A9A3BA]">
                   <span className="flex items-center gap-2">
-                    <CalendarClock className="h-4 w-4 text-[#DFB15B]" />
+                    <CalendarClock className={`h-4 w-4 ${isMath ? "text-emerald-200" : "text-[#DFB15B]"}`} />
                     {formatDateTime(exam.startTime)}
                   </span>
                   <span className="flex items-center gap-2">
-                    <Clock3 className="h-4 w-4 text-[#DFB15B]" />
+                    <Clock3 className={`h-4 w-4 ${isMath ? "text-emerald-200" : "text-[#DFB15B]"}`} />
                     Ends {formatDateTime(exam.endTime)}
                   </span>
                 </div>
@@ -186,7 +185,7 @@ function LiveExamsContent() {
                     <div className="flex flex-col gap-2">
                       <Link
                         href={`${examBasePath}/${exam._id}`}
-                        className={`inline-flex w-full items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-bold uppercase tracking-wider transition ${isOpen ? "bg-linear-to-r from-[#E6C687] to-[#AA7C11] text-black hover:brightness-110" : "border border-white/8 bg-[#0F0D15] text-white hover:border-[#DFB15B]/30 hover:text-[#DFB15B]"}`}
+                        className={`inline-flex w-full items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-bold uppercase tracking-wider transition ${isOpen ? (isMath ? "bg-linear-to-r from-emerald-300 via-[#DFB15B] to-[#AA7C11] text-black hover:brightness-110" : "bg-linear-to-r from-[#E6C687] to-[#AA7C11] text-black hover:brightness-110") : "border border-white/8 bg-[#0F0D15] text-white hover:border-[#DFB15B]/30 hover:text-[#DFB15B]"}`}
                       >
                         {isOpen ? <Play className="h-4 w-4 fill-current stroke-none" /> : <Eye className="h-4 w-4" />}
                         {isOpen ? "Start Exam" : exam.hasSubmitted ? "View Results" : "Review Solutions"}
@@ -222,6 +221,47 @@ function LiveExamsContent() {
           })}
         </div>
       ) : null}
+    </>
+  );
+
+  if (isMath) {
+    return (
+      <MathPageShell>
+        <MathHero
+          eyebrow="Math Exam Room"
+          title="Scheduled Math Exams"
+          description="Join daily math mocks during their official window, then review scores, solutions, and rankings after the deadline."
+          icon={Radio}
+          action={refreshButton}
+        >
+          <div className="grid gap-3 sm:grid-cols-3">
+            <Info label="Published" value={sortedItems.length} />
+            <Info label="Open Now" value={openCount} />
+            <Info label="Upcoming" value={upcomingCount} />
+          </div>
+        </MathHero>
+        {examContent}
+      </MathPageShell>
+    );
+  }
+
+  return (
+    <div className="flex w-full flex-col gap-6 text-left">
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+        <div>
+          <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.3em] text-[#DFB15B]">
+            <Radio className="h-4 w-4" /> Live Exams
+          </p>
+          <h1 className="mt-2 font-serif text-3xl font-medium tracking-wide text-white">Scheduled Exam Room</h1>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-[#8E8A9F]">
+            Join active live exams during their official time window, or review solutions after the deadline.
+          </p>
+        </div>
+
+        {refreshButton}
+      </div>
+
+      {examContent}
     </div>
   );
 }
