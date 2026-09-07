@@ -114,7 +114,7 @@ export default function DashboardSidebar() {
 
     return (
         <>
-            <aside className="hidden md:flex fixed inset-y-0 left-0 z-30 w-64 select-none flex-col justify-start overflow-y-auto border-r border-[#DFB15B]/10 bg-[#0D0B14]/95 px-4 py-6 shadow-[22px_0_70px_rgba(0,0,0,0.28)]">
+            <aside className="hidden md:flex fixed bottom-0 left-0 top-[69px] z-30 w-64 select-none flex-col justify-start overflow-y-auto border-r border-[#DFB15B]/10 bg-[#0D0B14]/95 px-4 py-6 shadow-[22px_0_70px_rgba(0,0,0,0.28)]">
                 <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(223,177,91,0.045)_1px,transparent_1px),linear-gradient(90deg,rgba(124,58,237,0.035)_1px,transparent_1px)] bg-size-[38px_38px]" />
                 <motion.div
                     className="pointer-events-none absolute -left-24 -top-24 h-64 w-64 rounded-full bg-[#DFB15B]/13 blur-3xl"

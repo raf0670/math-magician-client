@@ -62,10 +62,10 @@ export default function DashboardLayout({ children }) {
     }
 
     return (
-        <div className="min-h-screen bg-[#0A090F] text-white flex overflow-hidden">
+        <div className="min-h-[calc(100vh-69px)] bg-[#0A090F] text-white flex overflow-hidden">
             {!isFullscreenExamRoute && <DashboardSidebar />}
 
-            <div className={`flex-1 flex flex-col h-screen overflow-y-auto relative z-10 pb-24 md:pb-0 transition-all duration-200 ${isFullscreenExamRoute ? "md:pl-0" : "md:pl-64"}`}>
+            <div className={`flex-1 flex h-[calc(100vh-69px)] flex-col overflow-y-auto relative z-10 pb-24 md:pb-0 transition-all duration-200 ${isFullscreenExamRoute ? "md:pl-0" : "md:pl-64"}`}>
                 <main className={`flex-1 w-full mx-auto ${isFullscreenExamRoute ? "max-w-full px-0 py-0" : "max-w-7xl px-4 sm:px-8 py-8"}`}>
                     {children}
                 </main>
