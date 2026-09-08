@@ -109,7 +109,7 @@ function BookedCheckoutContent() {
       <div className="flex min-h-screen items-center justify-center bg-[#0A090F] px-4 text-white">
         <div className="w-full max-w-md rounded-3xl border border-[#DFB15B]/20 bg-[#121017] p-8 text-center shadow-2xl">
           <p className="text-xs font-bold uppercase tracking-[0.3em] text-[#DFB15B]">No Booking Found</p>
-          <h1 className="mt-3 font-serif text-3xl font-medium">Book a seat first</h1>
+          <h1 className="mt-3 font-sans text-3xl font-medium">Book a seat first</h1>
           <p className="mt-3 text-sm leading-6 text-[#8E8A9F]">
             Checkout opens after your seat booking information has been saved.
           </p>
@@ -148,7 +148,7 @@ function BookedCheckoutContent() {
                 <CreditCard className="h-3.5 w-3.5" />
                 Booked Seat Checkout
               </div>
-              <h1 className="mt-4 font-serif text-4xl font-medium leading-tight text-white sm:text-5xl">
+              <h1 className="mt-4 font-sans text-4xl font-medium leading-tight text-white sm:text-5xl">
                 Proceed to Payment
               </h1>
               <p className="mt-3 max-w-xl text-sm leading-6 text-[#A9A3BA]">
@@ -245,11 +245,11 @@ function FormSection({ title, description, children, index }) {
     >
       <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-white/15 to-transparent" />
       <div className="mb-6 flex items-start gap-4">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-[#DFB15B]/20 bg-[#DFB15B]/10 font-serif text-lg font-bold text-[#DFB15B]">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-[#DFB15B]/20 bg-[#DFB15B]/10 font-sans text-lg font-bold text-[#DFB15B]">
           {index}
         </div>
         <div>
-          <h2 className="font-serif text-2xl font-medium text-white">{title}</h2>
+          <h2 className="font-sans text-2xl font-medium text-white">{title}</h2>
           <p className="mt-2 text-sm text-[#8E8A9F]">{description}</p>
         </div>
       </div>
@@ -295,7 +295,7 @@ function PaymentChoiceField({ selectedPlan, value, onChange }) {
               </span>
             </span>
             <span className="mt-4 text-sm font-bold text-white">{option.title}</span>
-            <span className="mt-2 font-serif text-2xl font-semibold text-white">{formatBDT(option.amount)}</span>
+            <span className="mt-2 font-sans text-2xl font-semibold text-white">{formatBDT(option.amount)}</span>
             <span className="mt-2 text-xs font-medium leading-5 text-[#8E8A9F]">{option.note}</span>
           </motion.button>
         );

@@ -34,7 +34,7 @@ export default function ScheduleTimeline() {
         <div className="w-full bg-[#121017] border border-white/5 rounded-3xl p-6 sm:p-8 shadow-[0_4px_25px_rgba(0,0,0,0.25)] select-none">
             <div className="flex items-center justify-between mb-8 pb-4 border-b border-white/3">
                 <div className="flex flex-col gap-1">
-                    <h2 className="font-serif text-lg font-medium text-white tracking-wide">MongoDB Preparation Timeline</h2>
+                    <h2 className="font-sans text-lg font-medium text-white tracking-wide">MongoDB Preparation Timeline</h2>
                     <p className="text-[11px] font-medium text-[#6B667B]">Your upcoming exams and practice sets are pulled directly from the database.</p>
                 </div>
                 <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/2 border border-white/5 text-[10px] font-bold text-[#8E8A9F] tracking-wide uppercase">

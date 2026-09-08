@@ -130,7 +130,7 @@ function LiveExamsContent() {
       {!loading && !sortedItems.length ? (
         <div className={`rounded-3xl border px-6 py-12 text-center ${isMath ? "border-emerald-300/12 bg-[#121017] shadow-[0_18px_55px_rgba(0,0,0,0.28)]" : "border-white/5 bg-[#121017]"}`}>
           <CalendarClock className={`mx-auto h-10 w-10 ${isMath ? "text-emerald-200" : "text-[#DFB15B]"}`} />
-          <h2 className="mt-4 font-serif text-2xl font-medium text-white">{isMath ? "No math exams posted yet" : "No live exams posted yet"}</h2>
+          <h2 className="mt-4 font-sans text-2xl font-medium text-white">{isMath ? "No math exams posted yet" : "No live exams posted yet"}</h2>
           <p className="mt-2 text-sm text-[#8E8A9F]">{isMath ? "Daily mocks and full-length math exams will appear here once an admin publishes them." : "New scheduled exams will appear here once an admin publishes them."}</p>
         </div>
       ) : null}
@@ -252,7 +252,7 @@ function LiveExamsContent() {
           <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.3em] text-[#DFB15B]">
             <Radio className="h-4 w-4" /> Live Exams
           </p>
-          <h1 className="mt-2 font-serif text-3xl font-medium tracking-wide text-white">Scheduled Exam Room</h1>
+          <h1 className="mt-2 font-sans text-3xl font-medium tracking-wide text-white">Scheduled Exam Room</h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-[#8E8A9F]">
             Join active live exams during their official time window, or review solutions after the deadline.
           </p>

@@ -98,7 +98,7 @@ export default function WelcomeBanner() {
                         <span className="min-w-0 truncate">Premium Academy</span>
                     </div>
 
-                    <h1 className="mt-5 max-w-full wrap-break-word font-serif text-2xl font-semibold leading-tight tracking-wide text-white sm:text-4xl lg:text-5xl">
+                    <h1 className="mt-5 max-w-full wrap-break-word font-sans text-2xl font-semibold leading-tight tracking-wide text-white sm:text-4xl lg:text-5xl">
                         Welcome back, <span className={rankTone.name}>{firstName}</span>
                     </h1>
 

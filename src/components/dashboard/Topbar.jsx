@@ -129,7 +129,7 @@ export default function DashboardTopbar() {
                     </div>
                     <div className="min-w-0">
                         <p className="text-[9px] font-bold uppercase tracking-[0.28em] text-[#DFB15B]">Dashboard</p>
-                        <h2 className="truncate font-serif text-xl font-semibold tracking-wide text-white">{sectionTitle}</h2>
+                        <h2 className="truncate font-sans text-xl font-semibold tracking-wide text-white">{sectionTitle}</h2>
                     </div>
                 </div>
 
@@ -137,7 +137,7 @@ export default function DashboardTopbar() {
                     <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl border border-[#DFB15B]/20 bg-[#DFB15B]/10 text-[#DFB15B]">
                         <Sparkles className="h-4 w-4" />
                     </div>
-                    <span className="min-w-0 truncate font-serif text-sm font-semibold text-white">{sectionTitle}</span>
+                    <span className="min-w-0 truncate font-sans text-sm font-semibold text-white">{sectionTitle}</span>
                 </div>
             </div>
 

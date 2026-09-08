@@ -1,2 +1,7 @@
 @import "tailwindcss";
 @plugin "daisyui";
+
+@theme {
+  --font-sans: var(--font-google-sans), Arial, sans-serif;
+  --font-mono: var(--font-geist-mono), "Courier New", monospace;
+}

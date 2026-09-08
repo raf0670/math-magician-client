@@ -162,7 +162,7 @@ function AssessmentExamContent() {
       <div className="min-h-screen w-full px-4 py-6 sm:px-6 lg:px-10">
         <div className="mx-auto flex w-full max-w-7xl flex-col gap-6">
           <div className="flex flex-col items-start gap-1 text-left">
-            <h1 className="font-serif text-3xl font-medium tracking-wide text-white">
+            <h1 className="font-sans text-3xl font-medium tracking-wide text-white">
               {submissionResult?.isRetake ? "Assessment Retake Scorecard" : "Assessment Scorecard"}
             </h1>
             <p className="text-xs font-medium text-[#8E8A9F] sm:text-sm">
@@ -229,7 +229,7 @@ function AssessmentMessage({ icon, eyebrow, title, message }) {
           {icon}
         </div>
         <p className="mt-5 text-xs font-bold uppercase tracking-[0.3em] text-[#DFB15B]">{eyebrow}</p>
-        <h1 className="mt-3 font-serif text-3xl font-medium text-white">{title}</h1>
+        <h1 className="mt-3 font-sans text-3xl font-medium text-white">{title}</h1>
         <p className="mt-3 text-sm leading-6 text-[#8E8A9F]">{message}</p>
         <Link
           href="/dashboard/assessment-test"
@@ -252,7 +252,7 @@ function ReadOnlyAssessmentReview({ examData, isPreview = false }) {
           <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.3em] text-[#DFB15B]">
             <BookOpen className="h-4 w-4" /> {isPreview ? "Admin Preview" : "Solution Review"}
           </p>
-          <h1 className="mt-2 font-serif text-3xl font-medium tracking-wide text-white">{examData?.title || "Assessment Test"}</h1>
+          <h1 className="mt-2 font-sans text-3xl font-medium tracking-wide text-white">{examData?.title || "Assessment Test"}</h1>
           <p className="text-sm text-[#8E8A9F]">
             {isPreview ? `Official window: ${formatDateTime(examData?.startTime)} to ${formatDateTime(examData?.endTime)}` : `Ended ${formatDateTime(examData?.endTime)}. Submissions are closed, but solutions are available for review.`}
           </p>
@@ -327,7 +327,7 @@ function ReadOnlyAssessmentReview({ examData, isPreview = false }) {
         ) : (
           <div className="rounded-3xl border border-red-400/20 bg-red-500/10 px-6 py-10 text-center">
             <AlertTriangle className="mx-auto h-10 w-10 text-red-300" />
-            <h2 className="mt-4 font-serif text-2xl font-medium text-white">Assessment data is missing</h2>
+            <h2 className="mt-4 font-sans text-2xl font-medium text-white">Assessment data is missing</h2>
             <p className="mx-auto mt-2 max-w-2xl text-sm leading-6 text-red-100/75">
               No valid questions are available from the AssessmentTest collection.
             </p>

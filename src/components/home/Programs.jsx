@@ -360,7 +360,7 @@ export default function ProgramsAndTestimonials() {
                     <div className="inline-block px-3 py-1 rounded-full bg-[#DFB15B]/5 border border-[#DFB15B]/15 text-[10px] tracking-widest text-[#DFB15B] uppercase font-bold mb-4">
                         Programs
                     </div>
-                    <h2 className="font-serif text-3xl md:text-5xl font-medium tracking-wide text-white mb-4">
+                    <h2 className="font-sans text-3xl md:text-5xl font-medium tracking-wide text-white mb-4">
                         Choose Your Potion
                     </h2>
                     <p className="text-[#6B667B] text-xs md:text-sm font-medium">
@@ -423,7 +423,7 @@ export default function ProgramsAndTestimonials() {
                                                 <Shield className="relative h-6 w-6" />
                                             )}
                                         </div>
-                                        <h3 className={`font-serif font-semibold text-white tracking-wide ${card.featured ? "text-2xl md:text-3xl" : "text-xl"}`}>
+                                        <h3 className={`font-sans font-semibold text-white tracking-wide ${card.featured ? "text-2xl md:text-3xl" : "text-xl"}`}>
                                             {card.title}
                                         </h3>
                                     </div>
@@ -483,7 +483,7 @@ export default function ProgramsAndTestimonials() {
                                 {/* Pricing Framework Footers */}
                                 <div className="mt-auto pt-4 relative z-10">
                                     <div className="flex items-baseline gap-1.5 mb-6">
-                                        <span className="font-serif text-3xl font-bold text-white tracking-tight">
+                                        <span className="font-sans text-3xl font-bold text-white tracking-tight">
                                             {card.price}
                                         </span>
                                         <span className="text-[11px] font-medium text-[#6B667B]">
@@ -586,7 +586,7 @@ export default function ProgramsAndTestimonials() {
                     <div className="inline-block px-3 py-1 rounded-full bg-[#7C3AED]/10 border border-[#7C3AED]/20 text-[10px] tracking-widest text-[#A78BFA] uppercase font-bold mb-4">
                         Testimonials
                     </div>
-                    <h2 className="font-serif text-3xl md:text-5xl font-medium tracking-wide text-white mb-4">
+                    <h2 className="font-sans text-3xl md:text-5xl font-medium tracking-wide text-white mb-4">
                         Stories from the Magic Guild
                     </h2>
                     <p className="text-[#6B667B] text-xs md:text-sm font-medium">

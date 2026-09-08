@@ -86,7 +86,7 @@ function PendingLiveExamResults({ receipt, examData }) {
           <CheckCircle className="h-9 w-9 text-emerald-300" />
         </div>
         <p className="mt-5 text-xs font-bold uppercase tracking-[0.3em] text-[#DFB15B]">{isMath ? "Math Answer Sheet Submitted" : "Answer Sheet Submitted"}</p>
-        <h1 className="mt-3 font-serif text-3xl font-medium text-white">{isMath ? "Math results unlock after the deadline" : "Results unlock after the deadline"}</h1>
+        <h1 className="mt-3 font-sans text-3xl font-medium text-white">{isMath ? "Math results unlock after the deadline" : "Results unlock after the deadline"}</h1>
         <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-[#8E8A9F]">
           Your submission has been recorded. Scores, rankings, correct answers, and explanations will become available after {formatDateTime(unlockTime)}.
         </p>
@@ -282,7 +282,7 @@ function LiveExamArenaContent() {
       <div className="min-h-screen w-full px-4 py-6 sm:px-6 lg:px-10">
         <div className="mx-auto flex w-full max-w-7xl flex-col gap-6">
           <div className="flex flex-col items-start gap-1 text-left">
-            <h1 className="font-serif text-3xl font-medium tracking-wide text-white">
+            <h1 className="font-sans text-3xl font-medium tracking-wide text-white">
               {submissionResult?.isRetake ? (isMath ? "Math Exam Retake Scorecard" : "Live Exam Retake Scorecard") : (isMath ? "Math Exam Scorecard" : "Live Exam Scorecard")}
             </h1>
             <p className="text-xs font-medium text-[#8E8A9F] sm:text-sm">
@@ -362,7 +362,7 @@ function LiveExamMessage({ icon, eyebrow, title, message, returnHref = "/dashboa
           {icon}
         </div>
         <p className="mt-5 text-xs font-bold uppercase tracking-[0.3em] text-[#DFB15B]">{eyebrow}</p>
-        <h1 className="mt-3 font-serif text-3xl font-medium text-white">{title}</h1>
+        <h1 className="mt-3 font-sans text-3xl font-medium text-white">{title}</h1>
         <p className="mt-3 text-sm leading-6 text-[#8E8A9F]">{message}</p>
         <Link
           href={resolvedReturnHref}
@@ -384,7 +384,7 @@ function ReadOnlyLiveExamReview({ examData, isPreview = false, isMath = false, r
         <p className={`flex items-center gap-2 text-xs font-bold uppercase tracking-[0.3em] ${isMath ? "text-emerald-200" : "text-[#DFB15B]"}`}>
           <BookOpen className="h-4 w-4" /> {isPreview ? (isMath ? "Math Admin Preview" : "Admin Preview") : (isMath ? "Math Solution Review" : "Solution Review")}
         </p>
-        <h1 className="mt-2 font-serif text-3xl font-medium tracking-wide text-white">{examData?.title || "Live Exam"}</h1>
+        <h1 className="mt-2 font-sans text-3xl font-medium tracking-wide text-white">{examData?.title || "Live Exam"}</h1>
         <p className="text-sm text-[#8E8A9F]">
           {isPreview ? `Official window: ${formatDateTime(examData?.startTime)} to ${formatDateTime(examData?.endTime)}` : `Ended ${formatDateTime(examData?.endTime)}. Submissions are closed, but solutions are available for review.`}
         </p>
@@ -451,7 +451,7 @@ function ReadOnlyLiveExamReview({ examData, isPreview = false, isMath = false, r
       ) : (
         <div className="rounded-3xl border border-red-400/20 bg-red-500/10 px-6 py-10 text-center">
           <AlertTriangle className="mx-auto h-10 w-10 text-red-300" />
-          <h2 className="mt-4 font-serif text-2xl font-medium text-white">Solution data is missing</h2>
+          <h2 className="mt-4 font-sans text-2xl font-medium text-white">Solution data is missing</h2>
           <p className="mx-auto mt-2 max-w-2xl text-sm leading-6 text-red-100/75">
             This exam record is still available, but its linked question documents are not in the question bank anymore.
             Please ask an admin to recreate or republish this live exam.

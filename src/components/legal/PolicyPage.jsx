@@ -17,7 +17,7 @@ export default function PolicyPage({ policy }) {
 
           <div className="mt-10 max-w-3xl">
             <p className="text-xs font-bold uppercase tracking-[0.24em] text-[#DFB15B]">{policy.eyebrow}</p>
-            <h1 className="mt-4 font-serif text-4xl font-medium leading-tight text-white sm:text-5xl">{policy.title}</h1>
+            <h1 className="mt-4 font-sans text-4xl font-medium leading-tight text-white sm:text-5xl">{policy.title}</h1>
             <p className="mt-5 text-sm font-medium leading-7 text-[#A9A3BA] sm:text-base">{policy.description}</p>
             <p className="mt-4 text-xs font-semibold uppercase tracking-[0.18em] text-[#6B667B]">
               Last updated: {businessInfo.lastUpdated}
@@ -31,7 +31,7 @@ export default function PolicyPage({ policy }) {
           <div className="space-y-5">
             {policy.sections.map((section) => (
               <article key={section.heading} className="rounded-xl border border-white/7 bg-[#121017] p-5 sm:p-6">
-                <h2 className="font-serif text-2xl font-medium text-white">{section.heading}</h2>
+                <h2 className="font-sans text-2xl font-medium text-white">{section.heading}</h2>
                 <div className="mt-4 space-y-3">
                   {section.body.map((paragraph) => (
                     <p key={paragraph} className="text-sm font-medium leading-7 text-[#A9A3BA]">

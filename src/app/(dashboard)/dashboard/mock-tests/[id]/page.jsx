@@ -116,7 +116,7 @@ function ActiveMockExamContent() {
             <div className="min-h-screen w-full px-4 py-6 sm:px-6 lg:px-10">
                 <div className="mx-auto flex w-full max-w-7xl flex-col gap-6">
                     <div className="flex flex-col items-start gap-1 text-left">
-                        <h1 className="font-serif text-3xl font-medium tracking-wide text-white">Performance Scorecard</h1>
+                        <h1 className="font-sans text-3xl font-medium tracking-wide text-white">Performance Scorecard</h1>
                         <p className="text-xs font-medium text-[#8E8A9F] sm:text-sm">
                             Your submission has been scored against the backend evaluation logic.
                         </p>

@@ -237,7 +237,7 @@ export default function MathEnrollment({ initialPlan }) {
                 <WandSparkles className="h-3.5 w-3.5 shrink-0" />
                 <span className="truncate">{upgrade ? "Slytherin Upgrade" : "Math Enrollment"}</span>
               </div>
-              <h1 className="mt-5 max-w-4xl font-serif text-3xl font-semibold leading-tight tracking-wide text-white sm:text-5xl">
+              <h1 className="mt-5 max-w-4xl font-sans text-3xl font-semibold leading-tight tracking-wide text-white sm:text-5xl">
                 {upgrade ? "Join Slytherin" : "Your math journey starts here"}
               </h1>
               <p className="mt-4 max-w-2xl text-sm font-medium leading-7 text-[#A9A3BA]">
@@ -366,7 +366,7 @@ function FormSection({ title, description, children, index, icon: Icon }) {
         </div>
         <div className="min-w-0">
           <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#DFB15B]">Step {index}</p>
-          <h2 className="mt-1 font-serif text-2xl font-medium text-white">{title}</h2>
+          <h2 className="mt-1 font-sans text-2xl font-medium text-white">{title}</h2>
           <p className="mt-2 text-sm leading-6 text-[#8E8A9F]">{description}</p>
         </div>
       </div>
@@ -503,7 +503,7 @@ function SlytherinChoice({ checked, onChange }) {
           <Check className="h-4 w-4" />
         </span>
         <span className="min-w-0">
-          <span className="block font-serif text-2xl font-medium text-white">Add Slytherin</span>
+          <span className="block font-sans text-2xl font-medium text-white">Add Slytherin</span>
           <span className="mt-2 block text-sm font-medium leading-7 text-[#A9A3BA]">
             Add Slytherin for BDT 5,999 and unlock the full website, regular exams, and house competition.
           </span>
@@ -551,7 +551,7 @@ function CheckoutSummary({
             <CreditCard className="h-3.5 w-3.5" />
             Secure Checkout
           </p>
-          <h2 className="mt-3 font-serif text-3xl font-semibold text-white">{planLabel}</h2>
+          <h2 className="mt-3 font-sans text-3xl font-semibold text-white">{planLabel}</h2>
           <p className="mt-2 text-sm leading-6 text-[#8E8A9F]">Full payment through PayStation.</p>
         </div>
 
@@ -590,7 +590,7 @@ function CheckoutSummary({
             ) : null}
             <div className="border-t border-white/10 pt-4">
               <p className="text-[#8E8A9F]">Payable now</p>
-              <p className="mt-1 font-serif text-4xl font-bold text-[#DFB15B]">{amount(readyQuote.amount)}</p>
+              <p className="mt-1 font-sans text-4xl font-bold text-[#DFB15B]">{amount(readyQuote.amount)}</p>
             </div>
             <p className="text-xs leading-6 text-[#8E8A9F]">Only the best single discount applies.</p>
           </div>

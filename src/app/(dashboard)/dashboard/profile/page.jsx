@@ -10,7 +10,7 @@ export default function UserProfileDashboard() {
                 <div className="inline-flex items-center rounded-full border border-[#DFB15B]/20 bg-[#DFB15B]/10 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.24em] text-[#DFB15B]">
                     Student Profile
                 </div>
-                <h1 className="font-serif text-3xl font-semibold tracking-wide text-white sm:text-4xl">
+                <h1 className="font-sans text-3xl font-semibold tracking-wide text-white sm:text-4xl">
                     Profile Configurations
                 </h1>
                 <p className="max-w-2xl text-xs font-medium leading-6 text-[#A9A3BA] sm:text-sm">

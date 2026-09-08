@@ -55,7 +55,7 @@ export default function Testimonials() {
                     <div className="inline-block px-3 py-1 rounded-full bg-[#DFB15B]/5 border border-[#DFB15B]/15 text-[10px] tracking-widest text-[#DFB15B] uppercase font-bold mb-4">
                         Student Stories
                     </div>
-                    <h2 className="font-serif text-3xl md:text-5xl font-medium tracking-wide text-white mb-4">
+                    <h2 className="font-sans text-3xl md:text-5xl font-medium tracking-wide text-white mb-4">
                         Voices from IBA&apos;s Newest Magicians
                     </h2>
                     <p className="text-[#6B667B] text-xs md:text-sm font-medium">

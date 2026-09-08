@@ -73,7 +73,7 @@ export default function ResourcesVault() {
                                 </span>
                             </div>
 
-                            <h2 className="mt-4 font-serif text-2xl font-medium leading-tight tracking-wide text-white sm:text-3xl">
+                            <h2 className="mt-4 font-sans text-2xl font-medium leading-tight tracking-wide text-white sm:text-3xl">
                                 Curated PDF resource library
                             </h2>
                             <p className="mt-3 text-xs font-medium leading-6 text-[#8E8A9F] sm:text-sm">
@@ -104,7 +104,7 @@ export default function ResourcesVault() {
                                             <Icon className="h-5 w-5" />
                                         </div>
 
-                                        <h3 className="mt-5 font-serif text-2xl font-medium tracking-wide text-white">
+                                        <h3 className="mt-5 font-sans text-2xl font-medium tracking-wide text-white">
                                             {item.label}
                                         </h3>
                                         <p className="mt-3 text-sm leading-6 text-[#8E8A9F]">
@@ -178,7 +178,7 @@ function ResourceModal({ category, onClose }) {
                                 <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-[#DFB15B]">
                                     {category.resources.length} file{category.resources.length === 1 ? "" : "s"}
                                 </p>
-                                <h2 id="resources-category-title" className="mt-1 font-serif text-2xl font-medium tracking-wide text-white sm:text-3xl">
+                                <h2 id="resources-category-title" className="mt-1 font-sans text-2xl font-medium tracking-wide text-white sm:text-3xl">
                                     {category.label}
                                 </h2>
                                 <p className="mt-2 text-sm leading-6 text-[#8E8A9F]">
@@ -209,7 +209,7 @@ function ResourceModal({ category, onClose }) {
                                     className="flex flex-col gap-3 rounded-2xl border border-white/5 bg-[#0F0D15] p-4 sm:flex-row sm:items-center sm:justify-between"
                                 >
                                     <div className="flex min-w-0 items-center gap-3">
-                                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-white/5 bg-white/3 font-serif text-sm font-bold text-[#DFB15B]">
+                                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-white/5 bg-white/3 font-sans text-sm font-bold text-[#DFB15B]">
                                             {index + 1}
                                         </div>
                                         <div className="min-w-0">

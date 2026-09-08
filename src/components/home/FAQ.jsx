@@ -306,7 +306,7 @@ export default function FAQ() {
                     <div className="inline-block px-3 py-1 rounded-full bg-[#DFB15B]/5 border border-[#DFB15B]/15 text-[10px] tracking-widest text-[#DFB15B] uppercase font-bold mb-4">
                         FAQ
                     </div>
-                    <h2 className="font-serif text-3xl md:text-5xl font-medium tracking-wide text-white">
+                    <h2 className="font-sans text-3xl md:text-5xl font-medium tracking-wide text-white">
                         Questions from Aspiring Magicians
                     </h2>
                 </div>

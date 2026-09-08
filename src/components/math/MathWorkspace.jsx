@@ -307,7 +307,7 @@ function ArchiveView({ payload }) {
                     >
                       <div>
                         <div className="flex items-center justify-between gap-3">
-                          <span className="flex h-9 w-9 items-center justify-center rounded-xl border border-emerald-300/16 bg-emerald-300/8 font-serif text-sm font-bold text-emerald-200">
+                          <span className="flex h-9 w-9 items-center justify-center rounded-xl border border-emerald-300/16 bg-emerald-300/8 font-sans text-sm font-bold text-emerald-200">
                             {index + 1}
                           </span>
                           <span className={`rounded-full border px-2.5 py-1 text-[9px] font-bold uppercase tracking-wider ${ready ? "border-emerald-300/20 bg-emerald-300/10 text-emerald-200" : "border-white/8 bg-white/5 text-[#8E8A9F]"}`}>

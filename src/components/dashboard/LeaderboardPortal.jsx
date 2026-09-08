@@ -159,7 +159,7 @@ export default function LeaderboardPortal() {
                             <Medal className="h-3.5 w-3.5" />
                             Your Standing
                         </div>
-                        <h2 className={`mt-4 font-serif text-3xl font-semibold tracking-wide sm:text-4xl ${currentRankTone.name}`}>
+                        <h2 className={`mt-4 font-sans text-3xl font-semibold tracking-wide sm:text-4xl ${currentRankTone.name}`}>
                             {currentUserEntry ? `${isRankPointMode ? "RP" : "Score"} Rank ${currentBasisRank}` : "No Rank Yet"}
                         </h2>
                         <div className={`mt-3 inline-flex rounded-full border px-3 py-1 text-[10px] font-bold uppercase tracking-wider ${currentRankTone.badge}`}>
@@ -196,7 +196,7 @@ export default function LeaderboardPortal() {
             <section className="rounded-3xl border border-white/5 bg-[#121017] p-5 shadow-[0_16px_45px_rgba(0,0,0,0.28)] sm:p-6">
                 <div className="mb-5 flex items-center justify-between gap-4">
                     <div>
-                        <h2 className="font-serif text-2xl font-medium tracking-wide text-white">House Cup</h2>
+                        <h2 className="font-sans text-2xl font-medium tracking-wide text-white">House Cup</h2>
                         <p className="mt-1 text-xs font-medium text-[#6B667B]">Points are exam averages by house participants.</p>
                     </div>
                     <Shield className="h-5 w-5 text-[#DFB15B]" />
@@ -218,7 +218,7 @@ export default function LeaderboardPortal() {
                                 </div>
                                 <span className="rounded-xl border border-[#DFB15B]/20 bg-[#DFB15B]/10 px-2.5 py-1 text-xs font-black text-[#DFB15B]">{index + 1}</span>
                             </div>
-                            <p className="mt-4 font-serif text-3xl font-bold text-white">{formatNumber(house.totalPoints)}</p>
+                            <p className="mt-4 font-sans text-3xl font-bold text-white">{formatNumber(house.totalPoints)}</p>
                             <p className="mt-1 text-xs font-medium text-[#8E8A9F]">{house.examsCounted || 0} exams counted</p>
                         </motion.div>
                     ))}
@@ -227,7 +227,7 @@ export default function LeaderboardPortal() {
 
             <section className="grid gap-4 xl:grid-cols-2">
                 <div className="rounded-3xl border border-white/5 bg-[#121017] p-5 shadow-[0_16px_45px_rgba(0,0,0,0.28)] sm:p-6">
-                    <h2 className="flex items-center gap-2 font-serif text-2xl font-medium tracking-wide text-white">
+                    <h2 className="flex items-center gap-2 font-sans text-2xl font-medium tracking-wide text-white">
                         <Crown className="h-5 w-5 text-[#DFB15B]" />
                         Champions
                     </h2>
@@ -240,7 +240,7 @@ export default function LeaderboardPortal() {
                 </div>
 
                 <div className="rounded-3xl border border-white/5 bg-[#121017] p-5 shadow-[0_16px_45px_rgba(0,0,0,0.28)] sm:p-6">
-                    <h2 className="flex items-center gap-2 font-serif text-2xl font-medium tracking-wide text-white">
+                    <h2 className="flex items-center gap-2 font-sans text-2xl font-medium tracking-wide text-white">
                         <Sparkles className="h-5 w-5 text-[#DFB15B]" />
                         Master Badges
                     </h2>
@@ -262,7 +262,7 @@ export default function LeaderboardPortal() {
             <section className="rounded-3xl border border-white/5 bg-[#121017] p-5 shadow-[0_16px_45px_rgba(0,0,0,0.28)] sm:p-6">
                 <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
                     <div>
-                        <h2 className="font-serif text-2xl font-medium tracking-wide text-white">Ranked Students</h2>
+                        <h2 className="font-sans text-2xl font-medium tracking-wide text-white">Ranked Students</h2>
                         <p className="mt-1 text-xs font-medium text-[#6B667B]">
                             Showing all {displayedLeaderboard.length} ranked student{displayedLeaderboard.length === 1 ? "" : "s"} by {isRankPointMode ? "rank points" : "score"}.
                         </p>

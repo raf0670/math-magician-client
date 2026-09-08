@@ -4,15 +4,8 @@ import { useEffect, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ArrowRight, Sparkles, X } from "lucide-react";
 import Image from "next/image";
-import { Cinzel_Decorative } from "next/font/google";
 
 const SESSION_KEY = "mathmagician_home_intro_seen";
-
-const cinzelDecorative = Cinzel_Decorative({
-  subsets: ["latin"],
-  weight: ["400", "700", "900"],
-  display: "swap",
-});
 
 const programs = [
   {
@@ -224,7 +217,7 @@ export default function HomeIntroPopup() {
             </motion.div>
 
             <motion.h2
-              className={`${cinzelDecorative.className} text-3xl font-bold leading-tight tracking-wide text-white drop-shadow-[0_0_20px_rgba(232,197,111,0.22)] sm:text-5xl`}
+              className="text-3xl font-bold leading-tight tracking-wide text-white drop-shadow-[0_0_20px_rgba(232,197,111,0.22)] sm:text-5xl"
               initial={{ opacity: 0, y: 22, filter: "blur(10px)" }}
               animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
               exit={{ opacity: 0, y: -10, filter: "blur(8px)" }}
@@ -234,7 +227,7 @@ export default function HomeIntroPopup() {
             </motion.h2>
 
             <motion.p
-              className="mt-4 max-w-3xl font-serif text-xl font-medium leading-tight tracking-wide text-[#F4DFA6] drop-shadow-[0_0_24px_rgba(223,177,91,0.22)] sm:text-3xl"
+              className="mt-4 max-w-3xl font-sans text-xl font-medium leading-tight tracking-wide text-[#F4DFA6] drop-shadow-[0_0_24px_rgba(223,177,91,0.22)] sm:text-3xl"
               initial={{ opacity: 0, y: 18, scale: 0.96, filter: "blur(8px)" }}
               animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
               exit={{ opacity: 0, y: -8, filter: "blur(6px)" }}
@@ -300,7 +293,7 @@ export default function HomeIntroPopup() {
                 Your IBA journey starts here
               </motion.div>
 
-              <h2 id="home-intro-title" className="font-serif text-3xl font-medium leading-tight tracking-wide text-white sm:text-4xl lg:text-5xl">
+              <h2 id="home-intro-title" className="font-sans text-3xl font-medium leading-tight tracking-wide text-white sm:text-4xl lg:text-5xl">
                 Every serious result begins with one clear decision.
               </h2>
 
@@ -356,7 +349,7 @@ export default function HomeIntroPopup() {
                     </span>
                   </span>
 
-                  <span className={`mt-5 font-serif font-semibold tracking-wide text-white ${
+                  <span className={`mt-5 font-sans font-semibold tracking-wide text-white ${
                     program.featured ? "text-2xl sm:text-3xl" : "text-xl"
                   }`}>
                     {program.title}
@@ -368,7 +361,7 @@ export default function HomeIntroPopup() {
                   </span>
 
                   <span className="mt-auto flex items-end justify-between gap-4 pt-5">
-                    <span className={`font-serif font-bold text-white ${
+                    <span className={`font-sans font-bold text-white ${
                       program.featured ? "text-3xl drop-shadow-[0_0_16px_rgba(52,211,153,0.26)]" : "text-2xl"
                     }`}>
                       {program.price}

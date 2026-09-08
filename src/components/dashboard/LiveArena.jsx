@@ -146,7 +146,7 @@ export default function LiveArena() {
                         <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border border-white/8 bg-white/5 text-[#8E8A9F]">
                             <VideoOff className="h-5 w-5" />
                         </div>
-                        <h1 className="font-serif text-2xl sm:text-3xl font-medium tracking-wide text-white mb-2 leading-tight">
+                        <h1 className="font-sans text-2xl sm:text-3xl font-medium tracking-wide text-white mb-2 leading-tight">
                             No live class is scheduled yet
                         </h1>
                         <p className="mb-6 max-w-2xl text-sm leading-6 text-[#8E8A9F]">
@@ -157,7 +157,7 @@ export default function LiveArena() {
 
                 {!error && liveClass ? (
                     <div className="relative">
-                        <h1 className="font-serif text-2xl sm:text-3xl font-medium tracking-wide text-white mb-2 leading-tight">
+                        <h1 className="font-sans text-2xl sm:text-3xl font-medium tracking-wide text-white mb-2 leading-tight">
                             {liveClass.title}
                         </h1>
                         {liveClass.note ? (

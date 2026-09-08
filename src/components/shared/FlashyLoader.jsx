@@ -184,7 +184,7 @@ export default function FlashyLoader({
         </div>
 
         <p className="mt-5 text-[10px] font-bold uppercase tracking-[0.28em] text-[#DFB15B]">{eyebrow}</p>
-        <h2 className="mt-2 max-w-xl font-serif text-2xl font-medium leading-tight text-white sm:text-3xl">{title}</h2>
+        <h2 className="mt-2 max-w-xl font-sans text-2xl font-medium leading-tight text-white sm:text-3xl">{title}</h2>
         <p className="mt-3 max-w-xl text-sm leading-6 text-[#A9A3BA]">{message}</p>
         {skeleton ? <SkeletonPreview type={skeleton} /> : null}
       </div>

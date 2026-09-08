@@ -597,7 +597,7 @@ export default function MoreFAQs() {
                     <div className="mb-4 inline-block rounded-full border border-[#DFB15B]/15 bg-[#DFB15B]/5 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-[#DFB15B]">
                         More FAQs
                     </div>
-                    <h1 className="font-serif text-3xl font-medium tracking-wide text-white md:text-5xl">
+                    <h1 className="font-sans text-3xl font-medium tracking-wide text-white md:text-5xl">
                         More Questions, Clearer Prep
                     </h1>
                 </div>

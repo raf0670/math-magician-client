@@ -151,7 +151,7 @@ function LiveExamRankingsContent() {
           <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.3em] text-[#DFB15B]">
             <Medal className="h-4 w-4" /> {isMath ? "Math Exam Rankings" : "Exam Rankings"}
           </p>
-          <h1 className="mt-2 font-serif text-3xl font-medium tracking-wide text-white">{exam.title || "Live Exam"}</h1>
+          <h1 className="mt-2 font-sans text-3xl font-medium tracking-wide text-white">{exam.title || "Live Exam"}</h1>
           <p className="mt-2 text-sm leading-6 text-[#8E8A9F]">
             Ended {formatDateTime(exam.endTime)}. Rankings are based on this {isMath ? "math exam" : "exam"}&apos;s marks only.
           </p>
@@ -177,7 +177,7 @@ function LiveExamRankingsContent() {
       <section className="rounded-3xl border border-white/5 bg-[#121017] p-5 shadow-[0_16px_45px_rgba(0,0,0,0.28)] sm:p-6">
         <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <h2 className="font-serif text-2xl font-medium tracking-wide text-white">Ranked Students</h2>
+            <h2 className="font-sans text-2xl font-medium tracking-wide text-white">Ranked Students</h2>
             <p className="mt-1 text-xs font-medium text-[#6B667B]">
               Showing {leaderboard.length} submitted student{leaderboard.length === 1 ? "" : "s"}.
             </p>
@@ -275,7 +275,7 @@ function RankingsMessage({ icon, eyebrow, title, message }) {
             {icon}
           </div>
           <p className="mt-5 text-xs font-bold uppercase tracking-[0.3em] text-[#DFB15B]">{eyebrow}</p>
-          <h1 className="mt-3 font-serif text-3xl font-medium text-white">{title}</h1>
+          <h1 className="mt-3 font-sans text-3xl font-medium text-white">{title}</h1>
           <p className="mt-3 text-sm leading-6 text-[#8E8A9F]">{message}</p>
           <Link
             href={examBasePath}

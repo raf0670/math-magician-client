@@ -301,7 +301,7 @@ function PaymentDetailsContent() {
           className="mx-auto flex min-h-120 max-w-xl flex-col items-center justify-center text-center"
         >
           <p className="text-xs font-bold uppercase tracking-[0.3em] text-[#DFB15B]">Plan Required</p>
-          <h1 className="mt-3 font-serif text-3xl font-medium">Choose a program first</h1>
+          <h1 className="mt-3 font-sans text-3xl font-medium">Choose a program first</h1>
           <p className="mt-3 text-sm leading-6 text-[#8E8A9F]">Select any program from the pricing section before filling out the enrollment form.</p>
           <Link href="/#programs-section" className="mt-6 rounded-2xl bg-[#DFB15B] px-5 py-3 text-sm font-bold uppercase tracking-wider text-black transition hover:brightness-110">
             Back to Pricing
@@ -381,7 +381,7 @@ function PaymentDetailsContent() {
         {FLOATING_GLYPHS.map((glyph, index) => (
           <motion.span
             key={`glyph-${index}`}
-            className="absolute font-serif text-4xl text-[#DFB15B]/35 drop-shadow-[0_0_18px_rgba(223,177,91,0.45)]"
+            className="absolute font-sans text-4xl text-[#DFB15B]/35 drop-shadow-[0_0_18px_rgba(223,177,91,0.45)]"
             style={{ left: glyph.left, top: glyph.top }}
             animate={{
               y: [0, -38, 20, 0],
@@ -421,7 +421,7 @@ function PaymentDetailsContent() {
                   <WandSparkles className="h-3.5 w-3.5" />
                   {isBookingMode ? "Seat Booking Form" : "Enrollment Form"}
                 </div>
-                <h1 className="mt-4 font-serif text-4xl font-medium leading-tight text-white sm:text-5xl">
+                <h1 className="mt-4 font-sans text-4xl font-medium leading-tight text-white sm:text-5xl">
                   {isBookingMode ? "Reserve Your Seat" : "Open the Portal"}
                 </h1>
                 <p className="mt-3 max-w-xl text-sm leading-6 text-[#A9A3BA]">
@@ -439,7 +439,7 @@ function PaymentDetailsContent() {
                 </div>
                 <p className="text-xs font-bold uppercase tracking-wider text-[#DFB15B]">Selected Program</p>
                 <p className="mt-2 text-base font-semibold text-white">{plan.title}</p>
-                <p className="mt-2 font-serif text-3xl font-bold text-white">{plan.amount}</p>
+                <p className="mt-2 font-sans text-3xl font-bold text-white">{plan.amount}</p>
                 <div className="mt-4 flex items-center gap-2 text-xs font-semibold text-[#EBD39B]">
                   <Check className="h-4 w-4" />
                   Any successful payment unlocks classes
@@ -571,11 +571,11 @@ function FormSection({ title, description, children, index }) {
     >
       <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-white/15 to-transparent" />
       <div className="mb-6 flex items-start gap-4">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-[#DFB15B]/20 bg-[#DFB15B]/10 font-serif text-lg font-bold text-[#DFB15B]">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-[#DFB15B]/20 bg-[#DFB15B]/10 font-sans text-lg font-bold text-[#DFB15B]">
           {index}
         </div>
         <div>
-          <h2 className="font-serif text-2xl font-medium text-white">{title}</h2>
+          <h2 className="font-sans text-2xl font-medium text-white">{title}</h2>
           <p className="mt-2 text-sm text-[#8E8A9F]">{description}</p>
         </div>
       </div>
@@ -660,7 +660,7 @@ function PaymentChoiceField({ selectedPlan, value, onChange }) {
               </span>
             </span>
             <span className="mt-4 text-sm font-bold text-white">{option.title}</span>
-            <span className="mt-2 font-serif text-2xl font-semibold text-white">{formatBDT(option.amount)}</span>
+            <span className="mt-2 font-sans text-2xl font-semibold text-white">{formatBDT(option.amount)}</span>
             <span className="mt-2 text-xs font-medium leading-5 text-[#8E8A9F]">{option.note}</span>
           </motion.button>
         );

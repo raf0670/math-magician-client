@@ -97,7 +97,7 @@ export default function Loading() {
         {GLYPHS.map((glyph) => (
           <motion.span
             key={glyph.text}
-            className={`absolute font-serif text-[#E8DDBF]/18 ${glyph.size}`}
+            className={`absolute font-sans text-[#E8DDBF]/18 ${glyph.size}`}
             style={{ left: glyph.left, top: glyph.top }}
             animate={
               shouldReduceMotion
@@ -204,7 +204,7 @@ export default function Loading() {
           Loading
         </div>
 
-        <h1 className="mt-4 max-w-2xl font-serif text-3xl font-medium leading-tight text-white sm:text-5xl">
+        <h1 className="mt-4 max-w-2xl font-sans text-3xl font-medium leading-tight text-white sm:text-5xl">
           Magician&apos;s School
         </h1>
         <p className="mt-3 max-w-xl text-sm leading-6 text-[#A9A3BA] sm:text-base">

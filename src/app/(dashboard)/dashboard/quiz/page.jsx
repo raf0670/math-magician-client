@@ -77,7 +77,7 @@ export default function QuizDashboardLanding() {
     return (
         <div className="flex w-full flex-col gap-8 text-left">
             <div className="flex flex-col items-start gap-1">
-                <h1 className="font-serif text-3xl font-medium tracking-wide text-white">
+                <h1 className="font-sans text-3xl font-medium tracking-wide text-white">
                     Quiz
                 </h1>
                 <p className="text-xs font-medium text-[#8E8A9F] sm:text-sm">

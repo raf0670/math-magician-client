@@ -95,7 +95,7 @@ function AssessmentTestContent() {
           <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.3em] text-[#DFB15B]">
             <FileCheck2 className="h-4 w-4" /> Assessment Test
           </p>
-          <h1 className="mt-2 font-serif text-3xl font-medium tracking-wide text-white">Official Assessment Room</h1>
+          <h1 className="mt-2 font-sans text-3xl font-medium tracking-wide text-white">Official Assessment Room</h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-[#8E8A9F]">
             A timed 90-minute assessment where your final score is added directly to your rank points.
           </p>
@@ -129,7 +129,7 @@ function AssessmentTestContent() {
               <span className={`inline-flex rounded-full border px-3 py-1 text-[10px] font-bold uppercase tracking-wider ${STATUS_STYLES[status] || STATUS_STYLES.upcoming}`}>
                 {status}
               </span>
-              <h2 className="mt-4 font-serif text-3xl font-medium tracking-wide text-white">{assessment.title || "Assessment Test"}</h2>
+              <h2 className="mt-4 font-sans text-3xl font-medium tracking-wide text-white">{assessment.title || "Assessment Test"}</h2>
               <p className="mt-2 text-sm leading-6 text-[#8E8A9F]">
                 {formatDateTime(assessment.startTime)} to {formatDateTime(assessment.endTime)}
               </p>

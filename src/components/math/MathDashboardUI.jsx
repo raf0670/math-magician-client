@@ -35,7 +35,7 @@ export function MathHero({ eyebrow, title, description, icon: Icon = Sparkles, c
             <Icon className="h-3.5 w-3.5 shrink-0" />
             <span className="truncate">{eyebrow}</span>
           </div>
-          <h1 className="mt-5 max-w-4xl font-serif text-3xl font-semibold leading-tight tracking-wide text-white sm:text-4xl lg:text-5xl">
+          <h1 className="mt-5 max-w-4xl font-sans text-3xl font-semibold leading-tight tracking-wide text-white sm:text-4xl lg:text-5xl">
             {title}
           </h1>
           <p className="mt-4 max-w-2xl text-sm font-medium leading-7 text-[#A9A3BA]">
@@ -63,7 +63,7 @@ export function MathStatCard({ label, value, icon: Icon = Sparkles, tone = "emer
         <Icon className="h-4 w-4 shrink-0 text-current" />
         <span className="truncate">{label}</span>
       </div>
-      <p className="mt-3 truncate font-serif text-2xl font-bold tracking-wide text-white">{value}</p>
+      <p className="mt-3 truncate font-sans text-2xl font-bold tracking-wide text-white">{value}</p>
     </motion.article>
   );
 }
@@ -78,7 +78,7 @@ export function MathActionCard({ href, title, description, icon: Icon = ArrowUpR
       <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-emerald-300/20 bg-emerald-300/10 text-emerald-200">
         <Icon className="h-5 w-5" />
       </div>
-      <h2 className="mt-5 flex items-center gap-2 font-serif text-2xl font-medium tracking-wide text-white">
+      <h2 className="mt-5 flex items-center gap-2 font-sans text-2xl font-medium tracking-wide text-white">
         <span>{title}</span>
         <ArrowUpRight className="h-4 w-4 text-[#DFB15B] transition group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
       </h2>
@@ -100,7 +100,7 @@ export function MathPanel({ eyebrow, title, description, icon: Icon = Sparkles, 
                 {eyebrow}
               </p>
             ) : null}
-            <h2 className="mt-2 font-serif text-2xl font-medium tracking-wide text-white sm:text-3xl">{title}</h2>
+            <h2 className="mt-2 font-sans text-2xl font-medium tracking-wide text-white sm:text-3xl">{title}</h2>
             {description ? <p className="mt-2 max-w-2xl text-sm leading-6 text-[#8E8A9F]">{description}</p> : null}
           </div>
           {action}
@@ -117,7 +117,7 @@ export function MathEmptyState({ icon: Icon = Sparkles, title, message, action }
       <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-emerald-300/16 bg-emerald-300/8 text-emerald-200">
         <Icon className="h-6 w-6" />
       </div>
-      <h3 className="mt-4 font-serif text-2xl font-medium text-white">{title}</h3>
+      <h3 className="mt-4 font-sans text-2xl font-medium text-white">{title}</h3>
       <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-[#8E8A9F]">{message}</p>
       {action ? <div className="mt-5">{action}</div> : null}
     </div>

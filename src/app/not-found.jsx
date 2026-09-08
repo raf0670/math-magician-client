@@ -59,10 +59,10 @@ export default function NotFound() {
           Page not found
         </div>
 
-        <h1 className="mt-5 font-serif text-5xl font-medium leading-none tracking-wide text-white sm:text-7xl">
+        <h1 className="mt-5 font-sans text-5xl font-medium leading-none tracking-wide text-white sm:text-7xl">
           404
         </h1>
-        <h2 className="mt-4 font-serif text-3xl font-medium leading-tight tracking-wide text-white sm:text-5xl">
+        <h2 className="mt-4 font-sans text-3xl font-medium leading-tight tracking-wide text-white sm:text-5xl">
           This path slipped out of the lesson plan.
         </h2>
         <p className="mx-auto mt-4 max-w-2xl text-sm leading-7 text-[#A9A3BA] sm:text-base">

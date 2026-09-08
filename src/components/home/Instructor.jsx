@@ -103,7 +103,7 @@ export default function Instructor() {
                             <span>Your Instructor</span>
                         </div>
 
-                        <h2 className="font-serif text-3xl md:text-5xl font-medium tracking-wide text-white mb-6 leading-tight">
+                        <h2 className="font-sans text-3xl md:text-5xl font-medium tracking-wide text-white mb-6 leading-tight">
                             Learn from the Best. <br />
                             <span className="text-[#DFB15B]">Not Just Anyone.</span>
                         </h2>

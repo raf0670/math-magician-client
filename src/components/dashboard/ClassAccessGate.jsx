@@ -106,7 +106,7 @@ export default function ClassAccessGate({ children, section = "classes", present
                         <LockKeyhole className="h-5 w-5" />
                     </div>
                     <p className="mt-6 text-xs font-bold uppercase tracking-[0.3em] text-[#DFB15B]">Approval Required</p>
-                    <h2 className="mt-3 font-serif text-3xl font-medium text-white">{copy.lockedTitle}</h2>
+                    <h2 className="mt-3 font-sans text-3xl font-medium text-white">{copy.lockedTitle}</h2>
                     <p className="mt-3 text-sm leading-6 text-[#8E8A9F]">
                         {copy.lockedMessage}
                     </p>

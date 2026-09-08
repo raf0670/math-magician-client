@@ -99,7 +99,7 @@ export default function AboutExperience() {
         {glyphs.map((glyph) => (
           <motion.span
             key={glyph.char}
-            className="pointer-events-none absolute font-serif text-2xl font-semibold text-[#DFB15B]/30"
+            className="pointer-events-none absolute font-sans text-2xl font-semibold text-[#DFB15B]/30"
             style={{ left: glyph.left, top: glyph.top }}
             animate={{ y: [0, -18, 10, 0], opacity: [0.16, 0.52, 0.2, 0.16], rotate: [0, 8, -5, 0] }}
             transition={{ duration: glyph.duration, repeat: Infinity, delay: glyph.delay, ease: "easeInOut" }}
@@ -120,7 +120,7 @@ export default function AboutExperience() {
               Your Instructor
             </motion.div>
 
-            <motion.h1 variants={itemVariants} className="mt-5 max-w-3xl font-serif text-4xl font-medium leading-tight text-white sm:text-5xl lg:text-6xl">
+            <motion.h1 variants={itemVariants} className="mt-5 max-w-3xl font-sans text-4xl font-medium leading-tight text-white sm:text-5xl lg:text-6xl">
               Learn IBA prep with <span className="text-[#DFB15B]">{instructor.name}</span>
             </motion.h1>
 
@@ -200,7 +200,7 @@ export default function AboutExperience() {
         <div className="mx-auto max-w-6xl">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.25 }} variants={containerVariants} className="max-w-2xl">
             <motion.p variants={itemVariants} className="text-xs font-bold uppercase tracking-[0.24em] text-[#DFB15B]">Teaching Approach</motion.p>
-            <motion.h2 variants={itemVariants} className="mt-3 font-serif text-3xl font-medium text-white sm:text-4xl">The method is practical, honest, and exam-facing.</motion.h2>
+            <motion.h2 variants={itemVariants} className="mt-3 font-sans text-3xl font-medium text-white sm:text-4xl">The method is practical, honest, and exam-facing.</motion.h2>
           </motion.div>
 
           <div className="mt-8 grid gap-4 md:grid-cols-3">
@@ -229,7 +229,7 @@ export default function AboutExperience() {
         <div className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[0.85fr_1.15fr] lg:items-start">
           <motion.div initial={{ opacity: 0, x: -18 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, amount: 0.3 }} transition={{ duration: 0.6 }}>
             <p className="text-xs font-bold uppercase tracking-[0.24em] text-[#DFB15B]">Student Guidance</p>
-            <h2 className="mt-3 font-serif text-3xl font-medium text-white sm:text-4xl">A smoother path does not mean an easier exam.</h2>
+            <h2 className="mt-3 font-sans text-3xl font-medium text-white sm:text-4xl">A smoother path does not mean an easier exam.</h2>
             <p className="mt-4 text-sm font-medium leading-7 text-[#8E8A9F]">
               The goal is to make every student more deliberate: sharper with timing, calmer under pressure, and clearer about what to practice next.
             </p>
@@ -245,7 +245,7 @@ export default function AboutExperience() {
                 transition={{ duration: 0.5, delay: index * 0.08 }}
                 className="flex gap-4 rounded-xl border border-white/6 bg-[#121017] p-4"
               >
-                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-[#DFB15B]/20 bg-[#DFB15B]/10 font-serif text-sm font-bold text-[#DFB15B]">
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-[#DFB15B]/20 bg-[#DFB15B]/10 font-sans text-sm font-bold text-[#DFB15B]">
                   {index + 1}
                 </span>
                 <p className="pt-1 text-sm font-semibold leading-6 text-[#D8D4E5]">{step}</p>
@@ -259,7 +259,7 @@ export default function AboutExperience() {
         <motion.div initial={{ opacity: 0, y: 22 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.3 }} transition={{ duration: 0.6 }} className="mx-auto flex max-w-6xl flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
           <div className="max-w-2xl">
             <p className="text-xs font-bold uppercase tracking-[0.24em] text-[#DFB15B]">Ready When You Are</p>
-            <h2 className="mt-3 font-serif text-3xl font-medium text-white">Start with the program that matches your life.</h2>
+            <h2 className="mt-3 font-sans text-3xl font-medium text-white">Start with the program that matches your life.</h2>
             <p className="mt-3 text-sm font-medium leading-6 text-[#8E8A9F]">
               Choose your house program, then use mocks and guided practice to build the pace IBA demands.
             </p>

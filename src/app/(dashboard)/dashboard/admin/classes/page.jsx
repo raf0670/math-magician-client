@@ -227,7 +227,7 @@ export default function AdminLiveClassesPage() {
         <div className="max-w-md">
           <ShieldAlert className="mx-auto h-10 w-10 text-red-300" />
           <p className="mt-5 text-xs font-bold uppercase tracking-[0.3em] text-red-300">Admins Only</p>
-          <h1 className="mt-3 font-serif text-3xl font-medium text-white">You do not have admin access</h1>
+          <h1 className="mt-3 font-sans text-3xl font-medium text-white">You do not have admin access</h1>
           <p className="mt-3 text-sm leading-6 text-red-100/75">
             Change this account role to admin in MongoDB Atlas, then refresh or sign in again.
           </p>
@@ -241,7 +241,7 @@ export default function AdminLiveClassesPage() {
       <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div>
           <p className="text-xs font-bold uppercase tracking-[0.3em] text-[#DFB15B]">Live Classes</p>
-          <h1 className="mt-2 font-serif text-3xl font-medium tracking-wide text-white">Zoom Class Manager</h1>
+          <h1 className="mt-2 font-sans text-3xl font-medium tracking-wide text-white">Zoom Class Manager</h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-[#8E8A9F]">
             Post a class link and schedule. Approved students will see it on their Live Classes page.
           </p>
@@ -259,7 +259,7 @@ export default function AdminLiveClassesPage() {
       <section className="rounded-3xl border border-white/6 bg-[#121017] p-5 sm:p-6">
         <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h2 className="font-serif text-2xl font-medium text-white">
+            <h2 className="font-sans text-2xl font-medium text-white">
               {editingId ? "Edit Class" : "Post New Class"}
             </h2>
             <p className="mt-1 text-sm text-[#8E8A9F]">Use browser-local time. The backend stores the schedule in UTC.</p>
@@ -342,7 +342,7 @@ export default function AdminLiveClassesPage() {
       {!loading && !sortedItems.length ? (
         <div className="rounded-3xl border border-white/5 bg-[#121017] px-6 py-12 text-center">
           <Video className="mx-auto h-9 w-9 text-[#DFB15B]" />
-          <h2 className="mt-4 font-serif text-2xl font-medium text-white">No classes posted yet</h2>
+          <h2 className="mt-4 font-sans text-2xl font-medium text-white">No classes posted yet</h2>
           <p className="mt-2 text-sm text-[#8E8A9F]">Create the first class schedule from the form above.</p>
         </div>
       ) : null}
@@ -357,7 +357,7 @@ export default function AdminLiveClassesPage() {
                 <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                   <div className="min-w-0">
                     <div className="flex flex-wrap items-center gap-3">
-                      <h2 className="font-serif text-2xl font-medium text-white">{item.title}</h2><p className="text-xs text-emerald-200">{item.program === "math" ? "Math Course" : "General website"}</p>
+                      <h2 className="font-sans text-2xl font-medium text-white">{item.title}</h2><p className="text-xs text-emerald-200">{item.program === "math" ? "Math Course" : "General website"}</p>
                       <span className={`rounded-full border px-3 py-1 text-xs font-bold uppercase tracking-wider ${STATUS_STYLES[status]}`}>
                         {status}
                       </span>

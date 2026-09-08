@@ -1,20 +1,18 @@
-import { Geist, Geist_Mono, Open_Sans } from "next/font/google";
+import { Geist_Mono, Google_Sans } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 import Navbar from "@/components/shared/Navbar";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const googleSans = Google_Sans({
+  variable: "--font-google-sans",
   subsets: ["latin"],
+  weight: "variable",
+  display: "swap",
+  fallback: ["Arial", "sans-serif"],
 });
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
-const openSans = Open_Sans({
-  variable: "--font-open-sans",
   subsets: ["latin"],
 });
 
@@ -27,9 +25,9 @@ export default function RootLayout({ children }) {
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} ${openSans.variable} h-full antialiased`}
+      className={`${googleSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-screen flex flex-col">
+      <body className="min-h-screen flex flex-col font-sans">
         <Script id="meta-pixel" strategy="afterInteractive">
           {`
             !function(f,b,e,v,n,t,s)

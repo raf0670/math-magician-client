@@ -67,7 +67,7 @@ export default function WhatYouGet() {
                     <div className="inline-block px-3 py-1 rounded-full bg-[#7C3AED]/10 border border-[#7C3AED]/20 text-[10px] tracking-widest text-[#A78BFA] uppercase font-bold mb-4">
                         Features
                     </div>
-                    <h2 className="font-serif text-3xl md:text-5xl font-medium tracking-wide text-white mb-4">
+                    <h2 className="font-sans text-3xl md:text-5xl font-medium tracking-wide text-white mb-4">
                         What You Actually Get
                     </h2>
                     <p className="text-[#6B667B] text-xs md:text-sm font-medium">
@@ -99,7 +99,7 @@ export default function WhatYouGet() {
 
                             {/* Info Blocks */}
                             <div className="flex flex-col gap-2.5">
-                                <h3 className="font-serif text-lg font-medium text-white tracking-wide transition-colors duration-200 group-hover:text-[#DFB15B]">
+                                <h3 className="font-sans text-lg font-medium text-white tracking-wide transition-colors duration-200 group-hover:text-[#DFB15B]">
                                     {card.title}
                                 </h3>
                                 <p className="text-[#8E8A9F] text-xs leading-relaxed font-medium transition-colors duration-200 group-hover:text-white/70">

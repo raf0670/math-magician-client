@@ -60,7 +60,7 @@ export default function ExamError({ error, reset }) {
             Exam arena interrupted
           </div>
 
-          <h1 className="mt-5 font-serif text-3xl font-medium leading-tight tracking-wide text-white sm:text-5xl">
+          <h1 className="mt-5 font-sans text-3xl font-medium leading-tight tracking-wide text-white sm:text-5xl">
             This practice paper did not open cleanly.
           </h1>
           <p className="mt-4 text-sm leading-7 text-[#A9A3BA] sm:text-base">

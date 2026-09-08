@@ -51,7 +51,7 @@ export default function DashboardNotFound() {
               Dashboard route not found
             </div>
 
-            <h1 className="mt-5 max-w-2xl font-serif text-3xl font-medium leading-tight tracking-wide text-white sm:text-5xl">
+            <h1 className="mt-5 max-w-2xl font-sans text-3xl font-medium leading-tight tracking-wide text-white sm:text-5xl">
               This dashboard path is off the map.
             </h1>
             <p className="mt-4 max-w-xl text-sm leading-7 text-[#A9A3BA] sm:text-base">

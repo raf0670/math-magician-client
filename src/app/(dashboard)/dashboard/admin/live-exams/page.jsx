@@ -316,7 +316,7 @@ export default function AdminLiveExamsPage() {
         <div className="max-w-md">
           <ShieldAlert className="mx-auto h-10 w-10 text-red-300" />
           <p className="mt-5 text-xs font-bold uppercase tracking-[0.3em] text-red-300">Admins Only</p>
-          <h1 className="mt-3 font-serif text-3xl font-medium text-white">You do not have admin access</h1>
+          <h1 className="mt-3 font-sans text-3xl font-medium text-white">You do not have admin access</h1>
           <p className="mt-3 text-sm leading-6 text-red-100/75">
             Change this account role to admin in MongoDB Atlas, then refresh or sign in again.
           </p>
@@ -330,7 +330,7 @@ export default function AdminLiveExamsPage() {
       <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div>
           <p className="text-xs font-bold uppercase tracking-[0.3em] text-[#DFB15B]">{program === "math" ? "Math Exam Admin" : "Live Exam Admin"}</p>
-          <h1 className="mt-2 font-serif text-3xl font-medium tracking-wide text-white">Live Exam Publisher</h1>
+          <h1 className="mt-2 font-sans text-3xl font-medium tracking-wide text-white">Live Exam Publisher</h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-[#8E8A9F]">
             {program === "math" ? "Paste a strict JSON array of math-only questions" : "Paste a strict JSON array of live exam questions"} and publish it for the scheduled exam window.
           </p>
@@ -348,7 +348,7 @@ export default function AdminLiveExamsPage() {
       <section className="rounded-3xl border border-white/6 bg-[#121017] p-5 sm:p-6">
         <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h2 className="font-serif text-2xl font-medium text-white">{editingId ? "Edit Live Exam" : "Publish Live Exam"}</h2>
+            <h2 className="font-sans text-2xl font-medium text-white">{editingId ? "Edit Live Exam" : "Publish Live Exam"}</h2>
             <p className="mt-1 text-sm text-[#8E8A9F]">Use browser-local time. The backend stores schedule times in UTC.</p>
           </div>
           {editingId ? (
@@ -441,7 +441,7 @@ export default function AdminLiveExamsPage() {
       {!loading && !sortedItems.length ? (
         <div className="rounded-3xl border border-white/5 bg-[#121017] px-6 py-12 text-center">
           <FileQuestion className="mx-auto h-9 w-9 text-[#DFB15B]" />
-          <h2 className="mt-4 font-serif text-2xl font-medium text-white">No live exams yet</h2>
+          <h2 className="mt-4 font-sans text-2xl font-medium text-white">No live exams yet</h2>
           <p className="mt-2 text-sm text-[#8E8A9F]">Publish the first live exam from the builder above.</p>
         </div>
       ) : null}
@@ -456,7 +456,7 @@ export default function AdminLiveExamsPage() {
                 <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                   <div className="min-w-0">
                     <div className="flex flex-wrap items-center gap-3">
-                      <h2 className="font-serif text-2xl font-medium text-white">{exam.title}</h2>
+                      <h2 className="font-sans text-2xl font-medium text-white">{exam.title}</h2>
                       <span className={`rounded-full border px-3 py-1 text-xs font-bold uppercase tracking-wider ${STATUS_STYLES[status] || STATUS_STYLES.scheduled}`}>
                         {status}
                       </span>

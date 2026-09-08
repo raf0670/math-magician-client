@@ -104,7 +104,7 @@ export default function ReadyToCrack() {
 
                 <motion.h2
                     variants={textNodeVariants}
-                    className="font-serif text-3xl md:text-5xl lg:text-6xl font-medium tracking-wide text-white mb-6 leading-tight"
+                    className="font-sans text-3xl md:text-5xl lg:text-6xl font-medium tracking-wide text-white mb-6 leading-tight"
                 >
                     Ready to Crack <span className="text-[#DFB15B]">IBA?</span>
                 </motion.h2>

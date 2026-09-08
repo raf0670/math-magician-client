@@ -44,7 +44,7 @@ export default function RegisterPage() {
       <div className="w-full max-w-md rounded-3xl border border-white/10 bg-[#121017] p-8 shadow-2xl">
         <div className="mb-8 text-left">
           <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#DFB15B]">Magician&apos;s School</p>
-          <h1 className="mt-2 font-serif text-3xl font-medium">Create your account</h1>
+          <h1 className="mt-2 font-sans text-3xl font-medium">Create your account</h1>
           <p className="mt-2 text-sm text-[#8E8A9F]">Join the platform and start tracking your mock performance.</p>
         </div>
 

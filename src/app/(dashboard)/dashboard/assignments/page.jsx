@@ -98,7 +98,7 @@ function AssignmentsContent() {
           <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.3em] text-[#DFB15B]">
             <ClipboardList className="h-4 w-4" /> Assignments
           </p>
-          <h1 className="mt-2 font-serif text-3xl font-medium tracking-wide text-white">Assignment Room</h1>
+          <h1 className="mt-2 font-sans text-3xl font-medium tracking-wide text-white">Assignment Room</h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-[#8E8A9F]">
             Submit assignments from 4:00 PM on the selected date until 3:59 PM the next day, then review solutions after the deadline.
           </p>
@@ -128,7 +128,7 @@ function AssignmentsContent() {
       {!loading && !sortedItems.length ? (
         <div className="rounded-3xl border border-white/5 bg-[#121017] px-6 py-12 text-center">
           <CalendarClock className="mx-auto h-10 w-10 text-[#DFB15B]" />
-          <h2 className="mt-4 font-serif text-2xl font-medium text-white">No assignments posted yet</h2>
+          <h2 className="mt-4 font-sans text-2xl font-medium text-white">No assignments posted yet</h2>
           <p className="mt-2 text-sm text-[#8E8A9F]">New assignments will appear here once an admin publishes them.</p>
         </div>
       ) : null}

@@ -6,7 +6,7 @@ export default function PerformanceAnalyticsDashboard() {
 
             {/* Title segment headings info */}
             <div className="flex flex-col items-start text-left gap-1">
-                <h1 className="font-serif text-3xl font-medium tracking-wide text-white">
+                <h1 className="font-sans text-3xl font-medium tracking-wide text-white">
                     Performance Telemetry
                 </h1>
                 <p className="text-[#8E8A9F] text-xs sm:text-sm font-medium">

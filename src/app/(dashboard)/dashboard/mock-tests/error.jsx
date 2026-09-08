@@ -37,7 +37,7 @@ export default function MockTestsError({ error, reset }) {
             Exam library paused
           </div>
 
-          <h1 className="mt-5 max-w-xl font-serif text-3xl font-medium leading-tight tracking-wide text-white sm:text-5xl">
+          <h1 className="mt-5 max-w-xl font-sans text-3xl font-medium leading-tight tracking-wide text-white sm:text-5xl">
             Practice did not open.
           </h1>
           <p className="mt-4 max-w-xl text-sm leading-7 text-[#A9A3BA] sm:text-base">

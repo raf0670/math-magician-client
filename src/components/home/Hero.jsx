@@ -166,7 +166,7 @@ export default function UnifiedHeroDeck() {
                         {floatingGlyphs.map((glyph) => (
                             <motion.span
                                 key={glyph.id}
-                                className="absolute font-serif text-white/40 selection:bg-transparent"
+                                className="absolute font-sans text-white/40 selection:bg-transparent"
                                 style={{
                                     left: glyph.left,
                                     top: glyph.top,
@@ -209,7 +209,7 @@ export default function UnifiedHeroDeck() {
                         </span>
                     </motion.div>
 
-                    <motion.h1 variants={heroItemVariants} className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-medium tracking-wide text-white leading-[1.12] mb-6">
+                    <motion.h1 variants={heroItemVariants} className="font-sans text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-medium tracking-wide text-white leading-[1.12] mb-6">
                         Crack the Code of <br />
                         <span className="text-transparent bg-clip-text bg-linear-to-r from-[#E6C687] via-[#D4AF37] to-[#AA7C11]">
                             IBA Admission
@@ -234,7 +234,7 @@ export default function UnifiedHeroDeck() {
                         {statItems.map((stat) => (
                             <div key={stat.label} className="flex flex-col items-center justify-center gap-1.5">
                                 <stat.icon className="w-4 h-4 text-[#DFB15B] opacity-80" />
-                                <span className="font-serif text-2xl md:text-3xl font-bold tracking-tight text-white">{stat.value}</span>
+                                <span className="font-sans text-2xl md:text-3xl font-bold tracking-tight text-white">{stat.value}</span>
                                 <span className="text-[10px] md:text-xs font-semibold text-[#6B667B] tracking-wide uppercase">{stat.label}</span>
                             </div>
                         ))}
@@ -257,7 +257,7 @@ export default function UnifiedHeroDeck() {
                         <div className="inline-block px-3 py-1 rounded-full bg-[#7C3AED]/10 border border-[#7C3AED]/20 text-[10px] tracking-widest text-[#A78BFA] uppercase font-bold mb-4">
                             Features
                         </div>
-                        <h2 className="font-serif text-3xl md:text-5xl font-medium tracking-wide text-white mb-4">
+                        <h2 className="font-sans text-3xl md:text-5xl font-medium tracking-wide text-white mb-4">
                             What You Actually Get
                         </h2>
                         <p className="text-[#6B667B] text-xs md:text-sm font-medium">
@@ -284,7 +284,7 @@ export default function UnifiedHeroDeck() {
                                     <card.icon className="w-5 h-5 stroke-[1.8]" />
                                 </div>
                                 <div className="flex flex-col gap-2.5">
-                                    <h3 className="font-serif text-lg font-medium text-white tracking-wide transition-colors duration-200 group-hover:text-[#DFB15B]">
+                                    <h3 className="font-sans text-lg font-medium text-white tracking-wide transition-colors duration-200 group-hover:text-[#DFB15B]">
                                         {card.title}
                                     </h3>
                                     <p className="text-[#8E8A9F] text-xs leading-relaxed font-medium transition-colors duration-200 group-hover:text-white/70">
@@ -357,7 +357,7 @@ export default function UnifiedHeroDeck() {
                                 <span>Your Instructor</span>
                             </motion.div>
 
-                            <motion.h2 variants={featureCardVariants} className="font-serif text-3xl md:text-5xl font-medium tracking-wide text-white mb-6 leading-tight">
+                            <motion.h2 variants={featureCardVariants} className="font-sans text-3xl md:text-5xl font-medium tracking-wide text-white mb-6 leading-tight">
                                 Learn from the Best. <br />
                                 <span className="text-[#DFB15B]">Mehrabur Rahaman</span>
                             </motion.h2>

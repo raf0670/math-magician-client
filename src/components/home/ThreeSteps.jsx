@@ -65,7 +65,7 @@ export default function ThreeSteps() {
                     <div className="inline-block px-3 py-1 rounded-full bg-[#7C3AED]/10 border border-[#7C3AED]/20 text-[10px] tracking-widest text-[#A78BFA] uppercase font-bold mb-4">
                         The Path
                     </div>
-                    <h2 className="font-serif text-3xl md:text-5xl font-medium tracking-wide text-white">
+                    <h2 className="font-sans text-3xl md:text-5xl font-medium tracking-wide text-white">
                         You&apos;re Only Three Steps Away from IBA
                     </h2>
                 </div>
@@ -134,7 +134,7 @@ export default function ThreeSteps() {
                                         {step.num}
                                     </span>
 
-                                    <h3 className={`font-serif text-2xl font-medium tracking-wide transition-colors duration-300 ${isActive ? "text-white" : "text-[#8E8A9F] group-hover:text-white"}`}>
+                                    <h3 className={`font-sans text-2xl font-medium tracking-wide transition-colors duration-300 ${isActive ? "text-white" : "text-[#8E8A9F] group-hover:text-white"}`}>
                                         {step.title}
                                     </h3>
 

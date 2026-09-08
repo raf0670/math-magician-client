@@ -75,7 +75,7 @@ export default function Community() {
                     <div className="inline-block px-3 py-1 rounded-full bg-[#7C3AED]/10 border border-[#7C3AED]/20 text-[10px] tracking-widest text-[#A78BFA] uppercase font-bold mb-4">
                         Community
                     </div>
-                    <h2 className="font-serif text-3xl md:text-5xl font-medium tracking-wide text-white mb-4">
+                    <h2 className="font-sans text-3xl md:text-5xl font-medium tracking-wide text-white mb-4">
                         Join the School
                     </h2>
                     <p className="text-[#6B667B] text-xs md:text-sm font-medium">
@@ -101,7 +101,7 @@ export default function Community() {
                             <div className="w-11 h-11 rounded-xl flex items-center justify-center bg-blue-500/10 text-blue-400 border border-blue-500/20 mb-6">
                                 <Users className="w-5 h-5 stroke-[1.8]" />
                             </div>
-                            <h3 className="font-serif text-xl font-semibold text-white tracking-wide mb-3">
+                            <h3 className="font-sans text-xl font-semibold text-white tracking-wide mb-3">
                                 FB Community
                             </h3>
                             <p className="text-[#6B667B] group-hover:text-[#8E8A9F] text-xs leading-relaxed font-medium transition-colors duration-300">
@@ -125,7 +125,7 @@ export default function Community() {
                             <div className="w-11 h-11 rounded-xl flex items-center justify-center bg-[#DFB15B]/10 text-[#DFB15B] border border-[#DFB15B]/20 mb-6">
                                 <MessageSquare className="w-5 h-5 stroke-[1.8]" />
                             </div>
-                            <h3 className="font-serif text-xl font-semibold text-white tracking-wide mb-3">
+                            <h3 className="font-sans text-xl font-semibold text-white tracking-wide mb-3">
                                 Messenger Group
                             </h3>
                             <p className="text-[#6B667B] group-hover:text-[#8E8A9F] text-xs leading-relaxed font-medium transition-colors duration-300">
@@ -149,7 +149,7 @@ export default function Community() {
                             <div className="w-11 h-11 rounded-xl flex items-center justify-center bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 mb-6">
                                 <Headphones className="w-5 h-5 stroke-[1.8]" />
                             </div>
-                            <h3 className="font-serif text-xl font-semibold text-white tracking-wide mb-3">
+                            <h3 className="font-sans text-xl font-semibold text-white tracking-wide mb-3">
                                 Discord Server
                             </h3>
                             <p className="text-[#6B667B] group-hover:text-[#8E8A9F] text-xs leading-relaxed font-medium transition-colors duration-300">

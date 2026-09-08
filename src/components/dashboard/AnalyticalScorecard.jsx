@@ -127,7 +127,7 @@ export default function AnalyticalScorecard({ answers, examData, submissionResul
                                 </span>
                             ) : null}
                         </div>
-                        <span className="mt-2 bg-linear-to-r from-emerald-300 to-teal-300 bg-clip-text font-serif text-5xl font-bold text-transparent">
+                        <span className="mt-2 bg-linear-to-r from-emerald-300 to-teal-300 bg-clip-text font-sans text-5xl font-bold text-transparent">
                             {shownScore.toFixed(2)}
                         </span>
                         <span className="mt-1 text-xs font-semibold text-[#8E8A9F]">out of {maxPossibleScore.toFixed(2)}</span>
@@ -173,7 +173,7 @@ export default function AnalyticalScorecard({ answers, examData, submissionResul
             {subjectBreakdown.length ? (
                 <div className="flex flex-col gap-4">
                     <div>
-                        <h2 className="font-serif text-2xl font-medium tracking-wide text-white">Subject Breakdown</h2>
+                        <h2 className="font-sans text-2xl font-medium tracking-wide text-white">Subject Breakdown</h2>
                         <p className="mt-1 text-xs font-medium text-[#8E8A9F]">
                             Score, accuracy, and skipped questions grouped by subject.
                         </p>
@@ -221,7 +221,7 @@ export default function AnalyticalScorecard({ answers, examData, submissionResul
 
             <div className="flex flex-col gap-4">
                 <div>
-                    <h2 className="flex items-center gap-2 font-serif text-2xl font-medium tracking-wide text-white">
+                    <h2 className="flex items-center gap-2 font-sans text-2xl font-medium tracking-wide text-white">
                         <BookOpen className="h-5 w-5 text-[#DFB15B]" /> Solution Review
                     </h2>
                     <p className="mt-1 text-xs font-medium text-[#8E8A9F]">

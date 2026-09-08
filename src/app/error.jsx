@@ -32,7 +32,7 @@ export default function Error({ error, reset }) {
         {GLYPHS.map((glyph) => (
           <motion.span
             key={glyph.text}
-            className="absolute font-serif text-lg text-[#E8DDBF]/18 sm:text-2xl"
+            className="absolute font-sans text-lg text-[#E8DDBF]/18 sm:text-2xl"
             style={{ left: glyph.left, top: glyph.top }}
             animate={
               shouldReduceMotion
@@ -65,7 +65,7 @@ export default function Error({ error, reset }) {
           Spell interrupted
         </div>
 
-        <h1 className="mt-5 font-serif text-3xl font-medium leading-tight tracking-wide text-white sm:text-5xl">
+        <h1 className="mt-5 font-sans text-3xl font-medium leading-tight tracking-wide text-white sm:text-5xl">
           Something broke in the calculation.
         </h1>
         <p className="mx-auto mt-4 max-w-2xl text-sm leading-7 text-[#A9A3BA] sm:text-base">

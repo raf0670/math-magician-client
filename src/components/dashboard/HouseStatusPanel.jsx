@@ -116,7 +116,7 @@ export default function HouseStatusPanel() {
                     </div>
                     <div className="min-w-0">
                         <p className="break-words text-[10px] font-bold uppercase tracking-[0.18em] text-[#DFB15B] sm:tracking-[0.24em]">House Status</p>
-                        <h2 className="mt-2 break-words font-serif text-xl font-semibold tracking-wide text-white [overflow-wrap:anywhere] sm:text-2xl">{statusTitle}</h2>
+                        <h2 className="mt-2 break-words font-sans text-xl font-semibold tracking-wide text-white [overflow-wrap:anywhere] sm:text-2xl">{statusTitle}</h2>
                         <p className="mt-3 break-words text-sm font-medium leading-6 text-[#9D96B3]">{statusCopy}</p>
                     </div>
                 </div>
@@ -173,7 +173,7 @@ export default function HouseStatusPanel() {
                                         <Shield className="h-5 w-5" />
                                     )}
                                 </div>
-                                <h3 className="mt-5 break-words font-serif text-xl font-semibold tracking-wide text-white [overflow-wrap:anywhere]">{house.name}</h3>
+                                <h3 className="mt-5 break-words font-sans text-xl font-semibold tracking-wide text-white [overflow-wrap:anywhere]">{house.name}</h3>
                                 <p className="mt-2 break-words text-xs font-semibold uppercase tracking-[0.16em] text-[#DFB15B] sm:tracking-[0.18em]">{house.mode}</p>
                                 <p className="mt-2 break-words text-sm font-medium text-[#9D96B3]">{house.location}</p>
                                 <div className="mt-auto pt-4">

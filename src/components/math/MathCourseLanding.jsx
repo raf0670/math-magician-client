@@ -185,7 +185,7 @@ export default function MathCourseLanding() {
             {glyphs.map((glyph) => (
               <motion.span
                 key={glyph.text}
-                className={`absolute ${glyph.className} ${glyph.size} font-serif font-bold text-emerald-100/10`}
+                className={`absolute ${glyph.className} ${glyph.size} font-sans font-bold text-emerald-100/10`}
                 animate={{ y: [0, -22, 0, 18, 0], x: [0, 10, -8, 0], rotate: [0, 5, -4, 0] }}
                 transition={{ duration: 10, delay: glyph.delay, repeat: Infinity, ease: "easeInOut" }}
               >
@@ -217,7 +217,7 @@ export default function MathCourseLanding() {
               </span>
             </div>
 
-            <h1 className="font-serif text-5xl leading-[0.98] text-white sm:text-6xl lg:text-8xl">
+            <h1 className="font-sans text-5xl leading-[0.98] text-white sm:text-6xl lg:text-8xl">
               Understand the basics.
               <span className="mt-2 block bg-linear-to-r from-emerald-200 via-[#DFB15B] to-emerald-300 bg-clip-text text-transparent">
                 Take on the difficult.
@@ -241,7 +241,7 @@ export default function MathCourseLanding() {
               {benefits.map((item) => (
                 <div key={item.label} className="rounded-2xl border border-white/8 bg-white/[0.045] p-4 backdrop-blur">
                   <item.icon className="h-4 w-4 text-[#DFB15B]" />
-                  <p className="mt-3 font-serif text-3xl font-bold text-white">{item.value}</p>
+                  <p className="mt-3 font-sans text-3xl font-bold text-white">{item.value}</p>
                   <p className="mt-1 text-xs font-bold uppercase tracking-[0.14em] text-emerald-100">{item.label}</p>
                   <p className="mt-2 text-xs leading-5 text-[#9B95AA]">{item.detail}</p>
                 </div>
@@ -274,7 +274,7 @@ export default function MathCourseLanding() {
                 <div className="flex items-center justify-between gap-4">
                   <div>
                     <p className="text-xs font-bold uppercase tracking-[0.22em] text-emerald-200">Batch Console</p>
-                    <p className="mt-2 font-serif text-3xl text-white">Math Course</p>
+                    <p className="mt-2 font-sans text-3xl text-white">Math Course</p>
                   </div>
                   <div className="rounded-2xl border border-[#DFB15B]/25 bg-[#DFB15B]/10 px-4 py-3 text-right">
                     <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#F3D89A]">Payable</p>
@@ -319,7 +319,7 @@ export default function MathCourseLanding() {
       <section className="relative mx-auto max-w-7xl px-5 py-12 sm:px-8 lg:px-10" aria-label="What the math course includes">
         <motion.div {...fadeUp()} className="mx-auto max-w-3xl text-center">
           <p className="text-xs font-black uppercase tracking-[0.28em] text-emerald-200">Everything inside</p>
-          <h2 className="mt-4 font-serif text-4xl text-white sm:text-5xl">A complete math track, not a loose collection of classes.</h2>
+          <h2 className="mt-4 font-sans text-4xl text-white sm:text-5xl">A complete math track, not a loose collection of classes.</h2>
         </motion.div>
 
         <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
@@ -334,7 +334,7 @@ export default function MathCourseLanding() {
                 <span className="flex h-12 w-12 items-center justify-center rounded-2xl border border-emerald-300/20 bg-emerald-300/10 text-emerald-100">
                   <Icon className="h-5 w-5" />
                 </span>
-                <span className="font-serif text-4xl font-bold text-[#DFB15B]">{count}</span>
+                <span className="font-sans text-4xl font-bold text-[#DFB15B]">{count}</span>
               </div>
               <h3 className="relative mt-6 text-lg font-bold text-white">{title}</h3>
               <p className="relative mt-3 text-sm leading-7 text-[#AAA5B8]">{description}</p>
@@ -347,12 +347,12 @@ export default function MathCourseLanding() {
         <div className="grid gap-5 lg:grid-cols-[0.8fr_1.2fr]">
           <motion.div {...fadeUp()} className="rounded-3xl border border-[#DFB15B]/25 bg-[#DFB15B]/8 p-7 shadow-[0_24px_80px_rgba(223,177,91,0.09)] sm:p-9">
             <p className="text-xs font-black uppercase tracking-[0.24em] text-[#F3D89A]">Existing house student</p>
-            <h2 className="mt-4 font-serif text-4xl text-white">Already in a house?</h2>
+            <h2 className="mt-4 font-sans text-4xl text-white">Already in a house?</h2>
             <p className="mt-4 text-sm leading-7 text-[#BDB7CA]">
               Approved Gryffindor, Hufflepuff, and Ravenclaw students receive 25% off Math. Keep your existing house and website access.
             </p>
             <div className="mt-6 flex flex-wrap items-end gap-3">
-              <p className="font-serif text-4xl font-black text-[#DFB15B]">BDT 4,499.25</p>
+              <p className="font-sans text-4xl font-black text-[#DFB15B]">BDT 4,499.25</p>
               <p className="pb-1 text-sm font-semibold text-[#9E98AA]">with eligible discount</p>
             </div>
           </motion.div>
@@ -364,7 +364,7 @@ export default function MathCourseLanding() {
               </span>
               <div>
                 <p className="text-xs font-black uppercase tracking-[0.24em] text-emerald-200">Learning path</p>
-                <h2 className="font-serif text-3xl text-white">From foundation to fight-ready.</h2>
+                <h2 className="font-sans text-3xl text-white">From foundation to fight-ready.</h2>
               </div>
             </div>
 
@@ -409,7 +409,7 @@ export default function MathCourseLanding() {
                 <WandSparkles className="h-3.5 w-3.5" />
                 Optional next step
               </div>
-              <h2 className="mt-5 font-serif text-4xl text-white sm:text-6xl">Math + Slytherin</h2>
+              <h2 className="mt-5 font-sans text-4xl text-white sm:text-6xl">Math + Slytherin</h2>
               <p className="mt-5 max-w-2xl text-sm leading-7 text-[#BBBFC0]">
                 Everything in the Math Course, plus full access to the website enjoyed by approved students in the other three houses: regular live classes, recordings, resources, practice, quizzes, assignments, exams, and the full leaderboard with house positions.
               </p>
@@ -429,7 +429,7 @@ export default function MathCourseLanding() {
               <div className="mt-8 flex flex-col gap-5 rounded-3xl border border-[#DFB15B]/20 bg-[#DFB15B]/8 p-5 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                   <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#F3D89A]">Bundle price</p>
-                  <p className="mt-2 font-serif text-4xl font-black text-emerald-100">BDT 11,998</p>
+                  <p className="mt-2 font-sans text-4xl font-black text-emerald-100">BDT 11,998</p>
                   <p className="mt-1 text-sm text-[#BBBFC0]">BDT 5,999 for Math + BDT 5,999 for Slytherin</p>
                 </div>
                 <Link

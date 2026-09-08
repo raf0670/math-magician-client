@@ -17,7 +17,7 @@ function PaymentFailedShell() {
     <div className="flex min-h-screen items-center justify-center bg-[#0A090F] px-4 text-white">
       <div className="w-full max-w-md rounded-3xl border border-red-500/20 bg-[#121017] p-8 text-center shadow-2xl">
         <p className="text-xs font-bold uppercase tracking-[0.3em] text-red-400">Payment Not Completed</p>
-        <h1 className="mt-3 font-serif text-3xl font-medium">Access was not unlocked</h1>
+        <h1 className="mt-3 font-sans text-3xl font-medium">Access was not unlocked</h1>
       </div>
     </div>
   );
@@ -32,7 +32,7 @@ function PaymentFailedContent() {
     <div className="flex min-h-screen items-center justify-center bg-[#0A090F] px-4 text-white">
       <div className="w-full max-w-md rounded-3xl border border-red-500/20 bg-[#121017] p-8 text-center shadow-2xl">
         <p className="text-xs font-bold uppercase tracking-[0.3em] text-red-400">Payment Not Completed</p>
-        <h1 className="mt-3 font-serif text-3xl font-medium">Access was not unlocked</h1>
+        <h1 className="mt-3 font-sans text-3xl font-medium">Access was not unlocked</h1>
         <p className="mt-3 text-sm leading-6 text-[#8E8A9F]">
           The PayStation payment was cancelled, failed, or could not be verified. Please try again from the pricing section.
         </p>

@@ -67,7 +67,7 @@ export default function Footer() {
             <div className="flex w-9 h-9 shrink-0 items-center justify-center">
               <BrandMark className="h-7 w-7" />
             </div>
-            <div className="flex flex-col font-serif tracking-wide text-[#DFB15B]">
+            <div className="flex flex-col font-sans tracking-wide text-[#DFB15B]">
               <span className="text-xl font-bold leading-tight">Magician&apos;s</span>
               <span className="text-xl font-bold leading-tight">School</span>
             </div>

@@ -35,7 +35,7 @@ function PaymentReviewSubmitted() {
           <StatusIcon className="h-5 w-5" />
         </div>
         <p className="mt-6 text-xs font-bold uppercase tracking-[0.3em] text-[#DFB15B]">{isBooking ? "Seat Booked" : isPaid ? "Payment Confirmed" : "Payment Submitted"}</p>
-        <h1 className="mt-3 font-serif text-3xl font-medium">{isBooking ? "Your seat is reserved" : isPaid ? "Access is unlocked" : "Enrollment submitted"}</h1>
+        <h1 className="mt-3 font-sans text-3xl font-medium">{isBooking ? "Your seat is reserved" : isPaid ? "Access is unlocked" : "Enrollment submitted"}</h1>
         <p className="mt-3 text-sm leading-6 text-[#8E8A9F]">
           {isBooking
             ? "Your student information has been saved. Class access is still locked until you proceed to checkout and complete payment."
