@@ -7,6 +7,7 @@ import { useParams } from "next/navigation";
 import { AlertTriangle, ArrowLeft, CalendarClock, Medal, ShieldAlert, Trophy, Users } from "lucide-react";
 import ClassAccessGate from "@/components/dashboard/ClassAccessGate";
 import FlashyLoader from "@/components/shared/FlashyLoader";
+import StudentAvatar from "@/components/shared/StudentAvatar";
 import { getExamLeaderboard, getStoredUser } from "@/lib/api";
 
 const MONGO_OBJECT_ID_PATTERN = /^[a-f\d]{24}$/i;
@@ -203,23 +204,31 @@ function LiveExamRankingsContent() {
                   className={`grid grid-cols-[auto_1fr] gap-3 rounded-2xl border px-4 py-3 sm:grid-cols-[auto_1fr_auto] sm:items-center ${isCurrentUser ? (isMath ? "border-emerald-300/30 bg-emerald-300/10 shadow-[0_0_28px_rgba(52,211,153,0.08)]" : "border-[#DFB15B]/30 bg-[#DFB15B]/10 shadow-[0_0_28px_rgba(223,177,91,0.08)]") : "border-white/5 bg-[#1A1722]/40"}`}
                 >
                   <RankBadge rank={entry.rank} />
-                  <div className="min-w-0">
-                    <div className="flex min-w-0 flex-wrap items-center gap-2">
-                      <span className="truncate text-sm font-semibold text-white">{entry.studentName || "Student"}</span>
-                      {isCurrentUser ? (
-                        <span className={`rounded-full border px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider ${isMath ? "border-emerald-300/20 bg-emerald-300/10 text-emerald-200" : "border-[#DFB15B]/20 bg-[#DFB15B]/10 text-[#DFB15B]"}`}>
-                          You
-                        </span>
-                      ) : null}
-                      {entry.isDisqualified ? (
-                        <span className="inline-flex items-center gap-1 rounded-full border border-red-400/20 bg-red-500/10 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-red-200">
-                          <ShieldAlert className="h-3 w-3" />
-                          Disqualified
-                        </span>
-                      ) : null}
-                    </div>
-                    <div className="mt-0.5 text-[11px] font-medium text-[#8E8A9F]">
-                      {entry.house ? `${entry.house} - ` : ""}Submitted {formatDateTime(entry.submittedAt)}
+                  <div className="flex min-w-0 items-center gap-3">
+                    <StudentAvatar
+                      name={entry.studentName}
+                      profileImageThumbUrl={entry.profileImageThumbUrl}
+                      profileImageUrl={entry.profileImageUrl}
+                      className={`h-10 w-10 rounded-xl border text-sm font-black ${isMath ? "border-emerald-300/25 bg-emerald-300/10 text-emerald-200" : "border-[#DFB15B]/25 bg-[#DFB15B]/10 text-[#DFB15B]"}`}
+                    />
+                    <div className="min-w-0">
+                      <div className="flex min-w-0 flex-wrap items-center gap-2">
+                        <span className="truncate text-sm font-semibold text-white">{entry.studentName || "Student"}</span>
+                        {isCurrentUser ? (
+                          <span className={`rounded-full border px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider ${isMath ? "border-emerald-300/20 bg-emerald-300/10 text-emerald-200" : "border-[#DFB15B]/20 bg-[#DFB15B]/10 text-[#DFB15B]"}`}>
+                            You
+                          </span>
+                        ) : null}
+                        {entry.isDisqualified ? (
+                          <span className="inline-flex items-center gap-1 rounded-full border border-red-400/20 bg-red-500/10 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-red-200">
+                            <ShieldAlert className="h-3 w-3" />
+                            Disqualified
+                          </span>
+                        ) : null}
+                      </div>
+                      <div className="mt-0.5 text-[11px] font-medium text-[#8E8A9F]">
+                        {entry.house ? `${entry.house} - ` : ""}Submitted {formatDateTime(entry.submittedAt)}
+                      </div>
                     </div>
                   </div>
                   <div className="col-span-2 flex items-center justify-between rounded-xl border border-white/5 bg-[#121017]/70 px-3 py-2 sm:col-span-1 sm:block sm:border-0 sm:bg-transparent sm:p-0 sm:text-right">

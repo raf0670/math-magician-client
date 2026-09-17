@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { LayoutDashboard, Video, ClipboardCheck, BarChart3, User, LogOut, ShieldCheck, Brain, Archive, Radio, FileQuestion, Trophy, Sparkles, ClipboardList, FolderOpen } from "lucide-react";
 import { clearAuthSession, getProfile, getStoredUser, saveAuthSession } from "@/lib/api";
 import BrandMark from "@/components/shared/BrandMark";
+import StudentAvatar from "@/components/shared/StudentAvatar";
 import { getDefaultRankInfo, getRankInfo, getRankProgressPercent, getRankTone } from "@/lib/rank";
 
 const SHOW_STUDENT_LIVE_EXAMS_NAV = true;
@@ -156,9 +157,12 @@ export default function DashboardSidebar() {
                 <div className={`relative z-10 mb-5 overflow-hidden rounded-3xl border px-4 py-4 backdrop-blur ${rankTone.card}`}>
                     <div className={`pointer-events-none absolute inset-0 ${rankTone.cardAura}`} />
                     <div className="relative z-10 flex items-start gap-3">
-                        <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border text-sm font-black ${rankTone.avatar}`}>
-                            {firstName.slice(0, 1).toUpperCase()}
-                        </div>
+                        <StudentAvatar
+                            name={currentUser?.name || firstName}
+                            profileImageThumbUrl={currentUser?.profileImageThumbUrl}
+                            profileImageUrl={currentUser?.profileImageUrl}
+                            className={`h-10 w-10 rounded-2xl border text-sm font-black ${rankTone.avatar}`}
+                        />
                         <div className="min-w-0 flex-1">
                             <p className={`text-[10px] font-bold uppercase tracking-[0.24em] ${rankTone.mutedText}`}>Signed in</p>
                             <p className={`mt-1 truncate text-sm font-semibold ${rankTone.name}`}>Hi, {firstName}</p>

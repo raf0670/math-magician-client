@@ -5,6 +5,7 @@ import { Bell, Flame, ChevronDown, Sparkles, ShieldCheck } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { clearAuthSession, getMyStats, getStoredUser } from "@/lib/api";
 import { getDefaultRankInfo, getRankInfo, getRankTone } from "@/lib/rank";
+import StudentAvatar from "@/components/shared/StudentAvatar";
 
 const SECTION_TITLES = {
     "/dashboard": "Overview",
@@ -87,7 +88,6 @@ export default function DashboardTopbar() {
     const fullName = currentUser?.name || "Student";
     const firstName = fullName.split(" ")[0] || "Student";
     const email = currentUser?.email || "student@example.com";
-    const initials = firstName.slice(0, 1).toUpperCase();
     const rankTone = getRankTone(rankInfo);
     const sectionTitle = SECTION_TITLES[pathname] || "Workspace";
     const streak = useMemo(() => {
@@ -196,7 +196,13 @@ export default function DashboardTopbar() {
                         onClick={() => setShowProfileMenu(!showProfileMenu)}
                         className={`group flex min-w-0 items-center gap-2.5 rounded-2xl border py-1.5 pl-1.5 pr-2.5 transition-all duration-200 ${showProfileMenu ? "border-[#DFB15B]/30 bg-[#DFB15B]/10" : "border-white/7 bg-white/5 hover:border-white/14"}`}
                     >
-                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border border-[#DFB15B]/20 bg-linear-to-br from-[#DFB15B]/20 to-[#7C3AED]/12 text-sm font-black text-[#DFB15B] shadow-[0_0_20px_rgba(223,177,91,0.08)]">{initials}</div>
+                        <StudentAvatar
+                            name={fullName}
+                            profileImageThumbUrl={currentUser?.profileImageThumbUrl}
+                            profileImageUrl={currentUser?.profileImageUrl}
+                            sizes="32px"
+                            className="h-8 w-8 rounded-xl border border-[#DFB15B]/20 bg-linear-to-br from-[#DFB15B]/20 to-[#7C3AED]/12 text-sm font-black text-[#DFB15B] shadow-[0_0_20px_rgba(223,177,91,0.08)]"
+                        />
                         <div className="hidden min-w-0 max-w-44 flex-col items-start text-left sm:flex">
                             <span className={`max-w-full truncate text-xs font-bold tracking-wide leading-none ${rankTone.name}`}>{fullName}</span>
                             <span className={`mt-1 flex max-w-full items-center gap-1 truncate text-[9px] font-bold uppercase tracking-wide ${rankTone.name}`}>

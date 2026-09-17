@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import { getCompetitionSummary, getContentCatalog, getMyStats, getProfile } from "@/lib/api";
 import { formatRankPoints, getRankInfo, getRankProgressPercent, getRankTone } from "@/lib/rank";
+import StudentAvatar from "@/components/shared/StudentAvatar";
 import FlashyLoader from "@/components/shared/FlashyLoader";
 import {
   MathActionCard,
@@ -397,21 +398,29 @@ function LeaderboardView({ payload }) {
                   className={`grid grid-cols-[auto_1fr] gap-3 rounded-2xl border px-4 py-3 sm:grid-cols-[auto_1fr_auto] sm:items-center ${isCurrentUser ? "border-emerald-300/30 bg-emerald-300/10 shadow-[0_0_32px_rgba(52,211,153,0.09)]" : "border-white/5 bg-[#0F0D15]"}`}
                 >
                   <RankBadge rank={rank} />
-                  <div className="min-w-0">
-                    <div className="flex min-w-0 flex-wrap items-center gap-2">
-                      <span className={`truncate text-sm font-semibold ${rankTone.name}`}>{entry.name || "Student"}</span>
-                      {isCurrentUser ? (
-                        <span className="rounded-full border border-emerald-300/20 bg-emerald-300/10 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-emerald-200">
-                          You
+                  <div className="flex min-w-0 items-center gap-3">
+                    <StudentAvatar
+                      name={entry.name}
+                      profileImageThumbUrl={entry.profileImageThumbUrl}
+                      profileImageUrl={entry.profileImageUrl}
+                      className={`h-10 w-10 rounded-xl border text-sm font-black ${rankTone.avatar}`}
+                    />
+                    <div className="min-w-0">
+                      <div className="flex min-w-0 flex-wrap items-center gap-2">
+                        <span className={`truncate text-sm font-semibold ${rankTone.name}`}>{entry.name || "Student"}</span>
+                        {isCurrentUser ? (
+                          <span className="rounded-full border border-emerald-300/20 bg-emerald-300/10 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-emerald-200">
+                            You
+                          </span>
+                        ) : null}
+                        <span className={`rounded-full border px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider ${rankTone.badge}`}>
+                          {rankInfo.rankName}
                         </span>
-                      ) : null}
-                      <span className={`rounded-full border px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider ${rankTone.badge}`}>
-                        {rankInfo.rankName}
-                      </span>
+                      </div>
+                      <p className="mt-0.5 text-[11px] font-medium text-[#8E8A9F]">
+                        {entry.examsTaken || 0} exams - Score {formatNumber(entry.totalScore)} - RP {formatRankPoints(rankInfo.rankPoints)}
+                      </p>
                     </div>
-                    <p className="mt-0.5 text-[11px] font-medium text-[#8E8A9F]">
-                      {entry.examsTaken || 0} exams - Score {formatNumber(entry.totalScore)} - RP {formatRankPoints(rankInfo.rankPoints)}
-                    </p>
                   </div>
                   <div className="col-span-2 flex items-center justify-between rounded-xl border border-white/5 bg-[#121017]/70 px-3 py-2 sm:col-span-1 sm:block sm:border-0 sm:bg-transparent sm:p-0 sm:text-right">
                     <span className="text-[10px] font-bold uppercase tracking-wide text-[#6B667B] sm:block">score</span>

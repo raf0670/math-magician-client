@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { BarChart3, Crown, Medal, Shield, Sparkles, Target, Trophy, Zap } from "lucide-react";
 import { getCompetitionSummary, getStoredUser } from "@/lib/api";
 import FlashyLoader from "@/components/shared/FlashyLoader";
+import StudentAvatar from "@/components/shared/StudentAvatar";
 import { formatRankPoints, getRankInfo, getRankTone } from "@/lib/rank";
 
 function formatNumber(value) {
@@ -221,20 +222,28 @@ export default function LeaderboardPortal() {
                                     className={`grid grid-cols-[auto_1fr] gap-3 rounded-2xl border px-4 py-3 sm:grid-cols-[auto_1fr_auto] sm:items-center ${isCurrentUser ? "border-[#DFB15B]/30 bg-[#DFB15B]/10 shadow-[0_0_28px_rgba(223,177,91,0.08)]" : "border-white/5 bg-[#1A1722]/40"}`}
                                 >
                                     <RankBadge rank={rank} />
-                                    <div className="min-w-0">
-                                        <div className="flex min-w-0 flex-wrap items-center gap-2">
-                                            <span className={`truncate text-sm font-semibold ${entryRankTone.name}`}>{entry.name || "Student"}</span>
-                                            {isCurrentUser ? (
-                                                <span className="rounded-full border border-[#DFB15B]/20 bg-[#DFB15B]/10 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-[#DFB15B]">
-                                                    You
+                                    <div className="flex min-w-0 items-center gap-3">
+                                        <StudentAvatar
+                                            name={entry.name}
+                                            profileImageThumbUrl={entry.profileImageThumbUrl}
+                                            profileImageUrl={entry.profileImageUrl}
+                                            className={`h-10 w-10 rounded-xl border text-sm font-black ${entryRankTone.avatar}`}
+                                        />
+                                        <div className="min-w-0">
+                                            <div className="flex min-w-0 flex-wrap items-center gap-2">
+                                                <span className={`truncate text-sm font-semibold ${entryRankTone.name}`}>{entry.name || "Student"}</span>
+                                                {isCurrentUser ? (
+                                                    <span className="rounded-full border border-[#DFB15B]/20 bg-[#DFB15B]/10 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-[#DFB15B]">
+                                                        You
+                                                    </span>
+                                                ) : null}
+                                                <span className={`rounded-full border px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider ${entryRankTone.badge}`}>
+                                                    {entryRankInfo.rankName}
                                                 </span>
-                                            ) : null}
-                                            <span className={`rounded-full border px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider ${entryRankTone.badge}`}>
-                                                {entryRankInfo.rankName}
-                                            </span>
-                                        </div>
-                                        <div className="mt-0.5 text-[11px] font-medium text-[#8E8A9F]">
-                                            {entry.house || "No house"} - {entry.examsTaken || 0} live exams - {entry.badgeCount || 0} badges - Avg {formatNumber(entry.averageScore)} - RP {formatRankPoints(entryRankInfo.rankPoints)}
+                                            </div>
+                                            <div className="mt-0.5 text-[11px] font-medium text-[#8E8A9F]">
+                                                {entry.house || "No house"} - {entry.examsTaken || 0} live exams - {entry.badgeCount || 0} badges - Avg {formatNumber(entry.averageScore)} - RP {formatRankPoints(entryRankInfo.rankPoints)}
+                                            </div>
                                         </div>
                                     </div>
                                     <div className="col-span-2 flex items-center justify-between rounded-xl border border-white/5 bg-[#121017]/70 px-3 py-2 sm:col-span-1 sm:block sm:border-0 sm:bg-transparent sm:p-0 sm:text-right">
@@ -257,10 +266,22 @@ function ChampionRow({ title, item, highlight = false }) {
     return (
         <div className={`rounded-2xl border px-4 py-3 ${highlight ? "border-[#DFB15B]/20 bg-[#DFB15B]/10" : "border-white/5 bg-[#1A1722]/45"}`}>
             <p className="text-xs font-bold uppercase tracking-wider text-[#8E8A9F]">{title}</p>
-            <p className={`mt-1 text-sm font-bold ${item ? rankTone.name : "text-white"}`}>{item?.name || "Not decided yet"}</p>
             {item ? (
-                <p className={`mt-0.5 text-xs font-semibold ${rankTone.name}`}>{item.house} - {formatNumber(item.totalScore)} score</p>
-            ) : null}
+                <div className="mt-2 flex min-w-0 items-center gap-3">
+                    <StudentAvatar
+                        name={item.name}
+                        profileImageThumbUrl={item.profileImageThumbUrl}
+                        profileImageUrl={item.profileImageUrl}
+                        className={`h-10 w-10 rounded-xl border text-sm font-black ${rankTone.avatar}`}
+                    />
+                    <div className="min-w-0">
+                        <p className={`truncate text-sm font-bold ${rankTone.name}`}>{item.name || "Student"}</p>
+                        <p className={`mt-0.5 text-xs font-semibold ${rankTone.name}`}>{item.house} - {formatNumber(item.totalScore)} score</p>
+                    </div>
+                </div>
+            ) : (
+                <p className="mt-1 text-sm font-bold text-white">Not decided yet</p>
+            )}
         </div>
     );
 }
