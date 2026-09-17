@@ -71,7 +71,7 @@ export default function LeaderboardPortal() {
                 message="House points, badges, and champions are being pulled from live exams."
                 iconName="analytics"
                 skeleton="cards"
-                className="min-h-[520px]"
+                className="min-h-130"
             />
         );
     }
@@ -105,7 +105,7 @@ export default function LeaderboardPortal() {
                         </p>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:min-w-[520px]">
+                    <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:min-w-130">
                         {[
                             { label: "Total Score", value: formatNumber(currentUserEntry?.totalScore), icon: Zap },
                             { label: "Live Exams", value: currentUserEntry?.examsTaken || 0, icon: BarChart3 },
