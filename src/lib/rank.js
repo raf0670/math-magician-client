@@ -101,6 +101,49 @@ export function formatRankPoints(value) {
   return Number(value || 0).toFixed(2);
 }
 
+function getEntryId(value) {
+  return value?.studentId?.toString?.() || value?.id?.toString?.() || value?._id?.toString?.() || "";
+}
+
+function getEntryTime(value) {
+  const time = new Date(value?.lastSubmittedAt || 0).getTime();
+  return Number.isNaN(time) ? 0 : time;
+}
+
+export function buildRankPointLeaderboard(entries = []) {
+  let previousRankPoints = null;
+  let previousRank = 0;
+
+  return [...entries]
+    .sort((first, second) => {
+      const rankPointDelta = Number(getRankInfo(second.rankInfo).rankPoints || 0)
+        - Number(getRankInfo(first.rankInfo).rankPoints || 0);
+      if (rankPointDelta !== 0) return rankPointDelta;
+
+      const totalScoreDelta = Number(second.totalScore || 0) - Number(first.totalScore || 0);
+      if (totalScoreDelta !== 0) return totalScoreDelta;
+
+      const bestScoreDelta = Number(second.bestScore || 0) - Number(first.bestScore || 0);
+      if (bestScoreDelta !== 0) return bestScoreDelta;
+
+      const submittedDelta = getEntryTime(first) - getEntryTime(second);
+      if (submittedDelta !== 0) return submittedDelta;
+
+      const nameDelta = (first.name || "").localeCompare(second.name || "");
+      if (nameDelta !== 0) return nameDelta;
+
+      return getEntryId(first).localeCompare(getEntryId(second));
+    })
+    .map((entry, index) => {
+      const rankPoints = Number(getRankInfo(entry.rankInfo).rankPoints || 0);
+      const displayRank = previousRankPoints === rankPoints ? previousRank : index + 1;
+      previousRankPoints = rankPoints;
+      previousRank = displayRank;
+
+      return { ...entry, displayRank };
+    });
+}
+
 export function formatSubjectLabel(value) {
   const subject = value?.toString().trim() || "General";
   const normalized = subject.toLowerCase();

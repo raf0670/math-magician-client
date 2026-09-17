@@ -5,7 +5,7 @@ import { BarChart3, Crown, Medal, Shield, Sparkles, Target, Trophy, Zap } from "
 import { getCompetitionSummary, getStoredUser } from "@/lib/api";
 import FlashyLoader from "@/components/shared/FlashyLoader";
 import StudentAvatar from "@/components/shared/StudentAvatar";
-import { formatRankPoints, getRankInfo, getRankTone } from "@/lib/rank";
+import { buildRankPointLeaderboard, formatRankPoints, getRankInfo, getRankTone } from "@/lib/rank";
 
 function formatNumber(value) {
     return Number(value || 0).toFixed(2);
@@ -54,13 +54,16 @@ export default function LeaderboardPortal() {
     }, []);
 
     const leaderboard = useMemo(() => summary?.leaderboard || [], [summary?.leaderboard]);
+    const displayedLeaderboard = useMemo(() => buildRankPointLeaderboard(leaderboard), [leaderboard]);
     const houses = useMemo(() => summary?.houses || [], [summary?.houses]);
     const champions = summary?.champions || {};
     const currentUserId = getStudentId(currentUser);
     const baseCurrentUserEntry = useMemo(() => {
         return summary?.currentUserEntry || leaderboard.find((entry) => getStudentId(entry) === currentUserId) || null;
     }, [leaderboard, currentUserId, summary?.currentUserEntry]);
-    const currentUserEntry = baseCurrentUserEntry;
+    const currentUserEntry = useMemo(() => {
+        return displayedLeaderboard.find((entry) => getStudentId(entry) === currentUserId) || baseCurrentUserEntry;
+    }, [baseCurrentUserEntry, currentUserId, displayedLeaderboard]);
     const currentRankInfo = getRankInfo(currentUserEntry?.rankInfo);
     const currentRankTone = getRankTone(currentRankInfo);
 
@@ -94,14 +97,14 @@ export default function LeaderboardPortal() {
                             Your Standing
                         </div>
                         <h2 className={`mt-4 font-sans text-3xl font-semibold tracking-wide sm:text-4xl ${currentRankTone.name}`}>
-                            {currentUserEntry ? `Score Rank ${currentUserEntry.rank}` : "No Rank Yet"}
+                            {currentUserEntry ? `RP Rank ${currentUserEntry.displayRank || "Pending"}` : "No Rank Yet"}
                         </h2>
                         <div className={`mt-3 inline-flex rounded-full border px-3 py-1 text-[10px] font-bold uppercase tracking-wider ${currentRankTone.badge}`}>
                             {currentRankInfo.rankName}
                         </div>
                         <p className="mt-3 max-w-xl text-sm font-medium leading-6 text-[#9D96B3]">
                             {currentUserEntry
-                                ? "Your exact position is based on live exam scores. Your tier badge is calculated from finalized daily and weekly exam points."
+                                ? "Your exact position is based on rank points from finalized rank-eligible work. House standings and champions remain score-based."
                                 : "Submit a live exam to enter the competition leaderboard."}
                         </p>
                     </div>
@@ -196,19 +199,19 @@ export default function LeaderboardPortal() {
                     <div>
                         <h2 className="font-sans text-2xl font-medium tracking-wide text-white">Ranked Students</h2>
                         <p className="mt-1 text-xs font-medium text-[#6B667B]">
-                            Showing all {leaderboard.length} ranked student{leaderboard.length === 1 ? "" : "s"} by score.
+                            Showing all {displayedLeaderboard.length} ranked student{displayedLeaderboard.length === 1 ? "" : "s"} by rank points.
                         </p>
                     </div>
                 </div>
 
-                {leaderboard.length === 0 ? (
+                {displayedLeaderboard.length === 0 ? (
                     <div className="rounded-2xl border border-white/5 bg-[#1A1722]/40 px-4 py-8 text-center text-sm font-medium text-[#8E8A9F]">
                         No leaderboard entries are available yet.
                     </div>
                 ) : (
                     <div className="flex flex-col gap-2">
-                        {leaderboard.map((entry, index) => {
-                            const rank = entry.rank || index + 1;
+                        {displayedLeaderboard.map((entry, index) => {
+                            const rank = entry.displayRank || index + 1;
                             const isCurrentUser = currentUserId && getStudentId(entry) === currentUserId;
                             const entryRankInfo = getRankInfo(entry.rankInfo);
                             const entryRankTone = getRankTone(entryRankInfo);
@@ -242,13 +245,13 @@ export default function LeaderboardPortal() {
                                                 </span>
                                             </div>
                                             <div className="mt-0.5 text-[11px] font-medium text-[#8E8A9F]">
-                                                {entry.house || "No house"} - {entry.examsTaken || 0} live exams - {entry.badgeCount || 0} badges - Avg {formatNumber(entry.averageScore)} - RP {formatRankPoints(entryRankInfo.rankPoints)}
+                                                {entry.house || "No house"} - {entry.examsTaken || 0} live exams - {entry.badgeCount || 0} badges - Avg {formatNumber(entry.averageScore)} - Score {formatNumber(entry.totalScore)}
                                             </div>
                                         </div>
                                     </div>
                                     <div className="col-span-2 flex items-center justify-between rounded-xl border border-white/5 bg-[#121017]/70 px-3 py-2 sm:col-span-1 sm:block sm:border-0 sm:bg-transparent sm:p-0 sm:text-right">
-                                        <span className="text-[10px] font-bold uppercase tracking-wide text-[#6B667B] sm:block">score</span>
-                                        <span className="text-sm font-bold text-[#DFB15B] sm:block">{formatNumber(entry.totalScore)}</span>
+                                        <span className="text-[10px] font-bold uppercase tracking-wide text-[#6B667B] sm:block">RP</span>
+                                        <span className="text-sm font-bold text-[#DFB15B] sm:block">{formatRankPoints(entryRankInfo.rankPoints)}</span>
                                     </div>
                                 </motion.div>
                             );

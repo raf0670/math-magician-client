@@ -22,7 +22,7 @@ import {
   Zap,
 } from "lucide-react";
 import { getCompetitionSummary, getContentCatalog, getMyStats, getProfile } from "@/lib/api";
-import { formatRankPoints, getRankInfo, getRankProgressPercent, getRankTone } from "@/lib/rank";
+import { buildRankPointLeaderboard, formatRankPoints, getRankInfo, getRankProgressPercent, getRankTone } from "@/lib/rank";
 import StudentAvatar from "@/components/shared/StudentAvatar";
 import FlashyLoader from "@/components/shared/FlashyLoader";
 import {
@@ -329,12 +329,14 @@ function ArchiveView({ payload }) {
 function LeaderboardView({ payload }) {
   const summary = payload?.data || {};
   const leaderboard = useMemo(() => (Array.isArray(summary.leaderboard) ? summary.leaderboard : []), [summary.leaderboard]);
+  const displayedLeaderboard = useMemo(() => buildRankPointLeaderboard(leaderboard), [leaderboard]);
 
-  const currentUserEntry = summary.currentUserEntry || null;
+  const baseCurrentUserEntry = summary.currentUserEntry || null;
+  const currentUserId = getStudentId(baseCurrentUserEntry);
+  const currentUserEntry = displayedLeaderboard.find((entry) => getStudentId(entry) === currentUserId) || baseCurrentUserEntry;
   const currentRankInfo = getRankInfo(currentUserEntry?.rankInfo);
   const currentRankTone = getRankTone(currentRankInfo);
-  const currentUserId = getStudentId(currentUserEntry);
-  const topEntry = leaderboard[0] || null;
+  const topEntry = displayedLeaderboard[0] || null;
 
   return (
     <MathPageShell>
@@ -345,16 +347,16 @@ function LeaderboardView({ payload }) {
         icon={Trophy}
       >
         <div className="grid gap-3 sm:grid-cols-3">
-          <HeroMetric label="Ranked Students" value={leaderboard.length} />
-          <HeroMetric label="Top Score" value={topEntry ? formatNumber(topEntry.totalScore) : "0.00"} />
-          <HeroMetric label="Your Rank" value={currentUserEntry?.rank || "Pending"} />
+          <HeroMetric label="Ranked Students" value={displayedLeaderboard.length} />
+          <HeroMetric label="Top RP" value={topEntry ? formatRankPoints(getRankInfo(topEntry.rankInfo).rankPoints) : "0.00"} />
+          <HeroMetric label="Your RP Rank" value={currentUserEntry?.displayRank || "Pending"} />
         </div>
       </MathHero>
 
       <MathPanel
         eyebrow="Your Standing"
-        title={currentUserEntry ? `Score Rank ${currentUserEntry.rank || "Pending"}` : "No Rank Yet"}
-        description={currentUserEntry ? "Your math rank updates after finalized math exam results." : "Submit a released math exam to enter the leaderboard."}
+        title={currentUserEntry ? `RP Rank ${currentUserEntry.displayRank || "Pending"}` : "No Rank Yet"}
+        description={currentUserEntry ? "Your math leaderboard position is based on rank points from finalized math work." : "Submit a released math exam to enter the leaderboard."}
         icon={Medal}
       >
         <div className="grid gap-3 sm:grid-cols-3">
@@ -372,10 +374,10 @@ function LeaderboardView({ payload }) {
       <MathPanel
         eyebrow="Ranked Students"
         title="Math students"
-        description={`Showing all ${leaderboard.length} ranked student${leaderboard.length === 1 ? "" : "s"} by score.`}
+        description={`Showing all ${displayedLeaderboard.length} ranked student${displayedLeaderboard.length === 1 ? "" : "s"} by rank points.`}
         icon={Users}
       >
-        {!leaderboard.length ? (
+        {!displayedLeaderboard.length ? (
           <MathEmptyState
             icon={Trophy}
             title="Leaderboard opens soon"
@@ -383,11 +385,11 @@ function LeaderboardView({ payload }) {
           />
         ) : (
           <div className="flex flex-col gap-2">
-            {leaderboard.map((entry, index) => {
+            {displayedLeaderboard.map((entry, index) => {
               const rankInfo = getRankInfo(entry.rankInfo);
               const rankTone = getRankTone(rankInfo);
               const isCurrentUser = currentUserId && getStudentId(entry) === currentUserId;
-              const rank = entry.rank || index + 1;
+              const rank = entry.displayRank || index + 1;
 
               return (
                 <motion.div
@@ -418,13 +420,13 @@ function LeaderboardView({ payload }) {
                         </span>
                       </div>
                       <p className="mt-0.5 text-[11px] font-medium text-[#8E8A9F]">
-                        {entry.examsTaken || 0} exams - Score {formatNumber(entry.totalScore)} - RP {formatRankPoints(rankInfo.rankPoints)}
+                        {entry.examsTaken || 0} exams - Score {formatNumber(entry.totalScore)}
                       </p>
                     </div>
                   </div>
                   <div className="col-span-2 flex items-center justify-between rounded-xl border border-white/5 bg-[#121017]/70 px-3 py-2 sm:col-span-1 sm:block sm:border-0 sm:bg-transparent sm:p-0 sm:text-right">
-                    <span className="text-[10px] font-bold uppercase tracking-wide text-[#6B667B] sm:block">score</span>
-                    <span className="text-sm font-bold text-emerald-200 sm:block">{formatNumber(entry.totalScore)}</span>
+                    <span className="text-[10px] font-bold uppercase tracking-wide text-[#6B667B] sm:block">RP</span>
+                    <span className="text-sm font-bold text-emerald-200 sm:block">{formatRankPoints(rankInfo.rankPoints)}</span>
                   </div>
                 </motion.div>
               );
