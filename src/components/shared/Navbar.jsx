@@ -4,9 +4,10 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowUpRight, ChevronDown, LayoutDashboard, LogIn, LogOut, Menu, Sparkles, UserRound, X } from "lucide-react";
+import { ArrowUpRight, ChevronDown, LayoutDashboard, LogIn, LogOut, Menu, Sparkles, X } from "lucide-react";
 import { clearAuthSession, getStoredUser } from "@/lib/api";
 import BrandMark from "@/components/shared/BrandMark";
+import StudentAvatar from "@/components/shared/StudentAvatar";
 
 export default function Navbar() {
     const pathname = usePathname();
@@ -157,9 +158,17 @@ export default function Navbar() {
                     <div className="relative z-20 mt-6 flex flex-col gap-3 pb-8">
                         {isLoggedIn ? (
                             <>
-                                <div className="rounded-3xl border border-white/7 bg-white/[0.035] px-4 py-3">
-                                    <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-[#6B667B]">Signed in</p>
-                                    <p className="mt-1 truncate text-sm font-semibold text-[#F6D98B]">Hi, {firstName}</p>
+                                <div className="flex items-center gap-3 rounded-3xl border border-white/7 bg-white/[0.035] px-4 py-3">
+                                    <StudentAvatar
+                                        name={currentUser?.name || firstName}
+                                        profileImageThumbUrl={currentUser?.profileImageThumbUrl}
+                                        profileImageUrl={currentUser?.profileImageUrl}
+                                        className="h-10 w-10 rounded-xl border border-[#DFB15B]/20 bg-linear-to-br from-[#DFB15B]/20 to-[#7C3AED]/12 text-sm font-black text-[#DFB15B]"
+                                    />
+                                    <div className="min-w-0">
+                                        <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-[#6B667B]">Signed in</p>
+                                        <p className="mt-1 truncate text-sm font-semibold text-[#F6D98B]">Hi, {firstName}</p>
+                                    </div>
                                 </div>
                                 <Link
                                     href="/dashboard"
@@ -274,9 +283,13 @@ export default function Navbar() {
                                     aria-expanded={showUserMenu}
                                     className={`flex items-center gap-2 rounded-2xl border py-1.5 pl-1.5 pr-3 text-sm font-semibold transition-all duration-200 ${showUserMenu ? "border-[#DFB15B]/35 bg-[#DFB15B]/10 text-[#F6D98B]" : "border-white/7 bg-white/5 text-[#E6C687] hover:border-[#DFB15B]/35 hover:bg-[#DFB15B]/8"}`}
                                 >
-                                    <span className="flex h-8 w-8 items-center justify-center rounded-xl border border-[#DFB15B]/20 bg-linear-to-br from-[#DFB15B]/20 to-[#7C3AED]/12 text-xs font-black text-[#DFB15B]">
-                                        <UserRound className="h-4 w-4" />
-                                    </span>
+                                    <StudentAvatar
+                                        name={currentUser?.name || firstName}
+                                        profileImageThumbUrl={currentUser?.profileImageThumbUrl}
+                                        profileImageUrl={currentUser?.profileImageUrl}
+                                        sizes="32px"
+                                        className="h-8 w-8 rounded-xl border border-[#DFB15B]/20 bg-linear-to-br from-[#DFB15B]/20 to-[#7C3AED]/12 text-xs font-black text-[#DFB15B]"
+                                    />
                                     <span className="max-w-28 truncate">Hi, {firstName}</span>
                                     <ChevronDown className={`h-3.5 w-3.5 text-[#8E8A9F] transition-transform duration-200 ${showUserMenu ? "rotate-180" : ""}`} />
                                 </motion.button>
