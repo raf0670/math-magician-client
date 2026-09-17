@@ -95,7 +95,7 @@ export default function MathWorkspace({ view = "overview" }) {
         message="Classes, rankings, and progress are being gathered."
         iconName="brain"
         skeleton="dashboard"
-        className="min-h-[520px]"
+        className="min-h-130"
       />
     );
   }
