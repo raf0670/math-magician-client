@@ -79,12 +79,14 @@ export async function warmBackend() {
 
 async function request(path, options = {}) {
   const token = typeof window !== "undefined" ? window.localStorage.getItem("exam_archive_token") : null;
+  const { timeoutMs = 10000, ...fetchOptions } = options;
+  const isFormData = typeof FormData !== "undefined" && fetchOptions.body instanceof FormData;
 
   const headers = {
-    ...(options.headers || {}),
+    ...(fetchOptions.headers || {}),
   };
 
-  if (!(options.body instanceof FormData)) {
+  if (!isFormData) {
     headers["Content-Type"] = "application/json";
   }
 
@@ -94,18 +96,18 @@ async function request(path, options = {}) {
 
   const controller = typeof AbortController !== "undefined" ? new AbortController() : null;
   const timeoutId = controller
-    ? setTimeout(() => controller.abort(), 10000)
+    ? setTimeout(() => controller.abort(), timeoutMs)
     : null;
 
   try {
     const response = await fetch(buildUrl(path), {
-      ...options,
+      ...fetchOptions,
       signal: controller?.signal,
       headers,
-      body: options.body
-        ? typeof options.body === "string"
-          ? options.body
-          : JSON.stringify(options.body)
+      body: fetchOptions.body
+        ? isFormData || typeof fetchOptions.body === "string"
+          ? fetchOptions.body
+          : JSON.stringify(fetchOptions.body)
         : undefined,
     });
 
@@ -246,6 +248,17 @@ export async function updateProfile(payload) {
   return request("/api/auth/profile", {
     method: "PUT",
     body: payload,
+  });
+}
+
+export async function uploadProfilePicture(file) {
+  const body = new FormData();
+  body.append("image", file);
+
+  return request("/api/auth/profile-picture", {
+    method: "PUT",
+    body,
+    timeoutMs: 45000,
   });
 }
 

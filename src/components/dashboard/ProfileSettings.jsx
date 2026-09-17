@@ -1,9 +1,13 @@
 "use client";
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { motion } from "framer-motion";
-import { User, BookOpen, GraduationCap, ShieldCheck, Mail, Lock, Save, Sparkles, Trophy, Target } from "lucide-react";
-import { changePassword, getMyStats, getStoredUser, saveAuthSession, updateProfile } from "@/lib/api";
+import { User, BookOpen, Camera, GraduationCap, ShieldCheck, Mail, Lock, LoaderCircle, Save, Sparkles, Trophy, Target } from "lucide-react";
+import { changePassword, getMyStats, getStoredUser, saveAuthSession, updateProfile, uploadProfilePicture } from "@/lib/api";
 import { POINTS_PER_LEVEL, formatRankPoints, getDefaultRankInfo, getRankInfo, getRankProgressPercent, getRankTone } from "@/lib/rank";
+
+const PROFILE_IMAGE_MAX_MB = Number(process.env.NEXT_PUBLIC_PROFILE_IMAGE_MAX_MB) || 5;
+const PROFILE_IMAGE_ALLOWED_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
 
 const RANK_PROGRESS_ACCENTS = {
     Silver: "from-slate-300 via-white to-slate-400 shadow-[0_0_28px_rgba(226,232,240,0.36)]",
@@ -50,10 +54,14 @@ export default function ProfileSettings() {
         focusArea: "No submissions yet",
         mocksCompleted: 0,
         rankInfo: getDefaultRankInfo(),
+        profileImageUrl: "",
+        profileImageThumbUrl: "",
     });
     const [form, setForm] = useState({ name: "", bio: "" });
     const [passwordForm, setPasswordForm] = useState({ currentPassword: "", newPassword: "", confirmPassword: "" });
     const [isSaving, setIsSaving] = useState(false);
+    const [isUploadingImage, setIsUploadingImage] = useState(false);
+    const [imagePreviewUrl, setImagePreviewUrl] = useState("");
     const [message, setMessage] = useState("");
     const [error, setError] = useState("");
 
@@ -66,6 +74,8 @@ export default function ProfileSettings() {
                     fullName: currentUser.name || prev.fullName,
                     email: currentUser.email || prev.email,
                     bio: currentUser.bio || prev.bio,
+                    profileImageUrl: currentUser.profileImageUrl || "",
+                    profileImageThumbUrl: currentUser.profileImageThumbUrl || currentUser.profileImageUrl || "",
                     rankInfo: getRankInfo((currentUser.hasMathAccess && !currentUser.hasClassAccess ? currentUser.mathRankInfo : currentUser.rankInfo) || prev.rankInfo),
                 }));
                 setForm({
@@ -106,6 +116,12 @@ export default function ProfileSettings() {
         };
     }, []);
 
+    useEffect(() => {
+        return () => {
+            if (imagePreviewUrl.startsWith("blob:")) URL.revokeObjectURL(imagePreviewUrl);
+        };
+    }, [imagePreviewUrl]);
+
     const handleProfileSave = async (event) => {
         event.preventDefault();
         setIsSaving(true);
@@ -131,6 +147,48 @@ export default function ProfileSettings() {
             setError(err.message || "Unable to save your profile.");
         } finally {
             setIsSaving(false);
+        }
+    };
+
+    const handleProfileImageChange = async (event) => {
+        const file = event.target.files?.[0];
+        event.target.value = "";
+        if (!file) return;
+
+        setError("");
+        setMessage("");
+
+        if (!PROFILE_IMAGE_ALLOWED_TYPES.has(file.type)) {
+            setError("Choose a JPG, PNG, or WebP image.");
+            return;
+        }
+
+        if (file.size > PROFILE_IMAGE_MAX_MB * 1024 * 1024) {
+            setError(`Profile image must be ${PROFILE_IMAGE_MAX_MB} MB or smaller.`);
+            return;
+        }
+
+        setImagePreviewUrl(URL.createObjectURL(file));
+        setIsUploadingImage(true);
+
+        try {
+            const payload = await uploadProfilePicture(file);
+            const updatedUser = payload?.data || {};
+            const currentUser = getStoredUser();
+            const nextUser = { ...(currentUser || {}), ...updatedUser };
+            saveAuthSession(localStorage.getItem("exam_archive_token"), nextUser);
+            setProfile((prev) => ({
+                ...prev,
+                profileImageUrl: updatedUser.profileImageUrl || "",
+                profileImageThumbUrl: updatedUser.profileImageThumbUrl || updatedUser.profileImageUrl || "",
+            }));
+            setImagePreviewUrl("");
+            setMessage("Profile picture updated successfully.");
+        } catch (err) {
+            setImagePreviewUrl("");
+            setError(err.message || "Unable to upload your profile picture.");
+        } finally {
+            setIsUploadingImage(false);
         }
     };
 
@@ -206,13 +264,23 @@ export default function ProfileSettings() {
                     transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
                     className="relative z-10 w-16 h-16 rounded-2xl bg-linear-to-tr from-[#E6C687] via-[#F6D98B] to-[#AA7C11] p-0.5 shrink-0"
                 >
-                    <div className="w-full h-full bg-[#121017] rounded-[14px] flex items-center justify-center">
-                        <motion.div
-                            animate={{ scale: [1, 1.08, 1], rotate: [0, -3, 3, 0] }}
-                            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                        >
-                            <User className="w-6 h-6 text-[#DFB15B]" />
-                        </motion.div>
+                    <div className="relative w-full h-full overflow-hidden bg-[#121017] rounded-[14px] flex items-center justify-center">
+                        {profile.profileImageThumbUrl || profile.profileImageUrl ? (
+                            <Image
+                                src={profile.profileImageThumbUrl || profile.profileImageUrl}
+                                alt={`${profile.fullName} profile picture`}
+                                fill
+                                sizes="64px"
+                                className="object-cover"
+                            />
+                        ) : (
+                            <motion.div
+                                animate={{ scale: [1, 1.08, 1], rotate: [0, -3, 3, 0] }}
+                                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                            >
+                                <User className="w-6 h-6 text-[#DFB15B]" />
+                            </motion.div>
+                        )}
                     </div>
                 </motion.div>
 
@@ -404,6 +472,39 @@ export default function ProfileSettings() {
                         <User className="w-4 h-4 text-[#DFB15B]" /> Edit account details
                     </div>
                     <div className="relative z-10 grid grid-cols-1 gap-4">
+                        <div className="flex flex-col gap-3 rounded-xl border border-white/7 bg-white/5 p-3 sm:flex-row sm:items-center">
+                            <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl border border-[#DFB15B]/25 bg-[#0B0910]">
+                                {imagePreviewUrl || profile.profileImageThumbUrl || profile.profileImageUrl ? (
+                                    <Image
+                                        src={imagePreviewUrl || profile.profileImageThumbUrl || profile.profileImageUrl}
+                                        alt="Profile picture preview"
+                                        fill
+                                        unoptimized={imagePreviewUrl.startsWith("blob:")}
+                                        sizes="64px"
+                                        className="object-cover"
+                                    />
+                                ) : (
+                                    <div className="flex h-full w-full items-center justify-center">
+                                        <User className="h-6 w-6 text-[#DFB15B]" />
+                                    </div>
+                                )}
+                            </div>
+                            <div className="min-w-0 flex-1">
+                                <p className="text-sm font-semibold text-white">Profile picture</p>
+                                <p className="mt-1 text-xs text-[#8E8A9F]">JPG, PNG, or WebP, up to {PROFILE_IMAGE_MAX_MB} MB</p>
+                            </div>
+                            <label className={`inline-flex min-h-10 cursor-pointer items-center justify-center gap-2 rounded-xl border border-[#DFB15B]/25 bg-[#DFB15B]/10 px-3 py-2 text-xs font-bold text-[#F6D98B] transition hover:bg-[#DFB15B]/15 ${isUploadingImage ? "pointer-events-none opacity-60" : ""}`}>
+                                {isUploadingImage ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <Camera className="h-4 w-4" />}
+                                {isUploadingImage ? "Uploading..." : "Choose photo"}
+                                <input
+                                    type="file"
+                                    accept="image/jpeg,image/png,image/webp"
+                                    className="sr-only"
+                                    disabled={isUploadingImage}
+                                    onChange={handleProfileImageChange}
+                                />
+                            </label>
+                        </div>
                         <label className="text-sm text-[#8E8A9F]">
                             <span className="mb-2 block text-[10px] font-bold uppercase tracking-[0.3em]">Display name</span>
                             <input
