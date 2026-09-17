@@ -41,20 +41,6 @@ function getStudentId(value) {
   return value?._id?.toString?.() || value?.id?.toString?.() || value?.studentId?.toString?.() || "";
 }
 
-function getEntryRankPoints(entry) {
-  return Number(getRankInfo(entry?.rankInfo).rankPoints || 0);
-}
-
-function sortRankPointEntries(first, second) {
-  const rankPointDelta = getEntryRankPoints(second) - getEntryRankPoints(first);
-  if (rankPointDelta !== 0) return rankPointDelta;
-
-  const scoreDelta = Number(second.totalScore || 0) - Number(first.totalScore || 0);
-  if (scoreDelta !== 0) return scoreDelta;
-
-  return (first.name || "").localeCompare(second.name || "");
-}
-
 const QUICK_LINKS = [
   ["classes", "Live Classes", "Join scheduled special math classes.", Video],
   ["archived-classes", "Recorded Classes", "Build from basics through archive lessons.", Archive],
@@ -62,15 +48,9 @@ const QUICK_LINKS = [
   ["leaderboard", "Math Leaderboard", "Track your standing across math exams.", Trophy],
 ];
 
-const BASIS_OPTIONS = [
-  { value: "score", label: "Score", icon: Trophy },
-  { value: "rp", label: "Math RP", icon: Sparkles },
-];
-
 export default function MathWorkspace({ view = "overview" }) {
   const [data, setData] = useState(null);
   const [error, setError] = useState("");
-  const [basis, setBasis] = useState("score");
 
   useEffect(() => {
     let active = true;
@@ -121,7 +101,7 @@ export default function MathWorkspace({ view = "overview" }) {
   }
 
   if (view === "archive") return <ArchiveView payload={data} />;
-  if (view === "leaderboard") return <LeaderboardView payload={data} basis={basis} setBasis={setBasis} />;
+  if (view === "leaderboard") return <LeaderboardView payload={data} />;
 
   return <OverviewView payload={data} />;
 }
@@ -345,30 +325,15 @@ function ArchiveView({ payload }) {
   );
 }
 
-function LeaderboardView({ payload, basis, setBasis }) {
+function LeaderboardView({ payload }) {
   const summary = payload?.data || {};
   const leaderboard = useMemo(() => (Array.isArray(summary.leaderboard) ? summary.leaderboard : []), [summary.leaderboard]);
-  const displayedLeaderboard = useMemo(() => {
-    if (basis === "rp") {
-      let previousPoints = null;
-      let previousRank = 0;
-      return [...leaderboard].sort(sortRankPointEntries).map((entry, index) => {
-        const rankPoints = getEntryRankPoints(entry);
-        const displayRank = previousPoints === rankPoints ? previousRank : index + 1;
-        previousPoints = rankPoints;
-        previousRank = displayRank;
-        return { ...entry, displayRank };
-      });
-    }
-
-    return leaderboard.map((entry, index) => ({ ...entry, displayRank: entry.rank || index + 1 }));
-  }, [basis, leaderboard]);
 
   const currentUserEntry = summary.currentUserEntry || null;
   const currentRankInfo = getRankInfo(currentUserEntry?.rankInfo);
   const currentRankTone = getRankTone(currentRankInfo);
   const currentUserId = getStudentId(currentUserEntry);
-  const topEntry = displayedLeaderboard[0] || null;
+  const topEntry = leaderboard[0] || null;
 
   return (
     <MathPageShell>
@@ -379,7 +344,7 @@ function LeaderboardView({ payload, basis, setBasis }) {
         icon={Trophy}
       >
         <div className="grid gap-3 sm:grid-cols-3">
-          <HeroMetric label="Ranked Students" value={displayedLeaderboard.length} />
+          <HeroMetric label="Ranked Students" value={leaderboard.length} />
           <HeroMetric label="Top Score" value={topEntry ? formatNumber(topEntry.totalScore) : "0.00"} />
           <HeroMetric label="Your Rank" value={currentUserEntry?.rank || "Pending"} />
         </div>
@@ -387,29 +352,9 @@ function LeaderboardView({ payload, basis, setBasis }) {
 
       <MathPanel
         eyebrow="Your Standing"
-        title={currentUserEntry ? `${basis === "rp" ? "RP" : "Score"} Rank ${currentUserEntry.rank || "Pending"}` : "No Rank Yet"}
+        title={currentUserEntry ? `Score Rank ${currentUserEntry.rank || "Pending"}` : "No Rank Yet"}
         description={currentUserEntry ? "Your math rank updates after finalized math exam results." : "Submit a released math exam to enter the leaderboard."}
         icon={Medal}
-        action={
-          <div className="inline-flex w-fit rounded-full border border-white/8 bg-white/5 p-1">
-            {BASIS_OPTIONS.map((option) => {
-              const Icon = option.icon;
-              const isActive = basis === option.value;
-              return (
-                <button
-                  key={option.value}
-                  type="button"
-                  aria-pressed={isActive}
-                  onClick={() => setBasis(option.value)}
-                  className={`inline-flex h-9 items-center gap-1.5 rounded-full px-3 text-[10px] font-bold uppercase tracking-wider transition ${isActive ? "bg-emerald-300 text-black" : "text-[#9D96B3] hover:bg-white/7 hover:text-white"}`}
-                >
-                  <Icon className="h-3.5 w-3.5" />
-                  {option.label}
-                </button>
-              );
-            })}
-          </div>
-        }
       >
         <div className="grid gap-3 sm:grid-cols-3">
           <MathStatCard label="Total Score" value={formatNumber(currentUserEntry?.totalScore)} icon={Zap} />
@@ -426,10 +371,10 @@ function LeaderboardView({ payload, basis, setBasis }) {
       <MathPanel
         eyebrow="Ranked Students"
         title="Math students"
-        description={`Showing all ${displayedLeaderboard.length} ranked student${displayedLeaderboard.length === 1 ? "" : "s"} by ${basis === "rp" ? "rank points" : "score"}.`}
+        description={`Showing all ${leaderboard.length} ranked student${leaderboard.length === 1 ? "" : "s"} by score.`}
         icon={Users}
       >
-        {!displayedLeaderboard.length ? (
+        {!leaderboard.length ? (
           <MathEmptyState
             icon={Trophy}
             title="Leaderboard opens soon"
@@ -437,21 +382,21 @@ function LeaderboardView({ payload, basis, setBasis }) {
           />
         ) : (
           <div className="flex flex-col gap-2">
-            {displayedLeaderboard.map((entry, index) => {
+            {leaderboard.map((entry, index) => {
               const rankInfo = getRankInfo(entry.rankInfo);
               const rankTone = getRankTone(rankInfo);
               const isCurrentUser = currentUserId && getStudentId(entry) === currentUserId;
-              const primaryValue = basis === "rp" ? formatRankPoints(rankInfo.rankPoints) : formatNumber(entry.totalScore);
+              const rank = entry.rank || index + 1;
 
               return (
                 <motion.div
-                  key={entry.studentId || `${entry.name}-${entry.displayRank}`}
+                  key={entry.studentId || `${entry.name}-${rank}`}
                   initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.35, delay: Math.min(index * 0.025, 0.35) }}
                   className={`grid grid-cols-[auto_1fr] gap-3 rounded-2xl border px-4 py-3 sm:grid-cols-[auto_1fr_auto] sm:items-center ${isCurrentUser ? "border-emerald-300/30 bg-emerald-300/10 shadow-[0_0_32px_rgba(52,211,153,0.09)]" : "border-white/5 bg-[#0F0D15]"}`}
                 >
-                  <RankBadge rank={entry.displayRank || index + 1} />
+                  <RankBadge rank={rank} />
                   <div className="min-w-0">
                     <div className="flex min-w-0 flex-wrap items-center gap-2">
                       <span className={`truncate text-sm font-semibold ${rankTone.name}`}>{entry.name || "Student"}</span>
@@ -469,8 +414,8 @@ function LeaderboardView({ payload, basis, setBasis }) {
                     </p>
                   </div>
                   <div className="col-span-2 flex items-center justify-between rounded-xl border border-white/5 bg-[#121017]/70 px-3 py-2 sm:col-span-1 sm:block sm:border-0 sm:bg-transparent sm:p-0 sm:text-right">
-                    <span className="text-[10px] font-bold uppercase tracking-wide text-[#6B667B] sm:block">{basis === "rp" ? "RP" : "score"}</span>
-                    <span className="text-sm font-bold text-emerald-200 sm:block">{primaryValue}</span>
+                    <span className="text-[10px] font-bold uppercase tracking-wide text-[#6B667B] sm:block">score</span>
+                    <span className="text-sm font-bold text-emerald-200 sm:block">{formatNumber(entry.totalScore)}</span>
                   </div>
                 </motion.div>
               );
