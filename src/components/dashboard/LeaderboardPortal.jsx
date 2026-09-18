@@ -104,7 +104,7 @@ export default function LeaderboardPortal() {
                         </div>
                         <p className="mt-3 max-w-xl text-sm font-medium leading-6 text-[#9D96B3]">
                             {currentUserEntry
-                                ? "Your exact position is based on rank points from finalized rank-eligible work. House standings and champions remain score-based."
+                                ? "Your exact position and competition champions are based on rank points. House standings remain score-based."
                                 : "Submit a live exam to enter the competition leaderboard."}
                         </p>
                     </div>
@@ -279,7 +279,9 @@ function ChampionRow({ title, item, highlight = false }) {
                     />
                     <div className="min-w-0">
                         <p className={`truncate text-sm font-bold ${rankTone.name}`}>{item.name || "Student"}</p>
-                        <p className={`mt-0.5 text-xs font-semibold ${rankTone.name}`}>{item.house} - {formatNumber(item.totalScore)} score</p>
+                        <p className={`mt-0.5 text-xs font-semibold ${rankTone.name}`}>
+                            {item.house} - {formatRankPoints(getRankInfo(item.rankInfo).rankPoints)} RP - {formatNumber(item.totalScore)} score
+                        </p>
                     </div>
                 </div>
             ) : (
