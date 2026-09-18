@@ -302,6 +302,14 @@ export async function submitBookedCheckout(payload) {
   });
 }
 
+export async function submitRemainingCheckout() {
+  return request("/api/payments/remaining-checkout", {
+    method: "POST",
+    body: {},
+    timeoutMs: 20000,
+  });
+}
+
 export async function getAdminEnrollmentReviews(status = "") {
   const suffix = status ? `?status=${encodeURIComponent(status)}` : "";
   return request(`/api/payments/admin/enrollments${suffix}`);

@@ -23,10 +23,11 @@ function PaymentReviewSubmitted() {
   const status = searchParams.get("status") || "";
   const isBooking = searchParams.get("booking") === "1";
   const paymentChoice = searchParams.get("paymentChoice") || "full";
+  const isFinalInstallment = searchParams.get("paymentStage") === "final";
   const remainingAmount = Number(searchParams.get("remainingAmount") || 0);
   const isPartial = paymentChoice === "partial" && remainingAmount > 0;
   const isPaid = status === "paid";
-  const StatusIcon = isBooking ? BookmarkCheck : Clock3;
+  const StatusIcon = isBooking || isFinalInstallment ? BookmarkCheck : Clock3;
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-[#0A090F] px-4 text-white">
@@ -35,10 +36,12 @@ function PaymentReviewSubmitted() {
           <StatusIcon className="h-5 w-5" />
         </div>
         <p className="mt-6 text-xs font-bold uppercase tracking-[0.3em] text-[#DFB15B]">{isBooking ? "Seat Booked" : isPaid ? "Payment Confirmed" : "Payment Submitted"}</p>
-        <h1 className="mt-3 font-sans text-3xl font-medium">{isBooking ? "Your seat is reserved" : isPaid ? "Access is unlocked" : "Enrollment submitted"}</h1>
+        <h1 className="mt-3 font-sans text-3xl font-medium">{isBooking ? "Your seat is reserved" : isFinalInstallment && isPaid ? "You are fully paid" : isPaid ? "Access is unlocked" : "Enrollment submitted"}</h1>
         <p className="mt-3 text-sm leading-6 text-[#8E8A9F]">
           {isBooking
             ? "Your student information has been saved. Class access is still locked until you proceed to checkout and complete payment."
+            : isFinalInstallment && isPaid
+              ? "Your final installment was verified successfully. Your enrollment is now fully paid."
             : isPartial
               ? `Your BDT 10,000 partial payment was verified. Class access is unlocked, with BDT ${remainingAmount.toLocaleString("en-US")} due later.`
               : "Your PayStation payment was verified successfully. You can now access your classes."}
@@ -49,10 +52,10 @@ function PaymentReviewSubmitted() {
           </div>
         ) : null}
         <Link
-          href={isMathPurchase ? "/dashboard/math" : isBooking ? "/dashboard" : "/dashboard/classes"}
+          href={isMathPurchase ? "/dashboard/math" : isBooking || isFinalInstallment ? "/dashboard" : "/dashboard/classes"}
           className="mt-6 inline-flex rounded-2xl bg-[#DFB15B] px-5 py-3 text-sm font-bold uppercase tracking-wider text-black transition hover:brightness-110"
         >
-          {isMathPurchase ? "Open Math Course" : isBooking ? "Go to Dashboard" : "Go to Classes"}
+          {isMathPurchase ? "Open Math Course" : isBooking || isFinalInstallment ? "Go to Dashboard" : "Go to Classes"}
         </Link>
       </div>
     </div>

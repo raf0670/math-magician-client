@@ -1,10 +1,10 @@
 "use client";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { CheckCircle2, Clock3, CreditCard, Crown, Shield, Sparkles, Trophy } from "lucide-react";
+import { AlertCircle, Banknote, CheckCircle2, Clock3, CreditCard, Crown, Shield, Sparkles, Trophy } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { getCompetitionSummary, getProfile, getStoredUser, saveAuthSession } from "@/lib/api";
+import { getCompetitionSummary, getPaymentAccess, getProfile, getStoredUser, saveAuthSession, submitRemainingCheckout } from "@/lib/api";
 
 const houses = [
     {
@@ -52,12 +52,20 @@ function formatPoints(value) {
 export default function HouseStatusPanel() {
     const [currentUser, setCurrentUser] = useState(null);
     const [standings, setStandings] = useState([]);
+    const [remainingPayment, setRemainingPayment] = useState(null);
+    const [paymentAccessLoaded, setPaymentAccessLoaded] = useState(false);
+    const [openingCheckout, setOpeningCheckout] = useState(false);
+    const [checkoutError, setCheckoutError] = useState("");
 
     useEffect(() => {
         const syncUser = () => setCurrentUser(getStoredUser());
         const refreshProfile = async () => {
             const token = window.localStorage.getItem("exam_archive_token");
             if (!token) return;
+
+            const accessPayload = await getPaymentAccess().catch(() => null);
+            setRemainingPayment(accessPayload?.data?.remainingPayment || null);
+            setPaymentAccessLoaded(true);
 
             const payload = await getProfile().catch(() => null);
             if (payload?.data) {
@@ -94,6 +102,22 @@ export default function HouseStatusPanel() {
             : "Your academy access will unlock after admin approval. The available houses are shown below without assigning you to one.";
     const StatusIcon = hasClassAccess ? CheckCircle2 : Clock3;
     const standingByHouse = new Map(standings.map((item) => [item.name, item]));
+    const showRemainingPayment = hasClassAccess && isPartiallyPaid && Boolean(remainingPayment);
+    const showPaymentSupport = hasClassAccess && isPartiallyPaid && paymentAccessLoaded && !remainingPayment;
+
+    const handleRemainingCheckout = async () => {
+        setCheckoutError("");
+        setOpeningCheckout(true);
+        try {
+            const payload = await submitRemainingCheckout();
+            const paymentUrl = payload?.data?.paymentUrl;
+            if (!paymentUrl) throw new Error("Unable to open the remaining-payment checkout.");
+            window.location.assign(paymentUrl);
+        } catch (error) {
+            setCheckoutError(error.message || "Unable to open the remaining-payment checkout.");
+            setOpeningCheckout(false);
+        }
+    };
 
     return (
         <motion.section
@@ -140,6 +164,42 @@ export default function HouseStatusPanel() {
                         <CreditCard className="h-4 w-4 shrink-0" />
                         <span className="min-w-0 truncate">Proceed to Checkout</span>
                     </Link>
+                ) : null}
+
+                {showRemainingPayment ? (
+                    <div className="relative z-10 mt-5 rounded-2xl border border-sky-300/20 bg-sky-400/8 p-4">
+                        <div className="flex items-start gap-3">
+                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-sky-300/20 bg-sky-300/10 text-sky-200">
+                                <Banknote className="h-5 w-5" />
+                            </div>
+                            <div className="min-w-0 flex-1">
+                                <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-sky-200">Final Installment</p>
+                                <p className="mt-1 text-sm font-semibold text-white">{remainingPayment.planTitle}</p>
+                                <div className="mt-3 grid grid-cols-3 gap-2 text-center">
+                                    <PaymentAmount label="Total" amount={remainingPayment.totalAmount} />
+                                    <PaymentAmount label="Paid" amount={remainingPayment.paidAmount} />
+                                    <PaymentAmount label="Due" amount={remainingPayment.remainingAmount} highlight />
+                                </div>
+                            </div>
+                        </div>
+                        <button
+                            type="button"
+                            disabled={openingCheckout}
+                            onClick={handleRemainingCheckout}
+                            className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-sky-300 px-4 py-3 text-sm font-black uppercase tracking-wide text-[#071018] transition hover:brightness-110 disabled:cursor-wait disabled:opacity-70"
+                        >
+                            <CreditCard className="h-4 w-4" />
+                            {openingCheckout ? "Opening PayStation..." : `Pay remaining BDT ${Number(remainingPayment.remainingAmount).toLocaleString("en-US")}`}
+                        </button>
+                        {checkoutError ? <p className="mt-3 text-sm font-semibold text-red-200">{checkoutError}</p> : null}
+                    </div>
+                ) : null}
+
+                {showPaymentSupport ? (
+                    <div className="relative z-10 mt-5 flex items-start gap-3 rounded-2xl border border-amber-300/20 bg-amber-300/8 p-4 text-sm leading-6 text-amber-100">
+                        <AlertCircle className="mt-0.5 h-5 w-5 shrink-0" />
+                        <span>Your balance needs a quick account review. Please contact support before sending the final installment.</span>
+                    </div>
                 ) : null}
             </div>
 
@@ -196,5 +256,16 @@ export default function HouseStatusPanel() {
                 })}
             </div>
         </motion.section>
+    );
+}
+
+function PaymentAmount({ label, amount, highlight = false }) {
+    return (
+        <div className={`min-w-0 rounded-xl border px-2 py-2 ${highlight ? "border-sky-300/20 bg-sky-300/10" : "border-white/6 bg-black/15"}`}>
+            <span className="block text-[9px] font-bold uppercase tracking-wide text-[#8E8A9F]">{label}</span>
+            <span className={`mt-1 block truncate text-xs font-black ${highlight ? "text-sky-100" : "text-white"}`}>
+                BDT {Number(amount || 0).toLocaleString("en-US")}
+            </span>
+        </div>
     );
 }

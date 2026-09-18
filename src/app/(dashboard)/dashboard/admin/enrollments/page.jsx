@@ -434,7 +434,11 @@ export default function AdminEnrollmentReviewsPage() {
             const isPending = item.status === "pending";
             const isPartial = item.paymentChoice === "partial";
             const hasRemainingDue = Number(item.remainingAmount || 0) > 0;
-            const canMarkFullyPaid = !isPreBooking && item.status === "approved" && isPartial && hasRemainingDue && !item.finalTrxID;
+            const canMarkFullyPaid = !isPreBooking
+              && ["approved", "paid"].includes(item.status)
+              && isPartial
+              && hasRemainingDue
+              && (!item.finalTrxID || item.finalPaystationStatus === "refund");
             const finalTrxID = finalTrxIDs[paymentId] || "";
 
             return (
