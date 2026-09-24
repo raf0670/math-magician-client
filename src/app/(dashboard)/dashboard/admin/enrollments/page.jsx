@@ -502,6 +502,44 @@ export default function AdminEnrollmentReviewsPage() {
                   {isPreBooking ? <Info label="Last Updated" value={formatDate(item.updatedAt)} /> : null}
                 </div>
 
+                {!isPreBooking && item.checkoutAttempts?.length ? (
+                  <div className="mt-5 rounded-2xl border border-white/8 bg-[#0F0D15]/80 p-4">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#DFB15B]">PayStation checkout attempts</p>
+                      {item.checkoutAttempts.some((attempt) => attempt.duplicateSuccess) ? (
+                        <span className="rounded-full border border-red-400/30 bg-red-500/10 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-red-200">
+                          Duplicate success — review required
+                        </span>
+                      ) : null}
+                    </div>
+                    <div className="mt-3 grid gap-2">
+                      {item.checkoutAttempts.map((attempt) => (
+                        <div key={attempt.id || attempt.invoiceNumber} className="grid gap-2 rounded-xl border border-white/6 bg-white/3 p-3 text-xs text-[#B8B2C8] md:grid-cols-[1.2fr_0.7fr_0.8fr_1fr]">
+                          <div className="min-w-0">
+                            <p className="font-mono text-white break-all">{attempt.invoiceNumber}</p>
+                            <p className="mt-1 uppercase tracking-wider text-[#8E8A9F]">{attempt.stage} installment</p>
+                          </div>
+                          <div>
+                            <p className="font-semibold text-white">{formatBDT(attempt.amount)}</p>
+                            <p className="mt-1 capitalize text-[#8E8A9F]">{attempt.status}</p>
+                          </div>
+                          <div>
+                            <p className="text-[#8E8A9F]">Expires</p>
+                            <p className="mt-1 text-white">{formatDate(attempt.expiresAt)}</p>
+                          </div>
+                          <div>
+                            <p className="text-[#8E8A9F]">Lifecycle</p>
+                            <p className="mt-1 text-white">
+                              {attempt.duplicateSuccess ? "Duplicate success" : attempt.settledAt ? "Settled" : attempt.supersededAt ? "Superseded" : "Current"}
+                            </p>
+                            {attempt.reviewReason ? <p className="mt-1 text-red-200">{attempt.reviewReason}</p> : null}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : null}
+
                 {isPreBooking ? (
                   <div className="mt-5 rounded-2xl border border-cyan-400/20 bg-cyan-400/8 px-4 py-3 text-sm font-semibold text-cyan-100">
                     This student has booked a seat but has not submitted a payment reference yet.

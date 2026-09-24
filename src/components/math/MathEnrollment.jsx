@@ -161,6 +161,10 @@ export default function MathEnrollment({ initialPlan }) {
 
     try {
       const payload = await submitManualEnrollment(selectedPlan, { ...form, email: form.emailAddress }, "full", couponCode, readyQuote.amount);
+      if (payload.data?.alreadyPaid) {
+        window.location.assign("/dashboard");
+        return;
+      }
       if (!payload.data?.paymentUrl) throw new Error("Checkout could not be opened. Please try again.");
       window.location.assign(payload.data.paymentUrl);
     } catch (err) {

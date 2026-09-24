@@ -104,12 +104,25 @@ export default function HouseStatusPanel() {
     const standingByHouse = new Map(standings.map((item) => [item.name, item]));
     const showRemainingPayment = hasClassAccess && isPartiallyPaid && Boolean(remainingPayment);
     const showPaymentSupport = hasClassAccess && isPartiallyPaid && paymentAccessLoaded && !remainingPayment;
+    const showFullyPaidConfirmation = hasClassAccess && currentUser?.paymentStatus === "fullyPaid";
 
     const handleRemainingCheckout = async () => {
         setCheckoutError("");
         setOpeningCheckout(true);
         try {
             const payload = await submitRemainingCheckout();
+            if (payload?.data?.alreadyPaid) {
+                const token = window.localStorage.getItem("exam_archive_token");
+                const [accessPayload, profilePayload] = await Promise.all([
+                    getPaymentAccess(),
+                    getProfile(),
+                ]);
+                setRemainingPayment(accessPayload?.data?.remainingPayment || null);
+                if (token && profilePayload?.data) saveAuthSession(token, profilePayload.data);
+                setCurrentUser(profilePayload?.data || getStoredUser());
+                setOpeningCheckout(false);
+                return;
+            }
             const paymentUrl = payload?.data?.paymentUrl;
             if (!paymentUrl) throw new Error("Unable to open the remaining-payment checkout.");
             window.location.assign(paymentUrl);
@@ -199,6 +212,13 @@ export default function HouseStatusPanel() {
                     <div className="relative z-10 mt-5 flex items-start gap-3 rounded-2xl border border-amber-300/20 bg-amber-300/8 p-4 text-sm leading-6 text-amber-100">
                         <AlertCircle className="mt-0.5 h-5 w-5 shrink-0" />
                         <span>Your balance needs a quick account review. Please contact support before sending the final installment.</span>
+                    </div>
+                ) : null}
+
+                {showFullyPaidConfirmation ? (
+                    <div className="relative z-10 mt-5 flex items-start gap-3 rounded-2xl border border-emerald-300/20 bg-emerald-400/8 p-4 text-sm leading-6 text-emerald-100">
+                        <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0" />
+                        <span>Your program fee is fully paid. No remaining installment is due.</span>
                     </div>
                 ) : null}
             </div>

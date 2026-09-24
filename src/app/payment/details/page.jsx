@@ -279,6 +279,10 @@ function PaymentDetailsContent() {
       }
 
       const payload = await submitManualEnrollment(selectedPlanId, form, paymentChoice);
+      if (payload?.data?.alreadyPaid) {
+        window.location.assign("/dashboard");
+        return;
+      }
       const paymentUrl = payload?.data?.paymentUrl;
 
       if (!paymentUrl) {

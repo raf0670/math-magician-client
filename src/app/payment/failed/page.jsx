@@ -28,6 +28,13 @@ function PaymentFailedContent() {
   const invoice = searchParams.get("invoice") || "";
   const reason = searchParams.get("reason") || searchParams.get("status") || "";
   const isFinalInstallment = searchParams.get("paymentStage") === "final";
+  const planId = searchParams.get("plan") || "";
+  const isMathCheckout = ["math", "mathSlytherin", "slytherinUpgrade"].includes(planId);
+  const retryHref = isFinalInstallment
+    ? "/dashboard"
+    : isMathCheckout
+      ? `/payment/details?plan=${encodeURIComponent(planId)}`
+      : "/#programs-section";
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-[#0A090F] px-4 text-white">
@@ -47,10 +54,10 @@ function PaymentFailedContent() {
           </div>
         ) : null}
         <Link
-          href={isFinalInstallment ? "/dashboard" : "/#programs-section"}
+          href={retryHref}
           className="mt-6 inline-flex rounded-2xl border border-[#DFB15B]/30 bg-[#DFB15B]/10 px-5 py-3 text-sm font-bold uppercase tracking-wider text-[#DFB15B] transition hover:bg-[#DFB15B] hover:text-black"
         >
-          {isFinalInstallment ? "Return to Dashboard" : "Return to Pricing"}
+          {isFinalInstallment ? "Return to Dashboard" : isMathCheckout ? "Retry Math Checkout" : "Return to Pricing"}
         </Link>
       </div>
     </div>
