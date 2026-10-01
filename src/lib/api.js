@@ -441,6 +441,47 @@ export async function getCompetitionSummary(program = 'general') {
   return request(buildQueryPath("/api/analytics/competition", { program }));
 }
 
+function buildRankPointAdjustmentForm(file, metadata = {}) {
+  const body = new FormData();
+  body.append("file", file);
+  body.append("label", metadata.label || "");
+  body.append("reason", metadata.reason || "");
+  body.append("program", metadata.program || "general");
+  body.append("expectedHouse", metadata.expectedHouse || "");
+  body.append("effectiveDate", metadata.effectiveDate || "");
+  return body;
+}
+
+export async function previewRankPointAdjustmentBatch(file, metadata) {
+  return request("/api/analytics/admin/rp-adjustment-batches/preview", {
+    method: "POST",
+    body: buildRankPointAdjustmentForm(file, metadata),
+    timeoutMs: 30000,
+  });
+}
+
+export async function applyRankPointAdjustmentBatch(file, metadata) {
+  return request("/api/analytics/admin/rp-adjustment-batches", {
+    method: "POST",
+    body: buildRankPointAdjustmentForm(file, metadata),
+    timeoutMs: 30000,
+  });
+}
+
+export async function getAdminRankPointAdjustmentBatches(page = 1) {
+  return request(buildQueryPath("/api/analytics/admin/rp-adjustment-batches", { page, limit: 20 }));
+}
+
+export async function reverseRankPointAdjustmentBatch(batchId) {
+  return request(`/api/analytics/admin/rp-adjustment-batches/${batchId}/reverse`, {
+    method: "POST",
+  });
+}
+
+export async function getMyRankPointAdjustments(program = "general", page = 1) {
+  return request(buildQueryPath("/api/analytics/rp-adjustments/me", { program, page, limit: 20 }));
+}
+
 export async function getAdminLiveExamSubmissions(examId) {
   return request(`/api/analytics/admin/live-exams/${examId}/submissions`);
 }

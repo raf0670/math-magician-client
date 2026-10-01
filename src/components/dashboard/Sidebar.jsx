@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { LayoutDashboard, Video, ClipboardCheck, BarChart3, User, LogOut, ShieldCheck, Brain, Archive, Radio, FileQuestion, Trophy, Sparkles, ClipboardList, FolderOpen } from "lucide-react";
+import { LayoutDashboard, Video, ClipboardCheck, BarChart3, User, LogOut, ShieldCheck, Brain, Archive, Radio, FileQuestion, Trophy, Sparkles, ClipboardList, FolderOpen, Gift } from "lucide-react";
 import { clearAuthSession, getProfile, getStoredUser, saveAuthSession } from "@/lib/api";
 import BrandMark from "@/components/shared/BrandMark";
 import StudentAvatar from "@/components/shared/StudentAvatar";
@@ -32,6 +32,7 @@ const NAV_ACCENTS = {
     "/dashboard/admin/classes": "from-cyan-300/18 via-[#7C3AED]/8 to-transparent",
     "/dashboard/admin/live-exams": "from-red-400/20 via-[#DFB15B]/8 to-transparent",
     "/dashboard/admin/assignments": "from-amber-300/20 via-[#DFB15B]/8 to-transparent",
+    "/dashboard/admin/rp-adjustments": "from-fuchsia-400/20 via-[#DFB15B]/8 to-transparent",
     "/dashboard/profile": "from-[#DFB15B]/22 via-[#7C3AED]/10 to-transparent",
 };
 
@@ -93,6 +94,7 @@ export default function DashboardSidebar() {
         currentUser?.role === "admin" ? { href: "/dashboard/admin/classes", label: "Class Admin", icon: Video } : null,
         currentUser?.role === "admin" ? { href: "/dashboard/admin/live-exams", label: "Live Exam Admin", icon: FileQuestion } : null,
         currentUser?.role === "admin" ? { href: "/dashboard/admin/assignments", label: "Assignment Admin", icon: ClipboardList } : null,
+        currentUser?.role === "admin" ? { href: "/dashboard/admin/rp-adjustments", label: "RP Adjustments", icon: Gift } : null,
         showMath ? { href: "/dashboard/math", label: "Math Overview", icon: Brain } : null,
         showMath ? { href: "/dashboard/math/classes", label: "Math Live Classes", icon: Video } : null,
         showMath ? { href: "/dashboard/math/archived-classes", label: "Math Recordings", icon: Archive } : null,

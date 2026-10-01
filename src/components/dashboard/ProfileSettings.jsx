@@ -2,8 +2,8 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { User, BookOpen, Camera, GraduationCap, ShieldCheck, Mail, Lock, LoaderCircle, Save, Sparkles, Trophy, Target } from "lucide-react";
-import { changePassword, getMyStats, getStoredUser, saveAuthSession, updateProfile, uploadProfilePicture } from "@/lib/api";
+import { User, BookOpen, Camera, GraduationCap, ShieldCheck, Mail, Lock, LoaderCircle, Save, Sparkles, Trophy, Target, Gift, History } from "lucide-react";
+import { changePassword, getMyRankPointAdjustments, getMyStats, getStoredUser, saveAuthSession, updateProfile, uploadProfilePicture } from "@/lib/api";
 import { POINTS_PER_LEVEL, formatRankPoints, getDefaultRankInfo, getRankInfo, getRankProgressPercent, getRankTone } from "@/lib/rank";
 
 const PROFILE_IMAGE_MAX_MB = Number(process.env.NEXT_PUBLIC_PROFILE_IMAGE_MAX_MB) || 5;
@@ -64,6 +64,9 @@ export default function ProfileSettings() {
     const [imagePreviewUrl, setImagePreviewUrl] = useState("");
     const [message, setMessage] = useState("");
     const [error, setError] = useState("");
+    const [rpAdjustments, setRpAdjustments] = useState([]);
+    const [rpAdjustmentSummary, setRpAdjustmentSummary] = useState({ totalPoints: 0, entryCount: 0 });
+    const [rpAdjustmentsLoading, setRpAdjustmentsLoading] = useState(true);
 
     useEffect(() => {
         const syncProfile = () => {
@@ -90,7 +93,8 @@ export default function ProfileSettings() {
         window.addEventListener("storage", syncProfile);
 
         const storedUser = getStoredUser();
-        getMyStats(storedUser?.hasMathAccess && !storedUser?.hasClassAccess ? 'math' : 'general')
+        const selectedProgram = storedUser?.hasMathAccess && !storedUser?.hasClassAccess ? 'math' : 'general';
+        getMyStats(selectedProgram)
             .then((payload) => {
                 const stats = payload?.stats || {};
                 const history = Array.isArray(payload?.history) ? payload.history : [];
@@ -109,6 +113,18 @@ export default function ProfileSettings() {
                 }));
             })
             .catch(() => {});
+
+        if (selectedProgram === 'general') {
+            getMyRankPointAdjustments('general')
+                .then((payload) => {
+                    setRpAdjustments(Array.isArray(payload?.data) ? payload.data : []);
+                    setRpAdjustmentSummary(payload?.summary || { totalPoints: 0, entryCount: 0 });
+                })
+                .catch(() => {})
+                .finally(() => setRpAdjustmentsLoading(false));
+        } else {
+            queueMicrotask(() => setRpAdjustmentsLoading(false));
+        }
 
         return () => {
             window.removeEventListener("auth-state-changed", syncProfile);
@@ -343,6 +359,61 @@ export default function ProfileSettings() {
                         </div>
                     </motion.div>
                 </div>
+            </motion.div>
+
+            <motion.div
+                variants={panelVariants}
+                whileHover={{ y: -4, boxShadow: "0 22px 64px rgba(124,58,237,0.13), 0 18px 55px rgba(0,0,0,0.34)" }}
+                className="relative overflow-hidden rounded-3xl border border-fuchsia-400/14 bg-[#121017]/92 p-6 shadow-[0_18px_55px_rgba(0,0,0,0.30)]"
+            >
+                <div className="pointer-events-none absolute -right-20 -top-20 h-56 w-56 rounded-full bg-fuchsia-500/10 blur-3xl" />
+                <div className="relative z-10 flex flex-wrap items-center justify-between gap-3 border-b border-white/5 pb-4">
+                    <div className="flex items-center gap-3">
+                        <span className="flex h-10 w-10 items-center justify-center rounded-2xl border border-fuchsia-400/20 bg-fuchsia-400/10 text-fuchsia-200">
+                            <Gift className="h-4 w-4" />
+                        </span>
+                        <div>
+                            <h3 className="text-sm font-semibold text-white">Offline class RP history</h3>
+                            <p className="text-[11px] text-[#8E8A9F]">Audited bonuses and deductions applied by an administrator.</p>
+                        </div>
+                    </div>
+                    <div className="rounded-2xl border border-white/8 bg-white/5 px-3 py-2 text-right">
+                        <p className="text-[9px] font-bold uppercase tracking-wider text-[#6B667B]">Net adjustment</p>
+                        <p className={`mt-0.5 font-mono text-sm font-black ${Number(rpAdjustmentSummary.totalPoints) > 0 ? "text-emerald-300" : Number(rpAdjustmentSummary.totalPoints) < 0 ? "text-rose-300" : "text-white"}`}>
+                            {Number(rpAdjustmentSummary.totalPoints) > 0 ? "+" : ""}{formatRankPoints(rpAdjustmentSummary.totalPoints)} RP
+                        </p>
+                    </div>
+                </div>
+
+                {rpAdjustmentsLoading ? (
+                    <div className="relative z-10 flex justify-center py-8"><LoaderCircle className="h-6 w-6 animate-spin text-fuchsia-200" /></div>
+                ) : rpAdjustments.length === 0 ? (
+                    <div className="relative z-10 flex items-center justify-center gap-2 py-8 text-xs text-[#6B667B]">
+                        <History className="h-4 w-4" /> No offline class RP adjustments yet.
+                    </div>
+                ) : (
+                    <div className="relative z-10 mt-4 grid gap-2">
+                        {rpAdjustments.map((adjustment) => {
+                            const points = Number(adjustment.points || 0);
+                            return (
+                                <div key={adjustment._id} className="flex flex-col gap-2 rounded-2xl border border-white/7 bg-white/4 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+                                    <div className="min-w-0">
+                                        <div className="flex flex-wrap items-center gap-2">
+                                            <p className="truncate text-xs font-semibold text-white">{adjustment.batch?.label || "RP adjustment"}</p>
+                                            {adjustment.kind === "reversal" ? (
+                                                <span className="rounded-full border border-amber-400/20 bg-amber-400/10 px-2 py-0.5 text-[8px] font-black uppercase tracking-wider text-amber-200">Reversal</span>
+                                            ) : null}
+                                        </div>
+                                        <p className="mt-1 text-[11px] text-[#8E8A9F]">{adjustment.reason} / {new Intl.DateTimeFormat("en-US", { dateStyle: "medium" }).format(new Date(adjustment.effectiveDate))}</p>
+                                    </div>
+                                    <span className={`font-mono text-sm font-black ${points > 0 ? "text-emerald-300" : points < 0 ? "text-rose-300" : "text-[#8E8A9F]"}`}>
+                                        {points > 0 ? "+" : ""}{formatRankPoints(points)} RP
+                                    </span>
+                                </div>
+                            );
+                        })}
+                    </div>
+                )}
             </motion.div>
 
             <motion.div
