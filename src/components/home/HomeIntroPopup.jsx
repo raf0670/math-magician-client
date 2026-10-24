@@ -14,50 +14,10 @@ const programs = [
     title: "Math Course",
     detail: "Dedicated online math preparation",
     schedule: "Recorded + Live Classes",
-    price: "BDT 5,999",
+    price: "BDT 4,500",
     imageSrc: "/slytherin.jpg",
     imageAlt: "Slytherin house crest",
     featured: true,
-  },
-  {
-    id: "farmgate",
-    badge: "Offline - Farmgate",
-    title: "Gryffindor",
-    detail: "Offline at RH Home Center, Farmgate",
-    schedule: "Sunday, Tuesday, Thursday - 1:30 - 3:30 pm",
-    price: "BDT 18,000",
-    imageSrc: "/gryffindor.jpeg",
-    imageAlt: "Gryffindor house crest",
-  },
-  {
-    id: "gryffindor2",
-    badge: "Offline - Farmgate",
-    title: "Gryffindor 2.0",
-    detail: "Offline at RH Home Center, Farmgate",
-    schedule: "Saturday, Monday, Wednesday - 2:00 - 4:00 pm",
-    price: "BDT 18,000",
-    imageSrc: "/gryffindor.jpeg",
-    imageAlt: "Gryffindor house crest",
-  },
-  {
-    id: "online",
-    badge: "Online Batch",
-    title: "Ravenclaw",
-    detail: "Online live class from your study room",
-    schedule: "Sunday, Tuesday, Thursday - 7:30 - 9:30 pm",
-    price: "BDT 17,500",
-    imageSrc: "/ravenclaw.jpeg",
-    imageAlt: "Ravenclaw house crest",
-  },
-  {
-    id: "bailey-road",
-    badge: "Offline - Bailey Road",
-    title: "Hufflepuff",
-    detail: "Offline at Siddheswari Road, Bailey Road",
-    schedule: "Sunday, Tuesday, Thursday - 4:00 - 6:00 pm",
-    price: "BDT 18,000",
-    imageSrc: "/hufflepuff.jpeg",
-    imageAlt: "Hufflepuff house crest",
   },
 ];
 
@@ -311,7 +271,7 @@ export default function HomeIntroPopup() {
               </button>
             </div>
 
-            <div className="relative z-10 mt-8 grid grid-cols-1 gap-3 sm:mt-9 md:grid-cols-2 xl:grid-cols-4">
+            <div className="relative z-10 mx-auto mt-8 grid max-w-3xl grid-cols-1 gap-3 sm:mt-9">
               {programs.map((program, index) => (
                 <motion.button
                   type="button"
@@ -319,7 +279,7 @@ export default function HomeIntroPopup() {
                   onClick={scrollToPrograms}
                   className={`group flex min-h-40 flex-col rounded-2xl border p-5 text-left transition hover:-translate-y-1 hover:shadow-[0_16px_36px_rgba(0,0,0,0.35)] ${
                     program.featured
-                      ? "md:col-span-2 xl:col-span-4 border-emerald-300/55 bg-linear-to-br from-emerald-400/18 via-[#DFB15B]/12 to-white/5 shadow-[0_0_48px_rgba(52,211,153,0.18)]"
+                      ? "border-emerald-300/55 bg-linear-to-br from-emerald-400/18 via-[#DFB15B]/12 to-white/5 shadow-[0_0_48px_rgba(52,211,153,0.18)]"
                       : "border-white/8 bg-white/4 hover:border-[#DFB15B]/20"
                   }`}
                   initial={{ opacity: 0, y: 18 }}

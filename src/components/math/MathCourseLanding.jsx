@@ -85,7 +85,7 @@ const pathSteps = [
 const benefits = [
   { value: "39", label: "Class touchpoints", detail: "Recorded, archive, and live special classes", icon: Flame },
   { value: "15", label: "Math exams", detail: "12 daily mocks plus 3 online full-length papers", icon: LineChart },
-  { value: "25%", label: "House discount", detail: "For approved Gryffindor, Hufflepuff, and Ravenclaw students", icon: BadgeCheck },
+  { value: "4.5K", label: "Flat course fee", detail: "The same BDT 4,500 price for every Math student", icon: BadgeCheck },
 ];
 
 const slytherinPerks = [
@@ -278,7 +278,7 @@ export default function MathCourseLanding() {
                   </div>
                   <div className="rounded-2xl border border-[#DFB15B]/25 bg-[#DFB15B]/10 px-4 py-3 text-right">
                     <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#F3D89A]">Payable</p>
-                    <p className="text-xl font-black text-[#DFB15B]">BDT 5,999</p>
+                    <p className="text-xl font-black text-[#DFB15B]">BDT 4,500</p>
                   </div>
                 </div>
 
@@ -346,14 +346,14 @@ export default function MathCourseLanding() {
       <section className="relative mx-auto max-w-7xl px-5 py-12 sm:px-8 lg:px-10">
         <div className="grid gap-5 lg:grid-cols-[0.8fr_1.2fr]">
           <motion.div {...fadeUp()} className="rounded-3xl border border-[#DFB15B]/25 bg-[#DFB15B]/8 p-7 shadow-[0_24px_80px_rgba(223,177,91,0.09)] sm:p-9">
-            <p className="text-xs font-black uppercase tracking-[0.24em] text-[#F3D89A]">Existing house student</p>
-            <h2 className="mt-4 font-sans text-4xl text-white">Already in a house?</h2>
+            <p className="text-xs font-black uppercase tracking-[0.24em] text-[#F3D89A]">One clear price</p>
+            <h2 className="mt-4 font-sans text-4xl text-white">Math for BDT 4,500.</h2>
             <p className="mt-4 text-sm leading-7 text-[#BDB7CA]">
-              Approved Gryffindor, Hufflepuff, and Ravenclaw students receive 25% off Math. Keep your existing house and website access.
+              Every student pays the same flat course fee. If you already belong to a house, you keep your current house and website access.
             </p>
             <div className="mt-6 flex flex-wrap items-end gap-3">
-              <p className="font-sans text-4xl font-black text-[#DFB15B]">BDT 4,499.25</p>
-              <p className="pb-1 text-sm font-semibold text-[#9E98AA]">with eligible discount</p>
+              <p className="font-sans text-4xl font-black text-[#DFB15B]">BDT 4,500</p>
+              <p className="pb-1 text-sm font-semibold text-[#9E98AA]">full Math Course</p>
             </div>
           </motion.div>
 
@@ -429,8 +429,8 @@ export default function MathCourseLanding() {
               <div className="mt-8 flex flex-col gap-5 rounded-3xl border border-[#DFB15B]/20 bg-[#DFB15B]/8 p-5 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                   <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#F3D89A]">Bundle price</p>
-                  <p className="mt-2 font-sans text-4xl font-black text-emerald-100">BDT 11,998</p>
-                  <p className="mt-1 text-sm text-[#BBBFC0]">BDT 5,999 for Math + BDT 5,999 for Slytherin</p>
+                  <p className="mt-2 font-sans text-4xl font-black text-emerald-100">BDT 9,000</p>
+                  <p className="mt-1 text-sm text-[#BBBFC0]">BDT 4,500 for Math + BDT 4,500 for Slytherin</p>
                 </div>
                 <Link
                   href="/payment/details?plan=mathSlytherin"
@@ -439,7 +439,7 @@ export default function MathCourseLanding() {
                   Enroll in Math + Slytherin <ArrowUpRight className="h-4 w-4" />
                 </Link>
               </div>
-              <p className="mt-4 text-xs leading-6 text-[#BBBFC0]">You can also start with Math and add Slytherin later for BDT 5,999.</p>
+              <p className="mt-4 text-xs leading-6 text-[#BBBFC0]">You can also start with Math and add Slytherin later for BDT 4,500.</p>
             </div>
           </div>
         </motion.div>

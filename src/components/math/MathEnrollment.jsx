@@ -6,14 +6,11 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import {
   ArrowLeft,
-  ArrowUpRight,
   BookOpenCheck,
-  Brain,
   Check,
   CreditCard,
   LockKeyhole,
   ShieldCheck,
-  Sparkles,
   WandSparkles,
 } from "lucide-react";
 import {
@@ -28,9 +25,7 @@ import {
 import PolicyAcceptance from "@/components/shared/PolicyAcceptance";
 import FlashyLoader, { LoadingButtonLabel } from "@/components/shared/FlashyLoader";
 
-const METHODS = ["By myself", "Offline coaching ( Mentors / Blueprint )", "Online coaching ( ACS / Michil )", "Personal batch"];
-const WEAKNESSES = ["Weak mental calculation", "Lack of question understanding", "Wrong approach", "Others"];
-const BACKUPS = ["IBA JU", "BUP BBA Gen", "BUP FBS", "DU B/C unit", "Engineering", "Medical", "DU A unit", "Private Uni", "Abroad"];
+const REQUIRED_FIELDS = ["yourName", "college", "phoneNumber", "address"];
 
 const SECTION_VARIANTS = {
   hidden: { opacity: 0, y: 26 },
@@ -63,10 +58,8 @@ export default function MathEnrollment({ initialPlan }) {
   const router = useRouter();
   const upgrade = initialPlan === "slytherinUpgrade";
   const [context, setContext] = useState(null);
-  const [form, setForm] = useState({ backupChoice: [], preparationMethods: [], mathWeaknesses: [] });
+  const [form, setForm] = useState({});
   const [joinSlytherin, setJoinSlytherin] = useState(initialPlan === "mathSlytherin");
-  const [couponInput, setCouponInput] = useState("");
-  const [couponCode, setCouponCode] = useState("");
   const [quote, setQuote] = useState(null);
   const [error, setError] = useState("");
   const [quoteError, setQuoteError] = useState("");
@@ -74,16 +67,13 @@ export default function MathEnrollment({ initialPlan }) {
   const [saving, setSaving] = useState(false);
 
   const selectedPlan = upgrade ? "slytherinUpgrade" : context?.existingHouseEligible ? "math" : joinSlytherin ? "mathSlytherin" : "math";
-  const readyQuote = quote?.planId === selectedPlan && quote.requestedCoupon === couponCode ? quote : null;
+  const readyQuote = quote?.planId === selectedPlan ? quote : null;
   const planLabel = getPlanLabel(selectedPlan, upgrade);
 
   const fieldProgress = useMemo(() => {
-    const fields = upgrade
-      ? ["yourName", "emailAddress"]
-      : ["yourName", "emailAddress", "phoneNumber", "address", "facebookProfile", "college", "group", "hscBatch", "backupChoice", "admissionSystemIdea", "preparationMethods", "mathFear", "mathWeaknesses"];
-    const completed = fields.filter((field) => isComplete(form[field])).length;
-    return { completed, total: fields.length };
-  }, [form, upgrade]);
+    const completed = REQUIRED_FIELDS.filter((field) => isComplete(form[field])).length;
+    return { completed, total: REQUIRED_FIELDS.length };
+  }, [form]);
 
   useEffect(() => {
     if (!getStoredToken()) {
@@ -119,10 +109,10 @@ export default function MathEnrollment({ initialPlan }) {
     if (!context) return;
 
     let active = true;
-    getPaymentQuote(selectedPlan, couponCode)
+    getPaymentQuote(selectedPlan)
       .then((payload) => {
         if (active) {
-          setQuote({ ...payload.data, requestedCoupon: couponCode });
+          setQuote(payload.data);
           setQuoteError("");
         }
       })
@@ -136,12 +126,9 @@ export default function MathEnrollment({ initialPlan }) {
     return () => {
       active = false;
     };
-  }, [context, selectedPlan, couponCode]);
+  }, [context, selectedPlan]);
 
   const update = (field, value) => setForm((current) => ({ ...current, [field]: value }));
-  const toggle = (field, value) => {
-    update(field, (form[field] || []).includes(value) ? form[field].filter((item) => item !== value) : [...(form[field] || []), value]);
-  };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -152,15 +139,16 @@ export default function MathEnrollment({ initialPlan }) {
       return;
     }
 
-    if (!upgrade && ["backupChoice", "preparationMethods", "mathWeaknesses"].some((field) => !form[field]?.length)) {
-      setError("Select at least one answer in each multiple-choice section.");
+    if (!upgrade && REQUIRED_FIELDS.some((field) => !isComplete(form[field]))) {
+      setError("Complete your name, college, contact number, and address before continuing.");
       return;
     }
 
     setSaving(true);
 
     try {
-      const payload = await submitManualEnrollment(selectedPlan, { ...form, email: form.emailAddress }, "full", couponCode, readyQuote.amount);
+      const enrollmentForm = Object.fromEntries(REQUIRED_FIELDS.map((field) => [field, form[field]]));
+      const payload = await submitManualEnrollment(selectedPlan, enrollmentForm, "full", readyQuote.amount);
       if (payload.data?.alreadyPaid) {
         window.location.assign("/dashboard");
         return;
@@ -264,7 +252,9 @@ export default function MathEnrollment({ initialPlan }) {
               <FormSection title="Your Enrollment" description="We will reuse the details from your Math Course enrollment." index={1} icon={ShieldCheck}>
                 <div className="grid gap-3 sm:grid-cols-2">
                   <ReadOnlyInfo label="Name" value={form.yourName || "Not saved"} />
-                  <ReadOnlyInfo label="Email" value={form.emailAddress || "Not saved"} />
+                    <ReadOnlyInfo label="College" value={form.college || "Not saved"} />
+                    <ReadOnlyInfo label="Contact number" value={form.phoneNumber || "Not saved"} />
+                    <ReadOnlyInfo label="Address" value={form.address || "Not saved"} />
                 </div>
                 <div className="mt-4 rounded-2xl border border-emerald-300/16 bg-emerald-300/8 px-4 py-4 text-sm font-medium leading-6 text-emerald-100">
                   Your Math Course progress, results, and access remain active. This upgrade adds the full website and Slytherin membership.
@@ -272,49 +262,23 @@ export default function MathEnrollment({ initialPlan }) {
               </FormSection>
             ) : (
               <>
-                <FormSection title="Contact Information" description="Use the details you want attached to this enrollment." index={1} icon={BookOpenCheck}>
+                <FormSection title="Enrollment Information" description="Enter the four details needed for your Math Course enrollment." index={1} icon={BookOpenCheck}>
                   <div className="grid gap-4 sm:grid-cols-2">
                     {[
                       ["yourName", "Your name", "text"],
-                      ["emailAddress", "Email address", "email"],
-                      ["phoneNumber", "Phone number", "tel"],
-                      ["address", "Address", "text"],
-                      ["facebookProfile", "Facebook profile link", "url"],
                       ["college", "College", "text"],
+                      ["phoneNumber", "Contact number", "tel"],
+                      ["address", "Address", "text"],
                     ].map(([field, label, type]) => (
                       <Field key={field} label={label} type={type} value={form[field]} onChange={(value) => update(field, value)} />
                     ))}
                   </div>
                 </FormSection>
 
-                <FormSection title="Academic Information" description="A few details help us place you in the right learning context." index={2} icon={Brain}>
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    <Select label="Group" value={form.group} options={["Science", "Arts", "Commerce", "Others"]} onChange={(value) => update("group", value)} />
-                    <Select label="HSC batch" value={form.hscBatch} options={["2025 or equivalent", "2026 or equivalent", "2027 or equivalent", "Others"]} onChange={(value) => update("hscBatch", value)} />
-                  </div>
-                  <Choices label="What is/are your back-up(s)?" options={BACKUPS} values={form.backupChoice} onChange={(value) => toggle("backupChoice", value)} />
-                  <Select label="Do you have a clear idea about the admission system?" value={form.admissionSystemIdea} options={["Yes", "No", "Maybe"]} onChange={(value) => update("admissionSystemIdea", value)} />
-                </FormSection>
-
-                <FormSection title="Your Math Preparation" description="This helps us understand where the Math Course can help most." index={3} icon={Sparkles}>
-                  <Choices label="1. How are you taking preparation right now?" options={METHODS} values={form.preparationMethods} onChange={(value) => toggle("preparationMethods", value)} />
-                  <Field
-                    label="2. What is your biggest fear in math?"
-                    value={form.mathFear}
-                    onChange={(value) => update("mathFear", value)}
-                    textarea
-                    maxLength={5000}
-                  />
-                  <Choices label="3. What do you think is wrong with your math?" options={WEAKNESSES} values={form.mathWeaknesses} onChange={(value) => toggle("mathWeaknesses", value)} />
-                  {form.mathWeaknesses?.includes("Others") ? (
-                    <Field label="Tell us more" value={form.mathWeaknessOther} maxLength={2000} onChange={(value) => update("mathWeaknessOther", value)} />
-                  ) : null}
-                </FormSection>
-
-                <FormSection title="Want To Join Slytherin Too?" description="Choose whether this checkout should include full website access." index={4} icon={ShieldCheck}>
+                <FormSection title="Want To Join Slytherin Too?" description="Choose whether this checkout should include full website access." index={2} icon={ShieldCheck}>
                   {context.existingHouseEligible ? (
                     <div className="rounded-2xl border border-emerald-300/18 bg-emerald-300/10 px-4 py-4 text-sm font-medium leading-7 text-emerald-100">
-                      Your existing house already includes full website access. You will keep your house and receive the best available math discount.
+                      Your existing house already includes full website access. You will keep your current house while joining the Math Course at the same flat price.
                     </div>
                   ) : (
                     <SlytherinChoice checked={joinSlytherin} onChange={setJoinSlytherin} />
@@ -328,9 +292,6 @@ export default function MathEnrollment({ initialPlan }) {
             upgrade={upgrade}
             planLabel={planLabel}
             selectedPlan={selectedPlan}
-            couponInput={couponInput}
-            setCouponInput={setCouponInput}
-            applyCoupon={() => setCouponCode(couponInput.trim())}
             readyQuote={readyQuote}
             quoteError={quoteError}
             accepted={accepted}
@@ -416,79 +377,6 @@ function Field({ label, value, onChange, type = "text", maxLength = 500, textare
   );
 }
 
-function Select({ label, value, options, onChange }) {
-  const complete = isComplete(value);
-
-  return (
-    <motion.label
-      whileFocusWithin={{ y: -2 }}
-      className={`block rounded-2xl border px-4 py-4 transition ${
-        complete ? "border-emerald-300/28 bg-emerald-300/7" : "border-white/5 bg-[#0F0D15]/70 focus-within:border-[#DFB15B]/35"
-      }`}
-    >
-      <span className={`text-sm font-semibold ${complete ? "text-emerald-100" : "text-white"}`}>
-        {label} <span className="text-[#DFB15B]">*</span>
-      </span>
-      <select
-        required
-        className={`mt-3 h-12 w-full rounded-xl border bg-[#0A090F] px-3 text-sm font-semibold text-white outline-none transition ${
-          complete ? "border-emerald-300/45" : "border-white/15 focus:border-[#DFB15B]/45"
-        }`}
-        value={value || ""}
-        onChange={(event) => onChange(event.target.value)}
-      >
-        <option value="">Select an answer</option>
-        {options.map((option) => (
-          <option key={option} value={option} className="bg-[#121017] text-white">
-            {option}
-          </option>
-        ))}
-      </select>
-    </motion.label>
-  );
-}
-
-function Choices({ label, options, values = [], onChange }) {
-  const complete = values.length > 0;
-
-  return (
-    <fieldset>
-      <legend className={`text-sm font-semibold ${complete ? "text-emerald-100" : "text-white"}`}>
-        {label} <span className="text-[#DFB15B]">*</span>
-      </legend>
-      <p className="mt-1 text-xs text-[#8E8A9F]">Select all that apply.</p>
-      <div className={`mt-4 grid gap-3 rounded-2xl border p-3 sm:grid-cols-2 ${complete ? "border-emerald-300/24 bg-emerald-300/7" : "border-white/5 bg-[#0F0D15]/70"}`}>
-        {options.map((option) => {
-          const checked = values.includes(option);
-
-          return (
-            <motion.label
-              key={option}
-              whileHover={{ y: -2 }}
-              className={`flex cursor-pointer items-center gap-3 rounded-2xl border px-4 py-3 text-sm font-medium transition ${
-                checked
-                  ? "border-emerald-300/50 bg-emerald-300/14 text-white shadow-[0_0_24px_rgba(52,211,153,0.08)]"
-                  : "border-white/5 bg-[#17131F]/70 text-[#D8D4E5] hover:border-white/12 hover:bg-[#1E1928]"
-              }`}
-            >
-              <input
-                type="checkbox"
-                checked={checked}
-                onChange={() => onChange(option)}
-                className="sr-only"
-              />
-              <span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md border ${checked ? "border-emerald-300 bg-emerald-300 text-black" : "border-[#8E8A9F] text-transparent"}`}>
-                <Check className="h-3.5 w-3.5" />
-              </span>
-              <span>{option}</span>
-            </motion.label>
-          );
-        })}
-      </div>
-    </fieldset>
-  );
-}
-
 function SlytherinChoice({ checked, onChange }) {
   return (
     <button
@@ -509,7 +397,7 @@ function SlytherinChoice({ checked, onChange }) {
         <span className="min-w-0">
           <span className="block font-sans text-2xl font-medium text-white">Add Slytherin</span>
           <span className="mt-2 block text-sm font-medium leading-7 text-[#A9A3BA]">
-            Add Slytherin for BDT 5,999 and unlock the full website, regular exams, and house competition.
+            Add Slytherin for BDT 4,500 and unlock the full website, regular exams, and house competition.
           </span>
           <span className="mt-4 inline-flex rounded-full border border-[#DFB15B]/18 bg-[#DFB15B]/10 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[#DFB15B]">
             {checked ? "Included in checkout" : "Optional add-on"}
@@ -533,9 +421,6 @@ function CheckoutSummary({
   upgrade,
   planLabel,
   selectedPlan,
-  couponInput,
-  setCouponInput,
-  applyCoupon,
   readyQuote,
   quoteError,
   accepted,
@@ -559,44 +444,17 @@ function CheckoutSummary({
           <p className="mt-2 text-sm leading-6 text-[#8E8A9F]">Full payment through PayStation.</p>
         </div>
 
-        {!upgrade ? (
-          <div className="rounded-2xl border border-white/6 bg-[#0F0D15]/75 px-4 py-4">
-            <label htmlFor="math-coupon" className="text-sm font-semibold text-white">Discount code</label>
-            <div className="mt-3 flex gap-2">
-              <input
-                id="math-coupon"
-                value={couponInput}
-                onChange={(event) => setCouponInput(event.target.value)}
-                className="min-w-0 flex-1 rounded-xl border border-white/15 bg-[#0A090F] px-3 py-3 text-sm text-white outline-none transition focus:border-emerald-300/45"
-              />
-              <button
-                type="button"
-                onClick={applyCoupon}
-                className="rounded-xl border border-emerald-300/30 px-3 text-sm font-bold text-emerald-200 transition hover:bg-emerald-300 hover:text-black"
-              >
-                Apply
-              </button>
-            </div>
-          </div>
-        ) : null}
-
         {readyQuote && !quoteError ? (
           <div aria-live="polite" className="space-y-3 rounded-2xl border border-white/6 bg-[#0F0D15]/75 px-4 py-4 text-sm">
             <div className="flex justify-between gap-3 text-[#D8D4E5]">
               <span>Course price</span>
               <span className="font-semibold text-white">{amount(readyQuote.originalAmount)}</span>
             </div>
-            {readyQuote.discountAmount > 0 ? (
-              <div className="flex justify-between gap-3 text-emerald-200">
-                <span>{readyQuote.discountType === "existingHouse" ? "House student discount" : "Code discount"}</span>
-                <span className="font-semibold">-{amount(readyQuote.discountAmount)}</span>
-              </div>
-            ) : null}
             <div className="border-t border-white/10 pt-4">
               <p className="text-[#8E8A9F]">Payable now</p>
               <p className="mt-1 font-sans text-4xl font-bold text-[#DFB15B]">{amount(readyQuote.amount)}</p>
             </div>
-            <p className="text-xs leading-6 text-[#8E8A9F]">Only the best single discount applies.</p>
+            <p className="text-xs leading-6 text-[#8E8A9F]">One flat price for every student.</p>
           </div>
         ) : (
           <p role="status" className="rounded-2xl border border-white/6 bg-[#0F0D15]/75 px-4 py-4 text-sm text-[#A9A3BA]">

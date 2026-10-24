@@ -68,7 +68,7 @@ export default function ProgramsAndTestimonials() {
                 "12 Daily + 3 Full-Length Math Exams",
                 "Optional Slytherin Membership"
             ],
-            price: "BDT 5,999",
+            price: "BDT 4,500",
             period: "",
             mathCourse: true,
             featured: true,
@@ -81,137 +81,6 @@ export default function ProgramsAndTestimonials() {
             sparkleClass: "text-emerald-200/70",
             crestFrameClass: "shadow-[0_0_42px_rgba(52,211,153,0.32)]",
             buttonStyle: "bg-emerald-300 text-black border border-emerald-200/70 hover:bg-[#DFB15B]"
-        },
-        {
-            id: "offline",
-            badge: "Offline - Farmgate",
-            title: "Gryffindor",
-            desc: "An offline batch taken at our Farmgate center, built for face-to-face mentorship and real-time exam simulations.",
-            imageSrc: "/gryffindor.jpeg",
-            imageAlt: "Gryffindor house crest",
-            location: {
-                text: "RH Home Center, Farmgate",
-                href: "https://maps.app.goo.gl/G6Qhf3stvisrsjXr6?g_st=ac"
-            },
-            schedule: {
-                days: "Sunday, Tuesday, Thursday",
-                time: "1:30 - 3:30 pm"
-            },
-            features: [
-                "24+ Interactive Physical Lectures",
-                "Weekly Specialized Topic Tests",
-                "15+ Realistic Full Mock Exams",
-                "Direct 1-on-1 Doubt Solving"
-            ],
-            price: "BDT 18,000",
-            period: "/ full program",
-            borderClass: "border-[#F97316]/18 hover:border-[#F97316]/35",
-            bgClass: "bg-[#121017]",
-            badgeStyle: "bg-white/5 border-white/10 text-white/80",
-            iconStyle: "bg-white/5 text-white/80 border-[#F97316]/25",
-            accentGlowClass: "bg-[#F97316]/16",
-            accentLineClass: "from-transparent via-[#F97316]/45 to-transparent",
-            sparkleClass: "text-[#F97316]/45",
-            crestFrameClass: "shadow-[0_0_34px_rgba(249,115,22,0.18)]",
-            buttonStyle: "bg-white/5 hover:bg-white/10 text-white border border-white/10"
-        },
-        {
-            id: "gryffindor2",
-            badge: "Offline - Farmgate",
-            title: "Gryffindor 2.0",
-            desc: "An offline batch taken at our Farmgate center, built for face-to-face mentorship and real-time exam simulations.",
-            imageSrc: "/gryffindor.jpeg",
-            imageAlt: "Gryffindor house crest",
-            location: {
-                text: "RH Home Center, Farmgate",
-                href: "https://maps.app.goo.gl/G6Qhf3stvisrsjXr6?g_st=ac"
-            },
-            schedule: {
-                days: "Saturday, Monday, Wednesday",
-                time: "2:00 - 4:00 pm"
-            },
-            features: [
-                "24+ Interactive Physical Lectures",
-                "Weekly Specialized Topic Tests",
-                "15+ Realistic Full Mock Exams",
-                "Direct 1-on-1 Doubt Solving"
-            ],
-            price: "BDT 18,000",
-            period: "/ full program",
-            borderClass: "border-[#F97316]/18 hover:border-[#F97316]/35",
-            bgClass: "bg-[#121017]",
-            badgeStyle: "bg-white/5 border-white/10 text-white/80",
-            iconStyle: "bg-white/5 text-white/80 border-[#F97316]/25",
-            accentGlowClass: "bg-[#F97316]/16",
-            accentLineClass: "from-transparent via-[#F97316]/45 to-transparent",
-            sparkleClass: "text-[#F97316]/45",
-            crestFrameClass: "shadow-[0_0_34px_rgba(249,115,22,0.18)]",
-            buttonStyle: "bg-white/5 hover:bg-white/10 text-white border border-white/10"
-        },
-        {
-            id: "premium",
-            badge: "Online Batch",
-            title: "Ravenclaw",
-            desc: "An online batch taken live from your study room, built for students who want the full program without traveling to a physical center.",
-            imageSrc: "/ravenclaw.jpeg",
-            imageAlt: "Ravenclaw house crest",
-            location: {
-                text: "Your Cozy Study Room"
-            },
-            schedule: {
-                days: "Sunday, Tuesday, Thursday",
-                time: "7:30 - 9:30 pm"
-            },
-            features: [
-               "24+ Interactive Online Lectures",
-                "Weekly Specialized Topic Tests",
-                "15+ Realistic Full Mock Exams",
-                "Direct 1-on-1 Doubt Solving"
-            ],
-            price: "BDT 17,500",
-            period: "/ full program",
-            borderClass: "border-[#60A5FA]/18 hover:border-[#60A5FA]/35 shadow-[0_4px_30px_rgba(96,165,250,0.04)]",
-            bgClass: "bg-[#121017]",
-            badgeStyle: "bg-[#60A5FA]/10 border-[#60A5FA]/20 text-[#BFDBFE]",
-            iconStyle: "bg-[#60A5FA]/10 text-[#BFDBFE] border-[#60A5FA]/25",
-            accentGlowClass: "bg-[#60A5FA]/16",
-            accentLineClass: "from-transparent via-[#60A5FA]/45 to-transparent",
-            sparkleClass: "text-[#93C5FD]/45",
-            crestFrameClass: "shadow-[0_0_34px_rgba(96,165,250,0.18)]",
-            buttonStyle: "bg-white/5 hover:bg-white/10 text-white border border-white/10"
-        },
-        {
-            id: "online",
-            badge: "Offline - Bailey Road",
-            title: "Hufflepuff",
-            desc: "An offline batch taken at our Bailey Road center, built for face-to-face mentorship and real-time exam simulations.",
-            imageSrc: "/hufflepuff.jpeg",
-            imageAlt: "Hufflepuff house crest",
-            location: {
-                text: "Siddheswari Road, Bailey Road",
-                href: "https://maps.app.goo.gl/aoFZ4eWXtpVx1RzEA?g_st=ac"
-            },
-            schedule: {
-                days: "Sunday, Tuesday, Thursday",
-                time: "4:00 - 6:00 pm"
-            },
-            features: [
-               "24+ Interactive Physical Lectures",
-                "Weekly Specialized Topic Tests",
-                "15+ Realistic Full Mock Exams",
-                "Direct 1-on-1 Doubt Solving"
-            ],
-            price: "BDT 18,000",
-            period: "/ full program",
-            borderClass: "border-[#FACC15]/18 hover:border-[#FACC15]/35",
-            bgClass: "bg-[#121017]",
-            badgeStyle: "bg-white/5 border-white/10 text-white/80",
-            iconStyle: "bg-white/5 text-white/80 border-[#FACC15]/25",
-            accentGlowClass: "bg-[#FACC15]/14",
-            accentLineClass: "from-transparent via-[#FACC15]/40 to-transparent",
-            sparkleClass: "text-[#FACC15]/45",
-            crestFrameClass: "shadow-[0_0_34px_rgba(250,204,21,0.16)]",
-            buttonStyle: "bg-white/5 hover:bg-white/10 text-white border border-white/10"
         }
     ];
 
@@ -370,7 +239,7 @@ export default function ProgramsAndTestimonials() {
 
                 {/* Programs Matrix Grid */}
                 <motion.div
-                    className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch"
+                    className="mx-auto grid max-w-4xl grid-cols-1 gap-8 items-stretch"
                     variants={containerVariants}
                     initial="hidden"
                     whileInView="visible"
@@ -382,7 +251,7 @@ export default function ProgramsAndTestimonials() {
                                 key={card.id}
                                 variants={itemVariants}
                                 whileHover={{ y: -6 }}
-                                className={`${card.bgClass} ${card.borderClass} ${card.featured ? "lg:col-span-2 ring-1 ring-emerald-200/10" : ""} rounded-3xl p-8 flex flex-col justify-between transition-all duration-300 relative group overflow-hidden hover:shadow-[0_12px_40px_rgba(0,0,0,0.5)]`}
+                                className={`${card.bgClass} ${card.borderClass} ${card.featured ? "ring-1 ring-emerald-200/10" : ""} rounded-3xl p-8 flex flex-col justify-between transition-all duration-300 relative group overflow-hidden hover:shadow-[0_12px_40px_rgba(0,0,0,0.5)]`}
                             >
                                 <div className={`pointer-events-none absolute -right-16 -top-16 ${card.featured ? "h-56 w-56 opacity-80" : "h-44 w-44 opacity-[0.55]"} rounded-full ${card.accentGlowClass} blur-3xl transition-opacity duration-500 group-hover:opacity-90`} />
                                 <div className={`pointer-events-none absolute inset-x-8 top-0 h-px bg-linear-to-r ${card.accentLineClass} ${card.featured ? "opacity-100" : "opacity-70"}`} />

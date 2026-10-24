@@ -39,11 +39,10 @@ async function mockRequest(event) {
     if (url.pathname === '/api/auth/me') payload.data = user;
     if (url.pathname === '/api/auth/register' || url.pathname === '/api/auth/login') { signup = true; payload = { success: true, token: 'smoke-token', user }; }
     if (url.pathname === '/api/payments/my-access') payload.data = user;
-    if (url.pathname === '/api/payments/math-context') payload.data = { ...user, existingHouseEligible: existingHouse };
+    if (url.pathname === '/api/payments/math-context') payload.data = { ...user, existingHouseEligible: existingHouse, student: { yourName: user.name, college: 'Test College', phoneNumber: '01700000000', address: 'Dhaka' } };
     if (url.pathname === '/api/payments/quote') {
-        const originalAmount = body.planId === 'mathSlytherin' ? 11998 : 5999;
-        const discountAmount = Math.max(existingHouse ? originalAmount * 0.25 : 0, body.couponCode === 'MAGNUS500' ? 500 : 0);
-        payload.data = { planId: body.planId, originalAmount, discountAmount, amount: originalAmount - discountAmount, discountType: existingHouse ? 'existingHouse' : 'coupon' };
+        const originalAmount = body.planId === 'mathSlytherin' ? 9000 : 4500;
+        payload.data = { planId: body.planId, originalAmount, discountAmount: 0, amount: originalAmount, discountType: 'none', couponCode: '' };
     }
     if (url.pathname === '/api/payments/manual-enrollment') { recordedCheckout = body; payload.data = { paymentUrl: `${origin}/payment/success?status=paid&plan=${body.planId}` }; }
     if (url.pathname === '/api/analytics/my-stats') payload = { success: true, stats: { totalExams: 0, rankInfo: rank }, rankInfo: rank, history: [] };
@@ -100,51 +99,51 @@ async function main() {
     // Signup is a client transition, preserving the saved plan in local storage.
     await field('Name', 'Math Test Student'); await field('Email', 'math@example.com'); await field('Password', 'password123');
     await evaluate('document.querySelector("form").requestSubmit()');
-    await textContains('Your math journey starts here'); await textContains('BDT 11,998');
+    await textContains('Your math journey starts here'); await textContains('BDT 9,000');
     assert.ok(signup); authenticated = true;
-    await checkbox('Add Slytherin'); await textContains('BDT 5,999');
-    await field('Discount code', 'MAGNUS500');
-    await evaluate(`Array.from(document.querySelectorAll('button')).find(x=>x.textContent==='Apply').click()`);
-    await textContains('BDT 5,499');
-    for (const [label, value] of [['Your name','Math Test Student'],['Email address','math@example.com'],['Phone number','01700000000'],['Address','Dhaka'],['Facebook profile link','https://facebook.com/test'],['College','Test College'],['Group','Science'],['HSC batch','2026 or equivalent'],['Do you have a clear idea','Yes'],['2. What is your biggest fear','Time pressure']]) await field(label, value);
-    await checkbox('IBA JU'); await checkbox('By myself'); await checkbox('Personal batch'); await checkbox('Wrong approach'); await checkbox('Others');
-    await field('Tell us more','Geometry'); await checkbox('I have read and agree');
+    await evaluate(`Array.from(document.querySelectorAll('button')).find(x=>x.textContent.includes('Add Slytherin')).click()`); await textContains('BDT 4,500');
+    for (const [label, value] of [['Your name','Math Test Student'],['College','Test College'],['Contact number','01700000000'],['Address','Dhaka']]) await field(label, value);
+    await checkbox('I have read and agree');
     await screenshot('enrollment-mobile');
     await evaluate('document.querySelector("form").requestSubmit()'); await textContains('Access is unlocked');
-    assert.equal(recordedCheckout.planId, 'math'); assert.equal(recordedCheckout.expectedAmount, 5499);
-    assert.deepEqual(recordedCheckout.formData.preparationMethods, ['By myself','Personal batch']);
-    assert.deepEqual(recordedCheckout.formData.mathWeaknesses, ['Wrong approach','Others']);
-    console.log('PASS signup continuation, bundle switch, discount, multi-select survey, checkout payload');
+    assert.equal(recordedCheckout.planId, 'math'); assert.equal(recordedCheckout.expectedAmount, 4500);
+    assert.deepEqual(Object.keys(recordedCheckout.formData).sort(), ['address','college','phoneNumber','yourName']);
+    console.log('PASS signup continuation, bundle switch, four-field enrollment, checkout payload');
 
     user = { ...user, hasMathAccess: true };
-    await navigate('/dashboard'); await textContains('Your Math Course');
-    assert.ok(await evaluate(`location.pathname === '/dashboard/math'`));
+    await navigate('/dashboard');
+    await until(() => evaluate(`location.pathname === '/dashboard/math'`), 'math dashboard redirect');
+    await textContains('Welcome back');
     assert.equal(await evaluate(`Boolean(document.querySelector('nav a[href="/dashboard/live-exams"]'))`), false);
     await screenshot('dashboard-mobile');
     await navigate('/dashboard/math/archived-classes'); await textContains('Archive Class 12');
-    assert.equal(await evaluate(`Array.from(document.querySelectorAll('p')).filter(x=>x.textContent==='Coming soon').length`), 24);
-    await navigate('/dashboard/math/live-exams'); await textContains('No live exams posted yet');
+    assert.equal(await evaluate(`Array.from(document.querySelectorAll('div')).filter(x=>x.textContent.trim()==='Coming Soon').length`), 24);
+    await navigate('/dashboard/math/live-exams'); await textContains('No math exams posted yet');
     assert.ok(apiRequests.includes('/api/exams/live?program=math'));
     await navigate('/dashboard/math/leaderboard'); await textContains('Math Leaderboard');
     assert.ok(apiRequests.includes('/api/analytics/competition?program=math'));
     assert.ok(await evaluate('document.documentElement.scrollWidth <= window.innerWidth + 1'), 'Mobile leaderboard overflows');
     console.log('PASS math-only navigation, redirect, recordings, exams and leaderboard');
 
-    await navigate('/payment/details?plan=slytherinUpgrade'); await textContains('We will use the details from your math enrollment.'); await textContains('BDT 5,999');
+    await navigate('/payment/details?plan=slytherinUpgrade');
+    await pause(1000);
+    const upgradeBody = await evaluate('document.body.innerText');
+    assert.match(upgradeBody, /Join Slytherin/);
+    assert.match(upgradeBody, /BDT 4,500/);
     assert.equal(await evaluate("Boolean(document.querySelector('#math-coupon'))"), false);
     await checkbox('I have read and agree');
     await evaluate('document.querySelector("form").requestSubmit()'); await textContains('Access is unlocked');
-    assert.equal(recordedCheckout.planId, 'slytherinUpgrade'); assert.equal(recordedCheckout.expectedAmount, 5999);
+    assert.equal(recordedCheckout.planId, 'slytherinUpgrade'); assert.equal(recordedCheckout.expectedAmount, 4500);
     authenticated = false; user = { ...user, hasMathAccess: false };
     await navigate('/payment/details?plan=math'); await textContains('Create your account');
     await evaluate(`document.querySelector('a[href="/login"]').click()`); await textContains('Welcome back');
     await field('Email','math@example.com'); await field('Password','password123');
-    await evaluate('document.querySelector("form").requestSubmit()'); await textContains('Your math journey starts here'); await textContains('BDT 5,999');
+    await evaluate('document.querySelector("form").requestSubmit()'); await textContains('Your math journey starts here'); await textContains('BDT 4,500');
     authenticated = true;
     console.log('PASS later upgrade and login continuation');
 
     existingHouse = true; user = { ...user, hasMathAccess: false, hasClassAccess: true, house: 'Gryffindor' };
-    await navigate('/payment/details?plan=mathSlytherin'); await textContains('BDT 4,499.25');
+    await navigate('/payment/details?plan=mathSlytherin'); await textContains('BDT 4,500');
     assert.equal(await evaluate(`Boolean(Array.from(document.querySelectorAll('label')).find(x=>x.textContent.includes('Add Slytherin'))) `), false);
     user = { ...user, role: 'admin', hasMathAccess: true };
     await navigate('/dashboard/admin/math/live-exams'); await textContains('Math Exam Admin');
@@ -152,7 +151,7 @@ async function main() {
     assert.ok(await evaluate(`Array.from(document.querySelectorAll('option')).some(x=>x.textContent==='Full-Length Math')`));
     await send('Emulation.setDeviceMetricsOverride', { width: 1365, height: 1000, deviceScaleFactor: 1, mobile: false });
     await screenshot('math-admin-desktop');
-    console.log('PASS existing-house price and separate math exam admin');
+    console.log('PASS existing-house flat price and separate math exam admin');
     assert.deepEqual(errors, [], 'Browser runtime errors');
     console.log('All math browser smoke checks passed. Screenshots: .math-browser/');
 }
