@@ -1,6 +1,6 @@
 "use client";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Ban, CheckCircle, ChevronLeft, ChevronRight, Clock3, Eraser, Infinity, Send, Sparkles } from "lucide-react";
+import { Ban, CheckCircle, Clock3, Eraser, Infinity, Send, Sparkles } from "lucide-react";
 import FormattedText from "@/components/shared/FormattedText";
 import { formatSubjectLabel } from "@/lib/rank";
 
@@ -166,8 +166,26 @@ function formatRemainingTime(totalSeconds) {
     return `${minutes}:${seconds}`;
 }
 
+function getScrollableParent(node) {
+    if (typeof window === "undefined") return null;
+
+    let parent = node?.parentElement;
+    while (parent) {
+        const overflowY = window.getComputedStyle(parent).overflowY;
+        if (["auto", "scroll", "overlay"].includes(overflowY)) return parent;
+        parent = parent.parentElement;
+    }
+
+    return null;
+}
+
+function getPreferredScrollBehavior() {
+    if (typeof window === "undefined") return "auto";
+    return window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth";
+}
+
 export default function ExamEngine({ examData, onComplete }) {
-    const [currentIndex, setCurrentIndex] = useState(0);
+    const [activeQuestionId, setActiveQuestionId] = useState("");
     const [answers, setAnswers] = useState({});
     const [eliminatedOptions, setEliminatedOptions] = useState({});
     const [attemptDeadlineTimestamp] = useState(() => getExamAttemptDeadlineTimestamp(examData));
@@ -178,6 +196,9 @@ export default function ExamEngine({ examData, onComplete }) {
     const autoSubmitAttemptedRef = useRef(false);
     const hasHydratedAnswersRef = useRef(false);
     const hasHydratedEliminationsRef = useRef(false);
+    const engineRootRef = useRef(null);
+    const stickyChromeRef = useRef(null);
+    const questionRefs = useRef(new Map());
 
     const normalizedQuestions = useMemo(() => {
         if (!examData?.questions?.length) return [];
@@ -221,7 +242,8 @@ export default function ExamEngine({ examData, onComplete }) {
         return [...orderedGroups, ...remainingGroups];
     }, [normalizedQuestions]);
 
-    const currentQuestion = normalizedQuestions[currentIndex];
+    const activeQuestion = normalizedQuestions.find((question) => question.id === activeQuestionId) || normalizedQuestions[0];
+    const activeSubjectGroup = questionGroups.find((group) => group.subjectLabel === activeQuestion?.subjectLabel) || questionGroups[0];
     const answeredCount = normalizedQuestions.filter((question) => answers[question.id] !== undefined).length;
     const skippedCount = normalizedQuestions.length - answeredCount;
     const examTitle = getStudentFacingExamTitle(examData?.title);
@@ -327,16 +349,108 @@ export default function ExamEngine({ examData, onComplete }) {
         }
     }, [eliminationStorageKey, eliminatedOptions]);
 
-    const handleSelectOption = (optionIndex) => {
-        if (!currentQuestion || isSubmitting) return;
-        setAnswers({ ...answers, [currentQuestion.id]: optionIndex });
+    const setQuestionRef = useCallback((questionId, node) => {
+        if (node) {
+            questionRefs.current.set(questionId, node);
+            return;
+        }
+
+        questionRefs.current.delete(questionId);
+    }, []);
+
+    const scrollToQuestion = useCallback((questionId) => {
+        const questionNode = questionRefs.current.get(questionId);
+        if (!questionNode) return;
+
+        setActiveQuestionId(questionId);
+        const scrollParent = getScrollableParent(questionNode);
+        const stickyHeight = stickyChromeRef.current?.getBoundingClientRect().height || 0;
+        const offset = stickyHeight + 16;
+        const behavior = getPreferredScrollBehavior();
+
+        if (scrollParent) {
+            const parentRect = scrollParent.getBoundingClientRect();
+            const questionRect = questionNode.getBoundingClientRect();
+            scrollParent.scrollTo({
+                top: scrollParent.scrollTop + questionRect.top - parentRect.top - offset,
+                behavior,
+            });
+            return;
+        }
+
+        const questionRect = questionNode.getBoundingClientRect();
+        window.scrollTo({
+            top: window.scrollY + questionRect.top - offset,
+            behavior,
+        });
+    }, []);
+
+    useEffect(() => {
+        if (!normalizedQuestions.length || !engineRootRef.current) return undefined;
+
+        const firstQuestionId = normalizedQuestions[0].id;
+        setActiveQuestionId((currentId) => (
+            normalizedQuestions.some((question) => question.id === currentId) ? currentId : firstQuestionId
+        ));
+
+        const scrollParent = getScrollableParent(engineRootRef.current);
+        const scrollTarget = scrollParent || window;
+        let animationFrame = 0;
+
+        const updateActiveQuestion = () => {
+            window.cancelAnimationFrame(animationFrame);
+            animationFrame = window.requestAnimationFrame(() => {
+                const stickyBottom = stickyChromeRef.current?.getBoundingClientRect().bottom || 0;
+                const viewportBottom = scrollParent
+                    ? Math.min(window.innerHeight, scrollParent.getBoundingClientRect().bottom)
+                    : window.innerHeight;
+                const availableHeight = Math.max(viewportBottom - stickyBottom, 1);
+                const activationY = stickyBottom + Math.min(160, Math.max(72, availableHeight * 0.24));
+                let nearestQuestionId = firstQuestionId;
+                let nearestDistance = Number.POSITIVE_INFINITY;
+
+                normalizedQuestions.forEach((question) => {
+                    const questionNode = questionRefs.current.get(question.id);
+                    if (!questionNode) return;
+
+                    const rect = questionNode.getBoundingClientRect();
+                    const distance = activationY < rect.top
+                        ? rect.top - activationY
+                        : activationY > rect.bottom
+                            ? activationY - rect.bottom
+                            : 0;
+
+                    if (distance < nearestDistance) {
+                        nearestDistance = distance;
+                        nearestQuestionId = question.id;
+                    }
+                });
+
+                setActiveQuestionId((currentId) => currentId === nearestQuestionId ? currentId : nearestQuestionId);
+            });
+        };
+
+        updateActiveQuestion();
+        scrollTarget.addEventListener("scroll", updateActiveQuestion, { passive: true });
+        window.addEventListener("resize", updateActiveQuestion);
+
+        return () => {
+            window.cancelAnimationFrame(animationFrame);
+            scrollTarget.removeEventListener("scroll", updateActiveQuestion);
+            window.removeEventListener("resize", updateActiveQuestion);
+        };
+    }, [normalizedQuestions]);
+
+    const handleSelectOption = (questionId, optionIndex) => {
+        if (!questionId || isSubmitting) return;
+        setAnswers((currentAnswers) => ({ ...currentAnswers, [questionId]: optionIndex }));
     };
 
-    const handleToggleElimination = (optionIndex) => {
-        if (!currentQuestion || isSubmitting) return;
+    const handleToggleElimination = (questionId, optionIndex) => {
+        if (!questionId || isSubmitting) return;
 
         setEliminatedOptions((currentEliminations) => {
-            const currentQuestionEliminations = currentEliminations[currentQuestion.id] || [];
+            const currentQuestionEliminations = currentEliminations[questionId] || [];
             const isAlreadyEliminated = currentQuestionEliminations.includes(optionIndex);
             const nextQuestionEliminations = isAlreadyEliminated
                 ? currentQuestionEliminations.filter((currentOptionIndex) => currentOptionIndex !== optionIndex)
@@ -344,20 +458,22 @@ export default function ExamEngine({ examData, onComplete }) {
             const nextEliminations = { ...currentEliminations };
 
             if (nextQuestionEliminations.length) {
-                nextEliminations[currentQuestion.id] = nextQuestionEliminations;
+                nextEliminations[questionId] = nextQuestionEliminations;
             } else {
-                delete nextEliminations[currentQuestion.id];
+                delete nextEliminations[questionId];
             }
 
             return nextEliminations;
         });
     };
 
-    const handleClearSelection = () => {
-        if (!currentQuestion || isSubmitting) return;
-        const updatedAnswers = { ...answers };
-        delete updatedAnswers[currentQuestion.id];
-        setAnswers(updatedAnswers);
+    const handleClearSelection = (questionId) => {
+        if (!questionId || isSubmitting) return;
+        setAnswers((currentAnswers) => {
+            const updatedAnswers = { ...currentAnswers };
+            delete updatedAnswers[questionId];
+            return updatedAnswers;
+        });
     };
 
     const handleSubmit = useCallback(async (submissionReason = SUBMISSION_REASONS.MANUAL) => {
@@ -440,169 +556,252 @@ export default function ExamEngine({ examData, onComplete }) {
         return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
     }, [handleSubmit, isAssignmentExam, normalizedQuestions.length]);
 
-    if (!currentQuestion) {
+    if (!activeQuestion) {
         return <p className="text-sm text-[#8E8A9F]">Preparing the exam...</p>;
     }
 
     return (
-        <div className="flex w-full flex-col gap-6 text-left [font-family:var(--font-google-sans),Arial,sans-serif]">
-            <div className="sticky top-0 z-30 flex w-full flex-col gap-4 rounded-2xl border border-white/8 bg-[#121017]/95 p-4 shadow-2xl shadow-black/30 backdrop-blur sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                    <span className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-[#DFB15B]">
-                        <Sparkles className="h-3.5 w-3.5" /> Active Examination Sheet
-                    </span>
-                    <h2 className="mt-1 text-base font-semibold text-white">{examTitle}</h2>
-                </div>
-                <div className="flex flex-wrap items-center gap-2">
-                    {hasTimedExam ? (
-                        <div className={`flex items-center gap-2 rounded-xl border px-4 py-2 text-sm font-bold ${remainingSeconds <= 60 ? "border-red-500/20 bg-red-500/10 text-red-300" : "border-emerald-500/15 bg-emerald-500/10 text-emerald-300"}`}>
-                            <Clock3 className="h-4 w-4" />
-                            <span>{formatRemainingTime(remainingSeconds)} left</span>
-                        </div>
-                    ) : (
-                        <div className="flex items-center gap-2 rounded-xl border border-emerald-500/15 bg-emerald-500/10 px-4 py-2 text-sm font-bold text-emerald-300">
-                            <Infinity className="h-4 w-4" />
-                            <span>Untimed practice</span>
-                        </div>
-                    )}
-                    <button
-                        disabled={isSubmitting}
-                        onClick={() => handleSubmit(SUBMISSION_REASONS.MANUAL)}
-                        className="inline-flex items-center justify-center gap-2 rounded-xl bg-linear-to-r from-emerald-500 to-teal-600 px-4 py-2 text-xs font-bold uppercase tracking-wider text-white shadow-md transition-all hover:brightness-110 disabled:cursor-wait disabled:opacity-70"
-                    >
-                        <Send className="h-4 w-4" /> {isSubmitting ? "Submitting..." : "Submit"}
-                    </button>
-                </div>
-            </div>
-
-            <div className="rounded-3xl border border-white/5 bg-[#121017] p-4 shadow-lg shadow-black/10 sm:p-6">
-                <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-[#6B667B]">Question numbers</span>
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-[#DFB15B]">
-                        {answeredCount} answered / {skippedCount} skipped
-                    </span>
-                </div>
-                <div className="flex gap-3 overflow-x-auto pb-1">
-                    {questionGroups.map((group) => (
-                        <div key={group.subjectLabel} className="flex min-w-42 flex-1 flex-col gap-2">
-                            <div className="flex h-9 items-center justify-center rounded-xl border border-white/5 bg-[#1A1722]/70 px-4 text-sm font-black text-white">
-                                {group.subjectLabel}
-                            </div>
-                            <div className="grid grid-cols-3 gap-1.5">
-                                {group.questions.map(({ question, index }) => {
-                                    const isAnswered = answers[question.id] !== undefined;
-                                    const isCurrent = index === currentIndex;
-                                    return (
-                                        <button
-                                            key={question.id}
-                                            disabled={isSubmitting}
-                                            onClick={() => setCurrentIndex(index)}
-                                            className={`flex h-8 min-w-0 items-center justify-center rounded-lg border px-2 text-xs font-black transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${isCurrent ? "border-[#DFB15B] bg-[#DFB15B] text-black shadow-md shadow-[#DFB15B]/10" : isAnswered ? "border-emerald-400/20 bg-emerald-400/10 text-emerald-300" : "border-white/5 bg-[#1A1722] text-[#8E8A9F] hover:border-white/15 hover:text-white"}`}
-                                        >
-                                            {question.displayQuestionNo}
-                                        </button>
-                                    );
-                                })}
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </div>
-
-            <div className="flex flex-col gap-5 rounded-3xl border border-white/5 bg-[#121017] p-4 shadow-lg shadow-black/10 sm:p-6">
-                <div className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(22rem,0.9fr)]">
-                    <div className="rounded-2xl border border-white/5 bg-[#17141F] p-5 sm:p-7">
-                        <div className="flex flex-wrap items-center justify-between gap-3">
-                            <span className="rounded-lg border border-indigo-500/20 bg-indigo-500/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-indigo-300">
-                                {currentQuestion.topic ? `${currentQuestion.subjectLabel} / ${currentQuestion.topic}` : currentQuestion.subjectLabel}
-                            </span>
-                            <span className="rounded-lg border border-[#DFB15B]/20 bg-[#DFB15B]/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#DFB15B]">
-                                Question #{currentQuestion.displayQuestionNo}
-                            </span>
-                        </div>
-
-                        <FormattedText
-                            as="p"
-                            value={currentQuestion.instruction}
-                            className={currentQuestion.instruction ? "mt-5 text-xs font-semibold leading-relaxed text-[#A9A3BA]" : "hidden"}
-                        />
-
-                        <FormattedText
-                            as="p"
-                            value={currentQuestion.questionText}
-                            className={`${currentQuestion.instruction ? "mt-3" : "mt-5"} text-base font-semibold leading-relaxed tracking-wide text-white sm:text-lg`}
-                        />
+        <div ref={engineRootRef} className="w-full text-left [font-family:var(--font-google-sans),Arial,sans-serif]">
+            <div ref={stickyChromeRef} className="sticky top-0 z-40 bg-[#0A090F]/95 pb-3 backdrop-blur-xl">
+                <div className="flex w-full flex-col gap-4 rounded-2xl border border-white/8 bg-[#121017]/95 p-4 shadow-2xl shadow-black/30 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="min-w-0">
+                        <span className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-[#DFB15B]">
+                            <Sparkles className="h-3.5 w-3.5" /> Active Examination Sheet
+                        </span>
+                        <h2 className="mt-1 truncate text-base font-semibold text-white">{examTitle}</h2>
                     </div>
+                    <div className="flex shrink-0 flex-wrap items-center gap-2">
+                        {hasTimedExam ? (
+                            <div className={`flex items-center gap-2 rounded-xl border px-4 py-2 text-sm font-bold ${remainingSeconds <= 60 ? "border-red-500/20 bg-red-500/10 text-red-300" : "border-emerald-500/15 bg-emerald-500/10 text-emerald-300"}`}>
+                                <Clock3 className="h-4 w-4" />
+                                <span>{formatRemainingTime(remainingSeconds)} left</span>
+                            </div>
+                        ) : (
+                            <div className="flex items-center gap-2 rounded-xl border border-emerald-500/15 bg-emerald-500/10 px-4 py-2 text-sm font-bold text-emerald-300">
+                                <Infinity className="h-4 w-4" />
+                                <span>Untimed practice</span>
+                            </div>
+                        )}
+                        <button
+                            type="button"
+                            disabled={isSubmitting}
+                            onClick={() => handleSubmit(SUBMISSION_REASONS.MANUAL)}
+                            className="inline-flex items-center justify-center gap-2 rounded-xl bg-linear-to-r from-emerald-500 to-teal-600 px-4 py-2 text-xs font-bold uppercase tracking-wider text-white shadow-md transition-all hover:brightness-110 disabled:cursor-wait disabled:opacity-70"
+                        >
+                            <Send className="h-4 w-4" /> {isSubmitting ? "Submitting..." : "Submit"}
+                        </button>
+                    </div>
+                </div>
 
-                    <div className="rounded-2xl border border-white/5 bg-[#17141F] p-5 sm:p-7">
-                        <div className="flex min-h-8 flex-wrap items-center justify-between gap-3">
-                            <span className="text-[10px] font-bold uppercase tracking-widest text-[#6B667B]">Answer options</span>
-                            {answers[currentQuestion.id] !== undefined && (
-                                <button disabled={isSubmitting} onClick={handleClearSelection} className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-red-400 hover:underline disabled:cursor-not-allowed disabled:opacity-50">
-                                    <Eraser className="h-3.5 w-3.5" /> Clear
+                <div className="mt-2 space-y-2 lg:hidden">
+                    <div className="flex gap-2 overflow-x-auto rounded-2xl border border-white/5 bg-[#121017]/95 p-2 shadow-lg shadow-black/20">
+                        {questionGroups.map((group) => {
+                            const isActiveSubject = group.subjectLabel === activeQuestion.subjectLabel;
+                            const subjectAnsweredCount = group.questions.filter(({ question }) => answers[question.id] !== undefined).length;
+                            return (
+                                <button
+                                    type="button"
+                                    key={group.subjectLabel}
+                                    disabled={isSubmitting}
+                                    onClick={() => scrollToQuestion(group.questions[0].question.id)}
+                                    aria-current={isActiveSubject ? "true" : undefined}
+                                    className={`shrink-0 rounded-xl border px-3 py-2 text-left transition disabled:cursor-not-allowed disabled:opacity-60 ${isActiveSubject ? "border-[#DFB15B]/60 bg-[#DFB15B]/12 text-white" : "border-white/5 bg-[#1A1722] text-[#8E8A9F]"}`}
+                                >
+                                    <span className="block text-xs font-black">{group.subjectLabel}</span>
+                                    <span className={`mt-0.5 block text-[9px] font-bold uppercase tracking-wider ${isActiveSubject ? "text-[#DFB15B]" : "text-[#6B667B]"}`}>
+                                        {subjectAnsweredCount}/{group.questions.length} answered
+                                    </span>
                                 </button>
-                            )}
-                        </div>
-
-                        <div className="mt-5 flex flex-col gap-3">
-                            {Object.entries(currentQuestion.options).map(([key, value]) => {
-                                const optionIndex = OPTION_LABELS.indexOf(key);
-                                const isSelected = answers[currentQuestion.id] === optionIndex;
-                                const isEliminated = (eliminatedOptions[currentQuestion.id] || []).includes(optionIndex);
-                                return (
-                                    <div
-                                        key={key}
-                                        className={`group flex min-h-16 w-full items-stretch gap-2 rounded-2xl border p-2 text-left transition-all ${isSubmitting ? "opacity-70" : ""} ${isSelected ? "border-[#DFB15B] bg-[#DFB15B]/10 shadow-md shadow-[#DFB15B]/5" : "border-white/5 bg-[#121017]/80 hover:border-[#DFB15B]/25 hover:bg-[#1A1722]"} ${isEliminated ? "opacity-55" : ""}`}
-                                    >
-                                        <button
-                                            disabled={isSubmitting}
-                                            onClick={() => handleSelectOption(optionIndex)}
-                                            className="flex min-w-0 flex-1 items-center gap-3 rounded-xl p-2 text-left transition disabled:cursor-not-allowed"
-                                            aria-pressed={isSelected}
-                                        >
-                                            <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border text-sm font-black ${isSelected ? "border-[#DFB15B] bg-[#DFB15B] text-black" : "border-white/5 bg-[#1A1722] text-[#8E8A9F] group-hover:border-[#DFB15B]/25 group-hover:text-[#DFB15B]"}`}>
-                                                {key}
-                                            </div>
-                                            <FormattedText
-                                                value={value}
-                                                className={`min-w-0 flex-1 text-sm font-semibold leading-relaxed ${isSelected ? "text-white" : "text-[#C9C2D8]"} ${isEliminated ? "line-through decoration-2 decoration-red-300/80" : ""}`}
-                                            />
-                                            {isSelected ? <CheckCircle className="h-4 w-4 shrink-0 text-[#DFB15B]" /> : null}
-                                        </button>
-                                        <button
-                                            type="button"
-                                            disabled={isSubmitting}
-                                            onClick={() => handleToggleElimination(optionIndex)}
-                                            className={`my-auto flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border transition disabled:cursor-not-allowed disabled:opacity-50 ${isEliminated ? "border-red-300/30 bg-red-500/15 text-red-200" : "border-white/5 bg-[#1A1722] text-[#6B667B] hover:border-red-300/25 hover:text-red-200"}`}
-                                            aria-label={`${isEliminated ? "Restore" : "Eliminate"} option ${key}`}
-                                            aria-pressed={isEliminated}
-                                            title={`${isEliminated ? "Restore" : "Eliminate"} option ${key}`}
-                                        >
-                                            <Ban className="h-4 w-4" />
-                                        </button>
-                                    </div>
-                                );
-                            })}
-                        </div>
+                            );
+                        })}
+                    </div>
+                    <div className="flex gap-1.5 overflow-x-auto rounded-2xl border border-white/5 bg-[#121017]/95 p-2 shadow-lg shadow-black/20">
+                        {activeSubjectGroup?.questions.map(({ question }) => {
+                            const isCurrent = question.id === activeQuestion.id;
+                            const isAnswered = answers[question.id] !== undefined;
+                            return (
+                                <button
+                                    type="button"
+                                    key={question.id}
+                                    disabled={isSubmitting}
+                                    onClick={() => scrollToQuestion(question.id)}
+                                    aria-label={`Go to question ${question.displayQuestionNo}`}
+                                    aria-current={isCurrent ? "step" : undefined}
+                                    className={`flex h-8 min-w-8 shrink-0 items-center justify-center rounded-lg border px-2 text-xs font-black transition disabled:cursor-not-allowed disabled:opacity-60 ${isCurrent ? "border-[#DFB15B] bg-[#DFB15B] text-black" : isAnswered ? "border-emerald-400/20 bg-emerald-400/10 text-emerald-300" : "border-white/5 bg-[#1A1722] text-[#8E8A9F]"}`}
+                                >
+                                    {question.displayQuestionNo}
+                                </button>
+                            );
+                        })}
                     </div>
                 </div>
+            </div>
 
-                <div className="flex items-center justify-between rounded-2xl border border-white/5 bg-[#1A1722]/45 p-3">
-                    <button
-                        disabled={currentIndex === 0 || isSubmitting}
-                        onClick={() => setCurrentIndex((prev) => prev - 1)}
-                        className="flex items-center gap-1 rounded-xl border border-white/5 bg-[#121017] px-3 py-2 text-xs font-bold uppercase tracking-wide text-[#8E8A9F] transition-colors hover:text-white disabled:cursor-not-allowed disabled:opacity-20"
-                    >
-                        <ChevronLeft className="h-4 w-4" /> Prev
-                    </button>
-                    <button
-                        disabled={currentIndex === normalizedQuestions.length - 1 || isSubmitting}
-                        onClick={() => setCurrentIndex((prev) => prev + 1)}
-                        className="flex items-center gap-1 rounded-xl border border-white/5 bg-[#121017] px-3 py-2 text-xs font-bold uppercase tracking-wide text-[#8E8A9F] transition-colors hover:text-white disabled:cursor-not-allowed disabled:opacity-20"
-                    >
-                        Next <ChevronRight className="h-4 w-4" />
-                    </button>
-                </div>
+            <div className="mt-3 grid items-start gap-5 lg:grid-cols-[12rem_minmax(0,1fr)_14rem] xl:grid-cols-[14rem_minmax(0,1fr)_17rem]">
+                <aside className="sticky top-28 hidden max-h-[calc(100vh-8rem)] overflow-y-auto rounded-3xl border border-white/5 bg-[#121017] p-4 shadow-lg shadow-black/10 lg:block" aria-label="Subject navigation">
+                    <div className="mb-4">
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-[#6B667B]">Subjects</span>
+                        <p className="mt-1 text-xs font-semibold text-[#A9A3BA]">{answeredCount} answered / {skippedCount} skipped</p>
+                    </div>
+                    <div className="space-y-2.5">
+                        {questionGroups.map((group) => {
+                            const isActiveSubject = group.subjectLabel === activeQuestion.subjectLabel;
+                            const subjectAnsweredCount = group.questions.filter(({ question }) => answers[question.id] !== undefined).length;
+                            const progress = group.questions.length ? (subjectAnsweredCount / group.questions.length) * 100 : 0;
+                            return (
+                                <button
+                                    type="button"
+                                    key={group.subjectLabel}
+                                    disabled={isSubmitting}
+                                    onClick={() => scrollToQuestion(group.questions[0].question.id)}
+                                    aria-current={isActiveSubject ? "true" : undefined}
+                                    className={`w-full rounded-2xl border p-3 text-left transition-all disabled:cursor-not-allowed disabled:opacity-60 ${isActiveSubject ? "border-[#DFB15B]/60 bg-[#DFB15B]/10 shadow-md shadow-[#DFB15B]/5" : "border-white/5 bg-[#1A1722]/75 hover:border-white/15"}`}
+                                >
+                                    <span className={`block text-sm font-black ${isActiveSubject ? "text-white" : "text-[#C9C2D8]"}`}>{group.subjectLabel}</span>
+                                    <span className={`mt-1 block text-[10px] font-bold uppercase tracking-wider ${isActiveSubject ? "text-[#DFB15B]" : "text-[#6B667B]"}`}>
+                                        {subjectAnsweredCount}/{group.questions.length} answered
+                                    </span>
+                                    <span className="mt-2 block h-1.5 overflow-hidden rounded-full bg-[#0A090F]">
+                                        <span className={`block h-full rounded-full ${isActiveSubject ? "bg-[#DFB15B]" : "bg-emerald-500"}`} style={{ width: `${progress}%` }} />
+                                    </span>
+                                </button>
+                            );
+                        })}
+                    </div>
+                </aside>
+
+                <section className="min-w-0 space-y-5 pb-[35vh]" aria-label="Exam questions">
+                    {normalizedQuestions.map((question) => {
+                        const isActive = question.id === activeQuestion.id;
+                        const selectedAnswer = answers[question.id];
+                        return (
+                            <article
+                                key={question.id}
+                                id={`exam-question-${question.id}`}
+                                ref={(node) => setQuestionRef(question.id, node)}
+                                aria-current={isActive ? "step" : undefined}
+                                aria-labelledby={`exam-question-title-${question.id}`}
+                                className={`scroll-mt-64 rounded-3xl border bg-[#121017] p-4 shadow-lg shadow-black/10 transition-colors sm:p-6 ${isActive ? "border-[#DFB15B]/35" : "border-white/5"}`}
+                            >
+                                <div className="rounded-2xl border border-white/5 bg-[#17141F] p-5 sm:p-7">
+                                    <div className="flex flex-wrap items-center justify-between gap-3">
+                                        <span className="rounded-lg border border-indigo-500/20 bg-indigo-500/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-indigo-300">
+                                            {question.topic ? `${question.subjectLabel} / ${question.topic}` : question.subjectLabel}
+                                        </span>
+                                        <span id={`exam-question-title-${question.id}`} className="rounded-lg border border-[#DFB15B]/20 bg-[#DFB15B]/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#DFB15B]">
+                                            Question #{question.displayQuestionNo}
+                                        </span>
+                                    </div>
+
+                                    <FormattedText
+                                        as="p"
+                                        value={question.instruction}
+                                        className={question.instruction ? "mt-5 text-xs font-semibold leading-relaxed text-[#A9A3BA]" : "hidden"}
+                                    />
+
+                                    <FormattedText
+                                        as="p"
+                                        value={question.questionText}
+                                        className={`${question.instruction ? "mt-3" : "mt-5"} text-base font-semibold leading-relaxed tracking-wide text-white sm:text-lg`}
+                                    />
+                                </div>
+
+                                <div className="mt-4 rounded-2xl border border-white/5 bg-[#17141F] p-4 sm:p-6">
+                                    <div className="flex min-h-8 flex-wrap items-center justify-between gap-3">
+                                        <span className="text-[10px] font-bold uppercase tracking-widest text-[#6B667B]">Answer options</span>
+                                        {selectedAnswer !== undefined && (
+                                            <button
+                                                type="button"
+                                                disabled={isSubmitting}
+                                                onClick={() => handleClearSelection(question.id)}
+                                                className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-red-400 hover:underline disabled:cursor-not-allowed disabled:opacity-50"
+                                            >
+                                                <Eraser className="h-3.5 w-3.5" /> Clear
+                                            </button>
+                                        )}
+                                    </div>
+
+                                    <div className="mt-4 flex flex-col gap-3">
+                                        {Object.entries(question.options).map(([key, value]) => {
+                                            const optionIndex = OPTION_LABELS.indexOf(key);
+                                            const isSelected = selectedAnswer === optionIndex;
+                                            const isEliminated = (eliminatedOptions[question.id] || []).includes(optionIndex);
+                                            return (
+                                                <div
+                                                    key={key}
+                                                    className={`group flex min-h-16 w-full items-stretch gap-2 rounded-2xl border p-2 text-left transition-all ${isSubmitting ? "opacity-70" : ""} ${isSelected ? "border-[#DFB15B] bg-[#DFB15B]/10 shadow-md shadow-[#DFB15B]/5" : "border-white/5 bg-[#121017]/80 hover:border-[#DFB15B]/25 hover:bg-[#1A1722]"} ${isEliminated ? "opacity-55" : ""}`}
+                                                >
+                                                    <button
+                                                        type="button"
+                                                        disabled={isSubmitting}
+                                                        onClick={() => handleSelectOption(question.id, optionIndex)}
+                                                        className="flex min-w-0 flex-1 items-center gap-3 rounded-xl p-2 text-left transition disabled:cursor-not-allowed"
+                                                        aria-label={`Question ${question.displayQuestionNo}, option ${key}`}
+                                                        aria-pressed={isSelected}
+                                                    >
+                                                        <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border text-sm font-black ${isSelected ? "border-[#DFB15B] bg-[#DFB15B] text-black" : "border-white/5 bg-[#1A1722] text-[#8E8A9F] group-hover:border-[#DFB15B]/25 group-hover:text-[#DFB15B]"}`}>
+                                                            {key}
+                                                        </span>
+                                                        <FormattedText
+                                                            value={value}
+                                                            className={`min-w-0 flex-1 text-sm font-semibold leading-relaxed ${isSelected ? "text-white" : "text-[#C9C2D8]"} ${isEliminated ? "line-through decoration-2 decoration-red-300/80" : ""}`}
+                                                        />
+                                                        {isSelected ? <CheckCircle className="h-4 w-4 shrink-0 text-[#DFB15B]" /> : null}
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        disabled={isSubmitting}
+                                                        onClick={() => handleToggleElimination(question.id, optionIndex)}
+                                                        className={`my-auto flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border transition disabled:cursor-not-allowed disabled:opacity-50 ${isEliminated ? "border-red-300/30 bg-red-500/15 text-red-200" : "border-white/5 bg-[#1A1722] text-[#6B667B] hover:border-red-300/25 hover:text-red-200"}`}
+                                                        aria-label={`${isEliminated ? "Restore" : "Eliminate"} option ${key} for question ${question.displayQuestionNo}`}
+                                                        aria-pressed={isEliminated}
+                                                        title={`${isEliminated ? "Restore" : "Eliminate"} option ${key}`}
+                                                    >
+                                                        <Ban className="h-4 w-4" />
+                                                    </button>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            </article>
+                        );
+                    })}
+                </section>
+
+                <aside className="sticky top-28 hidden max-h-[calc(100vh-8rem)] overflow-y-auto rounded-3xl border border-white/5 bg-[#121017] p-4 shadow-lg shadow-black/10 lg:block" aria-label="Question navigation">
+                    <div className="flex items-end justify-between gap-3">
+                        <div>
+                            <span className="text-[10px] font-bold uppercase tracking-widest text-[#6B667B]">Question numbers</span>
+                            <h3 className="mt-1 text-base font-black text-white">{activeSubjectGroup?.subjectLabel}</h3>
+                        </div>
+                        <span className="text-[10px] font-bold text-[#DFB15B]">{activeSubjectGroup?.questions.length || 0}</span>
+                    </div>
+                    <div className="mt-4 grid grid-cols-4 gap-2 xl:grid-cols-5">
+                        {activeSubjectGroup?.questions.map(({ question }) => {
+                            const isCurrent = question.id === activeQuestion.id;
+                            const isAnswered = answers[question.id] !== undefined;
+                            return (
+                                <button
+                                    type="button"
+                                    key={question.id}
+                                    disabled={isSubmitting}
+                                    onClick={() => scrollToQuestion(question.id)}
+                                    aria-label={`Go to question ${question.displayQuestionNo}`}
+                                    aria-current={isCurrent ? "step" : undefined}
+                                    className={`flex aspect-square min-w-0 items-center justify-center rounded-xl border text-xs font-black transition disabled:cursor-not-allowed disabled:opacity-60 ${isCurrent ? "border-[#DFB15B] bg-[#DFB15B] text-black shadow-md shadow-[#DFB15B]/10" : isAnswered ? "border-emerald-400/20 bg-emerald-400/10 text-emerald-300 hover:border-emerald-300/40" : "border-white/5 bg-[#1A1722] text-[#8E8A9F] hover:border-white/15 hover:text-white"}`}
+                                >
+                                    {question.displayQuestionNo}
+                                </button>
+                            );
+                        })}
+                    </div>
+                    <div className="mt-5 grid grid-cols-1 gap-2 border-t border-white/5 pt-4 text-[10px] font-bold uppercase tracking-wider text-[#8E8A9F] xl:grid-cols-2">
+                        <span className="flex items-center gap-2"><i aria-hidden="true" className="h-3 w-3 rounded-sm bg-[#DFB15B]" /> Current</span>
+                        <span className="flex items-center gap-2"><i aria-hidden="true" className="h-3 w-3 rounded-sm bg-emerald-500" /> Answered</span>
+                        <span className="flex items-center gap-2"><i aria-hidden="true" className="h-3 w-3 rounded-sm border border-white/10 bg-[#1A1722]" /> Unanswered</span>
+                    </div>
+                </aside>
             </div>
         </div>
     );
