@@ -39,7 +39,7 @@ async function mockRequest(event) {
     if (url.pathname === '/api/auth/me') payload.data = user;
     if (url.pathname === '/api/auth/register' || url.pathname === '/api/auth/login') { signup = true; payload = { success: true, token: 'smoke-token', user }; }
     if (url.pathname === '/api/payments/my-access') payload.data = user;
-    if (url.pathname === '/api/payments/math-context') payload.data = { ...user, existingHouseEligible: existingHouse, student: { yourName: user.name, college: 'Test College', phoneNumber: '01700000000', address: 'Dhaka' } };
+    if (url.pathname === '/api/payments/math-context') payload.data = { ...user, existingHouseEligible: existingHouse, student: { yourName: user.name, college: 'Test College', phoneNumber: '01700000000', address: 'Dhaka', facebookProfile: 'https://facebook.com/math.test.student' } };
     if (url.pathname === '/api/payments/quote') {
         const originalAmount = body.planId === 'mathSlytherin' ? 9000 : 4500;
         payload.data = { planId: body.planId, originalAmount, discountAmount: 0, amount: originalAmount, discountType: 'none', couponCode: '' };
@@ -102,13 +102,17 @@ async function main() {
     await textContains('Your math journey starts here'); await textContains('BDT 9,000');
     assert.ok(signup); authenticated = true;
     await evaluate(`Array.from(document.querySelectorAll('button')).find(x=>x.textContent.includes('Add Slytherin')).click()`); await textContains('BDT 4,500');
-    for (const [label, value] of [['Your name','Math Test Student'],['College','Test College'],['Contact number','01700000000'],['Address','Dhaka']]) await field(label, value);
+    for (const [label, value] of [['Your name','Math Test Student'],['College','Test College'],['Contact number','01700000000'],['Address','Dhaka'],['Facebook ID Link','https://example.com/math.test.student']]) await field(label, value);
     await checkbox('I have read and agree');
+    await evaluate('document.querySelector("form").requestSubmit()'); await textContains('Enter a valid Facebook ID link');
+    assert.equal(recordedCheckout, undefined);
+    await field('Facebook ID Link','https://facebook.com/math.test.student');
     await screenshot('enrollment-mobile');
     await evaluate('document.querySelector("form").requestSubmit()'); await textContains('Access is unlocked');
     assert.equal(recordedCheckout.planId, 'math'); assert.equal(recordedCheckout.expectedAmount, 4500);
-    assert.deepEqual(Object.keys(recordedCheckout.formData).sort(), ['address','college','phoneNumber','yourName']);
-    console.log('PASS signup continuation, bundle switch, four-field enrollment, checkout payload');
+    assert.deepEqual(Object.keys(recordedCheckout.formData).sort(), ['address','college','facebookProfile','phoneNumber','yourName']);
+    assert.equal(recordedCheckout.formData.facebookProfile, 'https://facebook.com/math.test.student');
+    console.log('PASS signup continuation, bundle switch, five-field enrollment, checkout payload');
 
     user = { ...user, hasMathAccess: true };
     await navigate('/dashboard');
@@ -130,6 +134,7 @@ async function main() {
     const upgradeBody = await evaluate('document.body.innerText');
     assert.match(upgradeBody, /Join Slytherin/);
     assert.match(upgradeBody, /BDT 4,500/);
+    assert.match(upgradeBody, /https:\/\/facebook.com\/math.test.student/);
     assert.equal(await evaluate("Boolean(document.querySelector('#math-coupon'))"), false);
     await checkbox('I have read and agree');
     await evaluate('document.querySelector("form").requestSubmit()'); await textContains('Access is unlocked');

@@ -25,7 +25,7 @@ import {
 import PolicyAcceptance from "@/components/shared/PolicyAcceptance";
 import FlashyLoader, { LoadingButtonLabel } from "@/components/shared/FlashyLoader";
 
-const REQUIRED_FIELDS = ["yourName", "college", "phoneNumber", "address"];
+const REQUIRED_FIELDS = ["yourName", "college", "phoneNumber", "address", "facebookProfile"];
 
 const SECTION_VARIANTS = {
   hidden: { opacity: 0, y: 26 },
@@ -52,6 +52,17 @@ function getPlanLabel(planId, upgrade) {
 
 function isComplete(value) {
   return Array.isArray(value) ? value.length > 0 : Boolean(value?.toString().trim());
+}
+
+function isFacebookProfileLink(value) {
+  try {
+    const url = new URL(value?.trim());
+    const hostname = url.hostname.toLowerCase();
+    return ["http:", "https:"].includes(url.protocol)
+      && (hostname === "facebook.com" || hostname.endsWith(".facebook.com"));
+  } catch {
+    return false;
+  }
 }
 
 export default function MathEnrollment({ initialPlan }) {
@@ -140,7 +151,12 @@ export default function MathEnrollment({ initialPlan }) {
     }
 
     if (!upgrade && REQUIRED_FIELDS.some((field) => !isComplete(form[field]))) {
-      setError("Complete your name, college, contact number, and address before continuing.");
+      setError("Complete your name, college, contact number, address, and Facebook ID link before continuing.");
+      return;
+    }
+
+    if (!upgrade && !isFacebookProfileLink(form.facebookProfile)) {
+      setError("Enter a valid Facebook ID link before continuing.");
       return;
     }
 
@@ -241,7 +257,10 @@ export default function MathEnrollment({ initialPlan }) {
 
             <div className="grid min-w-0 gap-3 rounded-3xl border border-white/7 bg-white/5 p-4 lg:min-w-72">
               <SummaryMetric label="Selected plan" value={planLabel} />
-              <SummaryMetric label="Progress" value={`${fieldProgress.completed}/${fieldProgress.total} fields`} />
+              <SummaryMetric
+                label={upgrade ? "Enrollment details" : "Progress"}
+                value={upgrade ? "Saved" : `${fieldProgress.completed}/${fieldProgress.total} fields`}
+              />
             </div>
           </div>
         </section>
@@ -255,6 +274,7 @@ export default function MathEnrollment({ initialPlan }) {
                     <ReadOnlyInfo label="College" value={form.college || "Not saved"} />
                     <ReadOnlyInfo label="Contact number" value={form.phoneNumber || "Not saved"} />
                     <ReadOnlyInfo label="Address" value={form.address || "Not saved"} />
+                    <ReadOnlyInfo label="Facebook ID Link" value={form.facebookProfile || "Not saved"} />
                 </div>
                 <div className="mt-4 rounded-2xl border border-emerald-300/16 bg-emerald-300/8 px-4 py-4 text-sm font-medium leading-6 text-emerald-100">
                   Your Math Course progress, results, and access remain active. This upgrade adds the full website and Slytherin membership.
@@ -262,13 +282,14 @@ export default function MathEnrollment({ initialPlan }) {
               </FormSection>
             ) : (
               <>
-                <FormSection title="Enrollment Information" description="Enter the four details needed for your Math Course enrollment." index={1} icon={BookOpenCheck}>
+                <FormSection title="Enrollment Information" description="Enter the five details needed for your Math Course enrollment." index={1} icon={BookOpenCheck}>
                   <div className="grid gap-4 sm:grid-cols-2">
                     {[
                       ["yourName", "Your name", "text"],
                       ["college", "College", "text"],
                       ["phoneNumber", "Contact number", "tel"],
                       ["address", "Address", "text"],
+                      ["facebookProfile", "Facebook ID Link", "url"],
                     ].map(([field, label, type]) => (
                       <Field key={field} label={label} type={type} value={form[field]} onChange={(value) => update(field, value)} />
                     ))}
