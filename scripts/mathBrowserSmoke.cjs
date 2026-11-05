@@ -12,7 +12,15 @@ let browser; let socket; let sequence = 0;
 const pending = new Map(); const errors = []; const apiRequests = [];
 let signup = false; let authenticated = true; let existingHouse = false; let recordedCheckout;
 const rank = { rankName: 'Silver III', tier: 'Silver', level: 'III', rankPoints: 10, countedExamCount: 1, pointsIntoLevel: 10, pointsToNextLevel: 10, nextRankName: 'Silver II' };
-let user = { id: '507f1f77bcf86cd799439011', name: 'Math Test Student', email: 'math@example.com', role: 'student', hasMathAccess: true, hasClassAccess: false, mathRankInfo: rank, rankInfo: rank };
+const generalRank = { rankName: 'Gold III', tier: 'Gold', level: 'III', rankPoints: 30, countedExamCount: 2, pointsIntoLevel: 10, pointsToNextLevel: 10, nextRankName: 'Gold II' };
+let user = { id: '507f1f77bcf86cd799439011', name: 'Math Test Student', email: 'math@example.com', role: 'student', hasMathAccess: true, hasClassAccess: false, mathRankInfo: rank, rankInfo: generalRank };
+const fullLengthStart = new Date(Date.now() + 60 * 60 * 1000);
+const fullLengthEnd = new Date(fullLengthStart.getTime() + 90 * 60 * 1000);
+const fullLengthMock = {
+    _id: '507f1f77bcf86cd799439014', title: 'Full Length Mock 01', competitionCategory: 'full-length',
+    duration: 90, totalMarks: 60, questionCount: 60, status: 'upcoming',
+    startTime: fullLengthStart.toISOString(), endTime: fullLengthEnd.toISOString(), hasSubmitted: false
+};
 const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
 async function until(action, label) {
     for (let attempt = 0; attempt < 100; attempt++) { try { if (await action()) return; } catch {} await pause(100); }
@@ -47,6 +55,7 @@ async function mockRequest(event) {
     if (url.pathname === '/api/payments/manual-enrollment') { recordedCheckout = body; payload.data = { paymentUrl: `${origin}/payment/success?status=paid&plan=${body.planId}` }; }
     if (url.pathname === '/api/analytics/my-stats') payload = { success: true, stats: { totalExams: 0, rankInfo: rank }, rankInfo: rank, history: [] };
     if (url.pathname === '/api/analytics/competition') payload.data = { leaderboard: [], houses: [], badges: [], champions: {}, currentUserEntry: null };
+    if (url.pathname === '/api/exams/live/full-length') payload.data = [fullLengthMock];
     if (url.pathname === '/api/classes/current') payload.data = null;
     if (url.pathname === '/api/classes/catalog') payload.data = ['Basic', 'Archive'].map(label => ({ label: `${label} Classes`, topics: Array.from({ length: 12 }, (_, i) => ({ label: `${label} Class ${i + 1}`, href: '' })) }));
     const responseBody = Buffer.from(JSON.stringify(payload)).toString('base64');
@@ -119,7 +128,17 @@ async function main() {
     await until(() => evaluate(`location.pathname === '/dashboard/math'`), 'math dashboard redirect');
     await textContains('Welcome back');
     assert.equal(await evaluate(`Boolean(document.querySelector('nav a[href="/dashboard/live-exams"]'))`), false);
+    assert.equal(await evaluate(`Boolean(document.querySelector('nav a[href="/dashboard/full-length-mocks"]'))`), true);
     await screenshot('dashboard-mobile');
+    await navigate('/dashboard/full-length-mocks'); await textContains('90-Minute Full Length Mocks'); await textContains('Full Length Mock 01');
+    assert.ok(apiRequests.includes('/api/exams/live/full-length'));
+    assert.ok(await evaluate('document.documentElement.scrollWidth <= window.innerWidth + 1'), 'Mobile Full Length Mocks overflows');
+    await screenshot('full-length-mocks-mobile');
+    await send('Emulation.setDeviceMetricsOverride', { width: 1365, height: 1000, deviceScaleFactor: 1, mobile: false });
+    await navigate('/dashboard/full-length-mocks'); await textContains('Full Length Mock 01'); await textContains('GOLD III');
+    assert.ok(await evaluate('document.documentElement.scrollWidth <= window.innerWidth + 1'), 'Desktop Full Length Mocks overflows');
+    await screenshot('full-length-mocks-desktop');
+    await send('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, deviceScaleFactor: 1, mobile: true });
     await navigate('/dashboard/math/archived-classes'); await textContains('Archive Class 12');
     assert.equal(await evaluate(`Array.from(document.querySelectorAll('div')).filter(x=>x.textContent.trim()==='Coming Soon').length`), 24);
     await navigate('/dashboard/math/live-exams'); await textContains('No math exams posted yet');
@@ -127,7 +146,7 @@ async function main() {
     await navigate('/dashboard/math/leaderboard'); await textContains('Math Leaderboard');
     assert.ok(apiRequests.includes('/api/analytics/competition?program=math'));
     assert.ok(await evaluate('document.documentElement.scrollWidth <= window.innerWidth + 1'), 'Mobile leaderboard overflows');
-    console.log('PASS math-only navigation, redirect, recordings, exams and leaderboard');
+    console.log('PASS math-only navigation, Full Length Mocks desktop/mobile, recordings, exams and leaderboard');
 
     await navigate('/payment/details?plan=slytherinUpgrade');
     await pause(1000);
@@ -154,9 +173,13 @@ async function main() {
     await navigate('/dashboard/admin/math/live-exams'); await textContains('Math Exam Admin');
     assert.ok(apiRequests.includes('/api/exams/live/admin?program=math'));
     assert.ok(await evaluate(`Array.from(document.querySelectorAll('option')).some(x=>x.textContent==='Full-Length Math')`));
+    assert.equal(await evaluate(`Array.from(document.querySelectorAll('option')).some(x=>x.textContent==='Full Length Mock')`), false);
+    await navigate('/dashboard/admin/live-exams'); await textContains('Live Exam Admin');
+    assert.ok(await evaluate(`Array.from(document.querySelectorAll('option')).some(x=>x.textContent==='Full Length Mock')`));
+    await field('Competition type', 'full-length'); await textContains('exactly 90 minutes after the start time');
     await send('Emulation.setDeviceMetricsOverride', { width: 1365, height: 1000, deviceScaleFactor: 1, mobile: false });
-    await screenshot('math-admin-desktop');
-    console.log('PASS existing-house flat price and separate math exam admin');
+    await screenshot('live-exam-admin-desktop');
+    console.log('PASS existing-house flat price and separate global Full Length Mock authoring');
     assert.deepEqual(errors, [], 'Browser runtime errors');
     console.log('All math browser smoke checks passed. Screenshots: .math-browser/');
 }

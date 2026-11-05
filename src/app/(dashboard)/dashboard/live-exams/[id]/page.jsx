@@ -66,7 +66,7 @@ function getCorrectOptionIndex(question) {
 }
 
 function PendingLiveExamResults({ receipt, examData }) {
-  const { program, examBasePath } = useProgram();
+  const { program, examBasePath, isFullLength } = useProgram();
   const isMath = program === "math";
   const unlockTime = receipt?.resultsAvailableAt || examData?.endTime;
   const [remainingLabel, setRemainingLabel] = useState(() => formatCountdown(unlockTime));
@@ -85,8 +85,8 @@ function PendingLiveExamResults({ receipt, examData }) {
         <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-3xl border border-emerald-400/20 bg-emerald-400/10 shadow-[0_0_28px_rgba(52,211,153,0.14)]">
           <CheckCircle className="h-9 w-9 text-emerald-300" />
         </div>
-        <p className="mt-5 text-xs font-bold uppercase tracking-[0.3em] text-[#DFB15B]">{isMath ? "Math Answer Sheet Submitted" : "Answer Sheet Submitted"}</p>
-        <h1 className="mt-3 font-sans text-3xl font-medium text-white">{isMath ? "Math results unlock after the deadline" : "Results unlock after the deadline"}</h1>
+        <p className="mt-5 text-xs font-bold uppercase tracking-[0.3em] text-[#DFB15B]">{isFullLength ? "Full Length Mock Submitted" : isMath ? "Math Answer Sheet Submitted" : "Answer Sheet Submitted"}</p>
+        <h1 className="mt-3 font-sans text-3xl font-medium text-white">{isFullLength ? "Mock results unlock after the deadline" : isMath ? "Math results unlock after the deadline" : "Results unlock after the deadline"}</h1>
         <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-[#8E8A9F]">
           Your submission has been recorded. Scores, rankings, correct answers, and explanations will become available after {formatDateTime(unlockTime)}.
         </p>
@@ -114,7 +114,7 @@ function PendingLiveExamResults({ receipt, examData }) {
           href={examBasePath}
           className="mt-6 inline-flex items-center justify-center rounded-2xl bg-[#DFB15B] px-5 py-3 text-sm font-bold uppercase tracking-wider text-black transition hover:brightness-110"
         >
-          {isMath ? "Return to Math Exams" : "Return to Live Exams"}
+          {isFullLength ? "Return to Full Length Mocks" : isMath ? "Return to Math Exams" : "Return to Live Exams"}
         </Link>
       </div>
     </div>
@@ -122,16 +122,18 @@ function PendingLiveExamResults({ receipt, examData }) {
 }
 
 export default function LiveExamArenaPage() {
+  const { isFullLength } = useProgram();
   return (
-    <ClassAccessGate section="liveExams" presentation="screen">
+    <ClassAccessGate section={isFullLength ? "fullLengthMocks" : "liveExams"} presentation="screen">
       <LiveExamArenaContent />
     </ClassAccessGate>
   );
 }
 
 function LiveExamArenaContent() {
-  const { program, examBasePath, adminExamPath } = useProgram();
+  const { program, examBasePath, adminExamPath, isFullLength } = useProgram();
   const isMath = program === "math";
+  const examListLabel = isFullLength ? "Full Length Mocks" : isMath ? "Math Exams" : "Live Exams";
   const params = useParams();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -174,6 +176,16 @@ function LiveExamArenaContent() {
           : await getExamById(examId, { isRetake: isRetakeMode });
         if (isMounted) {
           const nextExamData = payload?.data || null;
+          const isFullLengthExam = nextExamData?.competitionCategory === "full-length";
+          if (isFullLength && !isFullLengthExam) {
+            setNotFound(true);
+            return;
+          }
+          if (!isFullLength && program === "general" && isFullLengthExam) {
+            setNotFound(true);
+            router.replace(`/dashboard/full-length-mocks/${examId}${isAdminPreview ? "?preview=admin" : isRetakeMode ? "?mode=retake" : ""}`);
+            return;
+          }
           setExamData(nextExamData);
 
           if (!isRetakeMode && nextExamData?.submissionResult) {
@@ -201,7 +213,7 @@ function LiveExamArenaContent() {
     return () => {
       isMounted = false;
     };
-  }, [examId, isAdminPreview, isRetakeMode, program]);
+  }, [examId, isAdminPreview, isFullLength, isRetakeMode, program, router]);
 
   const status = useMemo(() => getStatus(examData), [examData]);
 
@@ -239,9 +251,9 @@ function LiveExamArenaContent() {
   if (loading) {
     return (
       <FlashyLoader
-        eyebrow={isMath ? "Math Exam" : "Live Exam"}
-        title={isMath ? "Loading math exam room" : "Loading exam room"}
-        message={isMath ? "Math questions, schedule, and access rules are being prepared." : "Schedule, questions, and access rules are being prepared."}
+        eyebrow={isFullLength ? "Full Length Mock" : isMath ? "Math Exam" : "Live Exam"}
+        title={isFullLength ? "Loading the 90-minute mock room" : isMath ? "Loading math exam room" : "Loading exam room"}
+        message={isFullLength ? "Questions, the shared deadline, and access rules are being prepared." : isMath ? "Math questions, schedule, and access rules are being prepared." : "Schedule, questions, and access rules are being prepared."}
         iconName="brain"
         skeleton="exam"
         surface="screen"
@@ -254,8 +266,8 @@ function LiveExamArenaContent() {
       <LiveExamMessage
         icon={<AlertTriangle className="h-10 w-10 text-red-300" />}
         eyebrow="Not Found"
-        title="This live exam could not be found"
-        message="The exam may have been removed or the link may be incorrect."
+        title={isFullLength ? "This Full Length Mock could not be found" : "This live exam could not be found"}
+        message={isFullLength ? "The mock may have been removed or the link may be incorrect." : "The exam may have been removed or the link may be incorrect."}
       />
     );
   }
@@ -268,7 +280,7 @@ function LiveExamArenaContent() {
         title={isAdminPreview ? "Admin preview is unavailable" : "This exam is not open yet"}
         message={blockedMessage}
         returnHref={isAdminPreview ? adminExamPath : examBasePath}
-        returnLabel={isAdminPreview ? (isMath ? "Return to Math Exam Admin" : "Return to Live Exam Admin") : (isMath ? "Return to Math Exams" : "Return to Live Exams")}
+        returnLabel={isAdminPreview ? (isMath ? "Return to Math Exam Admin" : "Return to Live Exam Admin") : `Return to ${examListLabel}`}
       />
     );
   }
@@ -283,7 +295,9 @@ function LiveExamArenaContent() {
         <div className="mx-auto flex w-full max-w-7xl flex-col gap-6">
           <div className="flex flex-col items-start gap-1 text-left">
             <h1 className="font-sans text-3xl font-medium tracking-wide text-white">
-              {submissionResult?.isRetake ? (isMath ? "Math Exam Retake Scorecard" : "Live Exam Retake Scorecard") : (isMath ? "Math Exam Scorecard" : "Live Exam Scorecard")}
+              {submissionResult?.isRetake
+                ? isFullLength ? "Full Length Mock Retake Scorecard" : isMath ? "Math Exam Retake Scorecard" : "Live Exam Retake Scorecard"
+                : isFullLength ? "Full Length Mock Scorecard" : isMath ? "Math Exam Scorecard" : "Live Exam Scorecard"}
             </h1>
             <p className="text-xs font-medium text-[#8E8A9F] sm:text-sm">
               {submissionResult?.isRetake
@@ -310,7 +324,7 @@ function LiveExamArenaContent() {
             examData={examData}
             submissionResult={submissionResult}
             returnHref={examBasePath}
-            returnLabel={isMath ? "Return to Math Exams" : "Return to Live Exams"}
+            returnLabel={`Return to ${examListLabel}`}
           />
         </div>
       </div>
@@ -324,7 +338,7 @@ function LiveExamArenaContent() {
         isPreview={isAdminPreview}
         isMath={isMath}
         returnHref={isAdminPreview ? adminExamPath : examBasePath}
-        returnLabel={isAdminPreview ? (isMath ? "Return to Math Exam Admin" : "Return to Live Exam Admin") : (isMath ? "Return to Math Exams" : "Return to Live Exams")}
+        returnLabel={isAdminPreview ? (isMath ? "Return to Math Exam Admin" : "Return to Live Exam Admin") : `Return to ${examListLabel}`}
       />
     );
   }
@@ -350,10 +364,13 @@ function LiveExamArenaContent() {
 }
 
 function LiveExamMessage({ icon, eyebrow, title, message, returnHref = "/dashboard/live-exams", returnLabel = "Return to Live Exams" }) {
-  const { program, examBasePath } = useProgram();
+  const { program, examBasePath, isFullLength } = useProgram();
   const isMath = program === "math";
-  const resolvedReturnHref = returnHref === "/dashboard/live-exams" && isMath ? examBasePath : returnHref;
-  const resolvedReturnLabel = returnLabel === "Return to Live Exams" && isMath ? "Return to Math Exams" : returnLabel;
+  const shouldResolveDefault = returnHref === "/dashboard/live-exams" && (isMath || isFullLength);
+  const resolvedReturnHref = shouldResolveDefault ? examBasePath : returnHref;
+  const resolvedReturnLabel = returnLabel === "Return to Live Exams"
+    ? isFullLength ? "Return to Full Length Mocks" : isMath ? "Return to Math Exams" : returnLabel
+    : returnLabel;
 
   return (
     <div className={`flex min-h-105 items-center justify-center rounded-3xl border bg-[#121017] px-6 py-12 text-center ${isMath ? "border-emerald-300/12 shadow-[0_18px_60px_rgba(52,211,153,0.06)]" : "border-white/5"}`}>

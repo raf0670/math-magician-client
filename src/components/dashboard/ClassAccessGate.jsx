@@ -22,6 +22,13 @@ const ACCESS_COPY = {
         lockedTitle: "Live exams unlock after payment verification",
         lockedMessage: "Complete enrollment and PayStation checkout. Once payment is verified, scheduled live exams will open here.",
     },
+    fullLengthMocks: {
+        loadingEyebrow: "Full Length Mocks",
+        loadingTitle: "Checking mock access",
+        loadingMessage: "Your active course access is being verified before the full-length exam room opens.",
+        lockedTitle: "Full Length Mocks unlock with any paid course",
+        lockedMessage: "Enroll in any general or math course. Once payment is active, every scheduled Full Length Mock will open here.",
+    },
     assignments: {
         loadingEyebrow: "Assignments",
         loadingTitle: "Checking assignment access",
@@ -52,17 +59,24 @@ export default function ClassAccessGate({ children, section = "classes", present
     const [verifiedProgram, setVerifiedProgram] = useState(null);
     const copy = ACCESS_COPY[section] || ACCESS_COPY.classes;
     const isScreenPresentation = presentation === "screen";
+    const accessKey = `${program}:${section}`;
 
     useEffect(() => {
         let isMounted = true;
 
         getPaymentAccess()
             .then(async (payload) => {
-                const allowed = Boolean(program === 'math' ? payload?.data?.hasMathAccess : payload?.data?.hasClassAccess);
+                const allowed = Boolean(
+                    section === 'fullLengthMocks'
+                        ? payload?.data?.hasClassAccess || payload?.data?.hasMathAccess
+                        : program === 'math'
+                            ? payload?.data?.hasMathAccess
+                            : payload?.data?.hasClassAccess
+                );
                 if (!isMounted) return;
 
                 setHasAccess(allowed);
-                setVerifiedProgram(program);
+                setVerifiedProgram(`${program}:${section}`);
 
                 if (allowed) {
                     const profile = await getProfile().catch(() => null);
@@ -73,7 +87,7 @@ export default function ClassAccessGate({ children, section = "classes", present
                 }
             })
             .catch(() => {
-                if (isMounted) { setHasAccess(false); setVerifiedProgram(program); }
+                if (isMounted) { setHasAccess(false); setVerifiedProgram(`${program}:${section}`); }
             })
             .finally(() => {
                 if (isMounted) setLoading(false);
@@ -82,9 +96,9 @@ export default function ClassAccessGate({ children, section = "classes", present
         return () => {
             isMounted = false;
         };
-    }, [program]);
+    }, [program, section]);
 
-    if (loading || verifiedProgram !== program) {
+    if (loading || verifiedProgram !== accessKey) {
         return (
             <FlashyLoader
                 eyebrow={copy.loadingEyebrow}

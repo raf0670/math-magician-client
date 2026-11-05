@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useProgram } from "@/lib/program";
 import Link from "next/link";
 import { CalendarClock, CheckCircle2, Clock3, Eye, LockKeyhole, Play, RefreshCw, Radio, RotateCcw, Trophy } from "lucide-react";
-import { getLiveExams } from "@/lib/api";
+import { getFullLengthMocks, getLiveExams } from "@/lib/api";
 import ClassAccessGate from "@/components/dashboard/ClassAccessGate";
 import FlashyLoader from "@/components/shared/FlashyLoader";
 import { MathHero, MathPageShell } from "@/components/math/MathDashboardUI";
@@ -40,15 +40,16 @@ function getStatus(exam) {
 }
 
 export default function LiveExamsPage() {
+  const { isFullLength } = useProgram();
   return (
-    <ClassAccessGate section="liveExams">
+    <ClassAccessGate section={isFullLength ? "fullLengthMocks" : "liveExams"}>
       <LiveExamsContent />
     </ClassAccessGate>
   );
 }
 
 function LiveExamsContent() {
-  const { program, examBasePath } = useProgram();
+  const { program, examBasePath, isFullLength } = useProgram();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [fatalError, setFatalError] = useState(null);
@@ -66,21 +67,21 @@ function LiveExamsContent() {
     setFatalError(null);
 
     try {
-      const payload = await getLiveExams(program);
+      const payload = isFullLength ? await getFullLengthMocks() : await getLiveExams(program);
       setItems(payload?.data || []);
     } catch (err) {
       setFatalError(err);
     } finally {
       setLoading(false);
     }
-  }, [program]);
+  }, [isFullLength, program]);
 
   useEffect(() => {
     let isMounted = true;
 
     async function fetchInitialLiveExams() {
       try {
-        const payload = await getLiveExams(program);
+        const payload = isFullLength ? await getFullLengthMocks() : await getLiveExams(program);
         if (isMounted) setItems(payload?.data || []);
       } catch (err) {
         if (isMounted) setFatalError(err);
@@ -93,7 +94,7 @@ function LiveExamsContent() {
     return () => {
       isMounted = false;
     };
-  }, [program]);
+  }, [isFullLength, program]);
 
   if (fatalError) {
     throw fatalError;
@@ -118,9 +119,9 @@ function LiveExamsContent() {
     <>
       {loading ? (
         <FlashyLoader
-          eyebrow={isMath ? "Math Exams" : "Live Exams"}
-          title={isMath ? "Loading math exam windows" : "Loading scheduled exams"}
-          message={isMath ? "Daily mocks and full-length math papers are being fetched." : "Exam windows and availability are being fetched."}
+          eyebrow={isFullLength ? "Full Length Mocks" : isMath ? "Math Exams" : "Live Exams"}
+          title={isFullLength ? "Loading 90-minute mock windows" : isMath ? "Loading math exam windows" : "Loading scheduled exams"}
+          message={isFullLength ? "The latest shared full-length exam windows are being fetched." : isMath ? "Daily mocks and full-length math papers are being fetched." : "Exam windows and availability are being fetched."}
           iconName="clipboard"
           skeleton="cards"
           className="min-h-90"
@@ -130,8 +131,8 @@ function LiveExamsContent() {
       {!loading && !sortedItems.length ? (
         <div className={`rounded-3xl border px-6 py-12 text-center ${isMath ? "border-emerald-300/12 bg-[#121017] shadow-[0_18px_55px_rgba(0,0,0,0.28)]" : "border-white/5 bg-[#121017]"}`}>
           <CalendarClock className={`mx-auto h-10 w-10 ${isMath ? "text-emerald-200" : "text-[#DFB15B]"}`} />
-          <h2 className="mt-4 font-sans text-2xl font-medium text-white">{isMath ? "No math exams posted yet" : "No live exams posted yet"}</h2>
-          <p className="mt-2 text-sm text-[#8E8A9F]">{isMath ? "Daily mocks and full-length math exams will appear here once an admin publishes them." : "New scheduled exams will appear here once an admin publishes them."}</p>
+          <h2 className="mt-4 font-sans text-2xl font-medium text-white">{isFullLength ? "No Full Length Mocks posted yet" : isMath ? "No math exams posted yet" : "No live exams posted yet"}</h2>
+          <p className="mt-2 text-sm text-[#8E8A9F]">{isFullLength ? "The next 90-minute live mock will appear here once an admin publishes it." : isMath ? "Daily mocks and full-length math exams will appear here once an admin publishes them." : "New scheduled exams will appear here once an admin publishes them."}</p>
         </div>
       ) : null}
 
@@ -170,9 +171,10 @@ function LiveExamsContent() {
                   </span>
                 </div>
 
-                <div className="mt-5 grid grid-cols-2 gap-3 border-y border-white/5 py-4">
+                <div className={`mt-5 grid gap-3 border-y border-white/5 py-4 ${isFullLength ? "grid-cols-3" : "grid-cols-2"}`}>
                   <Info label="Questions" value={exam.questionCount || 0} />
                   <Info label="Marks" value={exam.totalMarks || 0} />
+                  {isFullLength ? <Info label="Minutes" value={exam.duration || 90} /> : null}
                 </div>
 
                 <div className="mt-auto pt-5">
@@ -224,7 +226,7 @@ function LiveExamsContent() {
     </>
   );
 
-  if (isMath) {
+  if (isMath && !isFullLength) {
     return (
       <MathPageShell>
         <MathHero
@@ -250,11 +252,13 @@ function LiveExamsContent() {
       <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div>
           <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.3em] text-[#DFB15B]">
-            <Radio className="h-4 w-4" /> Live Exams
+            <Radio className="h-4 w-4" /> {isFullLength ? "Full Length Mocks" : "Live Exams"}
           </p>
-          <h1 className="mt-2 font-sans text-3xl font-medium tracking-wide text-white">Scheduled Exam Room</h1>
+          <h1 className="mt-2 font-sans text-3xl font-medium tracking-wide text-white">{isFullLength ? "90-Minute Full Length Mocks" : "Scheduled Exam Room"}</h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-[#8E8A9F]">
-            Join active live exams during their official time window, or review solutions after the deadline.
+            {isFullLength
+              ? "Join the shared 90-minute live window. Late starters receive only the time remaining before the common deadline."
+              : "Join active live exams during their official time window, or review solutions after the deadline."}
           </p>
         </div>
 

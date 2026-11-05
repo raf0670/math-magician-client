@@ -66,7 +66,10 @@ function formatSubmissionReason(value) {
 const COMPETITION_CATEGORIES = [
   { value: "daily", label: "Daily Exam" },
   { value: "weekly", label: "Weekly Exam" },
+  { value: "full-length", label: "Full Length Mock" },
 ];
+
+const FULL_LENGTH_DURATION_MS = 90 * 60 * 1000;
 
 const STATUS_STYLES = {
   upcoming: "border-sky-400/25 bg-sky-400/10 text-sky-200",
@@ -88,6 +91,12 @@ function toApiDate(value) {
   if (!value) return "";
   const date = new Date(value);
   return Number.isNaN(date.getTime()) ? "" : date.toISOString();
+}
+
+function hasExactFullLengthWindow(startValue, endValue) {
+  const startTime = new Date(startValue).getTime();
+  const endTime = new Date(endValue).getTime();
+  return Number.isFinite(startTime) && Number.isFinite(endTime) && endTime - startTime === FULL_LENGTH_DURATION_MS;
 }
 
 function formatDateTime(value) {
@@ -272,6 +281,11 @@ export default function AdminLiveExamsPage() {
       return;
     }
 
+    if (schedule.competitionCategory === "full-length" && !hasExactFullLengthWindow(schedule.startTime, schedule.endTime)) {
+      setError("Full Length Mock start and end times must be exactly 90 minutes apart.");
+      return;
+    }
+
     setSaving(true);
 
     try {
@@ -379,6 +393,12 @@ export default function AdminLiveExamsPage() {
             />
           </div>
 
+          {schedule.competitionCategory === "full-length" ? (
+            <div className="rounded-2xl border border-fuchsia-400/20 bg-fuchsia-400/10 px-4 py-3 text-sm font-semibold text-fuchsia-100">
+              Full Length Mocks use one shared live window. Set the end time exactly 90 minutes after the start time.
+            </div>
+          ) : null}
+
           <label className="block rounded-2xl border border-white/5 bg-[#0F0D15] px-4 py-3">
             <span className="flex items-center gap-2 text-sm font-semibold text-white">
               <FileJson className="h-4 w-4 text-[#DFB15B]" />
@@ -474,7 +494,7 @@ export default function AdminLiveExamsPage() {
 
                   <div className="flex flex-wrap items-center gap-2">
                     <Link
-                      href={`${examBasePath}/${exam._id}?preview=admin`}
+                      href={`${exam.competitionCategory === "full-length" ? "/dashboard/full-length-mocks" : examBasePath}/${exam._id}?preview=admin`}
                       className="inline-flex items-center justify-center gap-2 rounded-2xl border border-[#DFB15B]/25 bg-[#DFB15B]/10 px-4 py-3 text-sm font-semibold text-[#DFB15B] transition hover:border-[#DFB15B]/45 hover:bg-[#DFB15B]/15"
                     >
                       <Eye className="h-4 w-4" />

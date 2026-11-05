@@ -363,6 +363,10 @@ export async function getLiveExams(program = 'general') {
   return request(buildQueryPath("/api/exams/live", { program }));
 }
 
+export async function getFullLengthMocks() {
+  return request("/api/exams/live/full-length");
+}
+
 export async function getAssignments() {
   return request("/api/exams/assignments");
 }

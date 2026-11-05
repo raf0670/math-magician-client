@@ -42,15 +42,16 @@ function RankBadge({ rank }) {
 }
 
 export default function LiveExamRankingsPage() {
+  const { isFullLength } = useProgram();
   return (
-    <ClassAccessGate section="liveExams">
+    <ClassAccessGate section={isFullLength ? "fullLengthMocks" : "liveExams"}>
       <LiveExamRankingsContent />
     </ClassAccessGate>
   );
 }
 
 function LiveExamRankingsContent() {
-  const { program, examBasePath } = useProgram();
+  const { program, examBasePath, isFullLength } = useProgram();
   const isMath = program === "math";
   const params = useParams();
   const examId = params?.id;
@@ -111,9 +112,9 @@ function LiveExamRankingsContent() {
     return (
       <RankingsPageShell>
         <FlashyLoader
-          eyebrow={isMath ? "Math Exam Rankings" : "Exam Rankings"}
-          title={isMath ? "Loading math rankings" : "Loading leaderboard"}
-          message={isMath ? "Scores and ranks for this math exam are being fetched." : "Scores and ranks for this live exam are being fetched."}
+          eyebrow={isFullLength ? "Full Length Mock Rankings" : isMath ? "Math Exam Rankings" : "Exam Rankings"}
+          title={isFullLength ? "Loading mock leaderboard" : isMath ? "Loading math rankings" : "Loading leaderboard"}
+          message={isFullLength ? "Scores and ranks for this 90-minute mock are being fetched." : isMath ? "Scores and ranks for this math exam are being fetched." : "Scores and ranks for this live exam are being fetched."}
           iconName="analytics"
           skeleton="cards"
           className="min-h-105"
@@ -127,7 +128,7 @@ function LiveExamRankingsContent() {
       <RankingsMessage
         icon={<AlertTriangle className="h-10 w-10 text-red-300" />}
         eyebrow="Not Found"
-        title="This live exam leaderboard could not be found"
+        title={isFullLength ? "This Full Length Mock leaderboard could not be found" : "This live exam leaderboard could not be found"}
         message="The exam may have been removed, or this page may not belong to an official live exam."
       />
     );
@@ -150,11 +151,11 @@ function LiveExamRankingsContent() {
       <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div>
           <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.3em] text-[#DFB15B]">
-            <Medal className="h-4 w-4" /> {isMath ? "Math Exam Rankings" : "Exam Rankings"}
+            <Medal className="h-4 w-4" /> {isFullLength ? "Full Length Mock Rankings" : isMath ? "Math Exam Rankings" : "Exam Rankings"}
           </p>
           <h1 className="mt-2 font-sans text-3xl font-medium tracking-wide text-white">{exam.title || "Live Exam"}</h1>
           <p className="mt-2 text-sm leading-6 text-[#8E8A9F]">
-            Ended {formatDateTime(exam.endTime)}. Rankings are based on this {isMath ? "math exam" : "exam"}&apos;s marks only.
+            Ended {formatDateTime(exam.endTime)}. Rankings are based on this {isFullLength ? "full-length mock" : isMath ? "math exam" : "exam"}&apos;s marks only.
           </p>
         </div>
 
@@ -163,7 +164,7 @@ function LiveExamRankingsContent() {
           className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/8 bg-[#121017] px-4 py-3 text-sm font-semibold text-white transition hover:border-[#DFB15B]/30 hover:text-[#DFB15B]"
         >
           <ArrowLeft className="h-4 w-4" />
-          {isMath ? "Math Exams" : "Live Exams"}
+          {isFullLength ? "Full Length Mocks" : isMath ? "Math Exams" : "Live Exams"}
         </Link>
       </div>
 
@@ -274,7 +275,7 @@ function SummaryTile({ label, value, icon: Icon }) {
 }
 
 function RankingsMessage({ icon, eyebrow, title, message }) {
-  const { program, examBasePath } = useProgram();
+  const { program, examBasePath, isFullLength } = useProgram();
   const isMath = program === "math";
   return (
     <RankingsPageShell>
@@ -291,7 +292,7 @@ function RankingsMessage({ icon, eyebrow, title, message }) {
             className="mt-6 inline-flex items-center justify-center gap-2 rounded-2xl bg-[#DFB15B] px-5 py-3 text-sm font-bold uppercase tracking-wider text-black transition hover:brightness-110"
           >
             <ArrowLeft className="h-4 w-4" />
-            {isMath ? "Math Exams" : "Live Exams"}
+            {isFullLength ? "Full Length Mocks" : isMath ? "Math Exams" : "Live Exams"}
           </Link>
         </div>
       </div>

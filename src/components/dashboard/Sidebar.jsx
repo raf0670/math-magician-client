@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { LayoutDashboard, Video, ClipboardCheck, BarChart3, User, LogOut, ShieldCheck, Brain, Archive, Radio, FileQuestion, Trophy, Sparkles, ClipboardList, FolderOpen, Gift } from "lucide-react";
+import { LayoutDashboard, Video, ClipboardCheck, BarChart3, User, LogOut, ShieldCheck, Brain, Archive, Radio, FileQuestion, Trophy, Sparkles, ClipboardList, FolderOpen, Gift, Timer } from "lucide-react";
 import { clearAuthSession, getProfile, getStoredUser, saveAuthSession } from "@/lib/api";
 import BrandMark from "@/components/shared/BrandMark";
 import StudentAvatar from "@/components/shared/StudentAvatar";
@@ -13,6 +13,7 @@ const SHOW_STUDENT_LIVE_EXAMS_NAV = true;
 
 const NAV_ACCENTS = {
     "/dashboard": "from-[#DFB15B]/24 via-[#F6D98B]/10 to-transparent",
+    "/dashboard/full-length-mocks": "from-fuchsia-400/24 via-[#DFB15B]/10 to-transparent",
     "/dashboard/classes": "from-emerald-400/20 via-teal-400/8 to-transparent",
     "/dashboard/archived-classes": "from-cyan-300/18 via-sky-400/8 to-transparent",
     "/dashboard/resources": "from-violet-400/18 via-[#DFB15B]/8 to-transparent",
@@ -53,7 +54,9 @@ export default function DashboardSidebar() {
         const syncUser = () => {
             const storedUser = getStoredUser();
             setCurrentUser(storedUser);
-            setRankInfo(getRankInfo(storedUser?.hasMathAccess && (!storedUser?.hasClassAccess || pathname.startsWith("/dashboard/math")) ? storedUser?.mathRankInfo : storedUser?.rankInfo));
+            const isFullLengthRoute = pathname.startsWith("/dashboard/full-length-mocks");
+            const useMathRank = pathname.startsWith("/dashboard/math") || (storedUser?.hasMathAccess && !storedUser?.hasClassAccess && !isFullLengthRoute);
+            setRankInfo(getRankInfo(useMathRank ? storedUser?.mathRankInfo : storedUser?.rankInfo));
         };
         const refreshProfile = async () => {
             const token = window.localStorage.getItem("exam_archive_token");
@@ -80,6 +83,7 @@ export default function DashboardSidebar() {
     const mathOnly = currentUser?.hasMathAccess && !currentUser?.hasClassAccess && currentUser?.role !== "admin";
     const navItems = [
         { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
+        { href: "/dashboard/full-length-mocks", label: "Full Length Mock", icon: Timer },
         { href: "/dashboard/classes", label: "Live Classes", icon: Video },
         { href: "/dashboard/archived-classes", label: "Recorded Classes", icon: Archive },
         { href: "/dashboard/resources", label: "Resources", icon: FolderOpen },
@@ -104,7 +108,7 @@ export default function DashboardSidebar() {
         mathOnly ? { href: "/payment/details?plan=slytherinUpgrade", label: "Join Slytherin", icon: Sparkles } : null,
         currentUser?.role === "admin" ? { href: "/dashboard/admin/math/live-exams", label: "Math Exam Admin", icon: FileQuestion } : null,
         { href: "/dashboard/profile", label: "Profile", icon: User },
-    ].filter(Boolean).filter(item => !mathOnly || item.href.startsWith("/dashboard/math") || item.href === "/dashboard/profile" || item.href.startsWith("/payment/"));
+    ].filter(Boolean).filter(item => !mathOnly || item.href.startsWith("/dashboard/math") || item.href === "/dashboard/full-length-mocks" || item.href === "/dashboard/profile" || item.href.startsWith("/payment/"));
 
     const firstName = currentUser?.name?.trim().split(" ")[0] || "Student";
     const rankTone = getRankTone(rankInfo);
@@ -117,7 +121,7 @@ export default function DashboardSidebar() {
 
     return (
         <>
-            <aside className="hidden md:flex fixed bottom-0 left-0 top-[69px] z-30 w-64 select-none flex-col justify-start overflow-y-auto border-r border-[#DFB15B]/10 bg-[#0D0B14]/95 px-4 py-6 shadow-[22px_0_70px_rgba(0,0,0,0.28)]">
+            <aside className="hidden md:flex fixed bottom-0 left-0 top-17.25 z-30 w-64 select-none flex-col justify-start overflow-y-auto border-r border-[#DFB15B]/10 bg-[#0D0B14]/95 px-4 py-6 shadow-[22px_0_70px_rgba(0,0,0,0.28)]">
                 <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(223,177,91,0.045)_1px,transparent_1px),linear-gradient(90deg,rgba(124,58,237,0.035)_1px,transparent_1px)] bg-size-[38px_38px]" />
                 <motion.div
                     className="pointer-events-none absolute -left-24 -top-24 h-64 w-64 rounded-full bg-[#DFB15B]/13 blur-3xl"
