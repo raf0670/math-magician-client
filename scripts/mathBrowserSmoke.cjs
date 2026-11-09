@@ -21,6 +21,14 @@ const fullLengthMock = {
     duration: 90, totalMarks: 60, questionCount: 60, status: 'upcoming',
     startTime: fullLengthStart.toISOString(), endTime: fullLengthEnd.toISOString(), hasSubmitted: false
 };
+const resourceCatalog = [
+    {
+        label: 'Maths', caption: 'Math guides, shortcuts and question banks',
+        description: 'Browse Maths resources for quant concepts and practice.', icon: 'Sigma',
+        accent: 'text-[#DFB15B]', surface: 'border-[#DFB15B]/18 bg-[#DFB15B]/10',
+        resources: [{ label: 'Math Shortcuts', href: 'https://drive.google.com/file/d/test-resource/view' }]
+    }
+];
 const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
 async function until(action, label) {
     for (let attempt = 0; attempt < 100; attempt++) { try { if (await action()) return; } catch {} await pause(100); }
@@ -57,7 +65,11 @@ async function mockRequest(event) {
     if (url.pathname === '/api/analytics/competition') payload.data = { leaderboard: [], houses: [], badges: [], champions: {}, currentUserEntry: null };
     if (url.pathname === '/api/exams/live/full-length') payload.data = [fullLengthMock];
     if (url.pathname === '/api/classes/current') payload.data = null;
-    if (url.pathname === '/api/classes/catalog') payload.data = ['Basic', 'Archive'].map(label => ({ label: `${label} Classes`, topics: Array.from({ length: 12 }, (_, i) => ({ label: `${label} Class ${i + 1}`, href: '' })) }));
+    if (url.pathname === '/api/classes/catalog') {
+        payload.data = url.searchParams.get('kind') === 'resources'
+            ? resourceCatalog
+            : ['Basic', 'Archive'].map(label => ({ label: `${label} Classes`, topics: Array.from({ length: 12 }, (_, i) => ({ label: `${label} Class ${i + 1}`, href: '' })) }));
+    }
     const responseBody = Buffer.from(JSON.stringify(payload)).toString('base64');
     return send('Fetch.fulfillRequest', { requestId: event.requestId, responseCode: 200, responseHeaders: [{ name: 'Content-Type', value: 'application/json' }, { name: 'Access-Control-Allow-Origin', value: '*' }, { name: 'Access-Control-Allow-Headers', value: 'authorization, content-type' }, { name: 'Access-Control-Allow-Methods', value: 'GET, POST, PUT, DELETE, OPTIONS' }], body: responseBody });
 }
@@ -67,6 +79,8 @@ async function navigate(route) {
     const source = `localStorage.clear(); ${authenticated ? `localStorage.setItem('exam_archive_token','smoke-token');localStorage.setItem('exam_archive_user',${JSON.stringify(JSON.stringify(user))});` : ''}`;
     bootScript = (await send('Page.addScriptToEvaluateOnNewDocument', { source })).identifier;
     await send('Page.navigate', { url: origin + route });
+    const expectedPath = new URL(origin + route).pathname;
+    await until(() => evaluate(`location.pathname === ${JSON.stringify(expectedPath)}`), route + ' navigation');
     await until(() => evaluate('document.readyState === "complete"'), route);
 }
 async function textContains(text) { await until(() => evaluate(`document.body.innerText.includes(${JSON.stringify(text)})`), text); }
@@ -129,15 +143,30 @@ async function main() {
     await textContains('Welcome back');
     assert.equal(await evaluate(`Boolean(document.querySelector('nav a[href="/dashboard/live-exams"]'))`), false);
     assert.equal(await evaluate(`Boolean(document.querySelector('nav a[href="/dashboard/full-length-mocks"]'))`), true);
+    assert.equal(await evaluate(`Boolean(document.querySelector('nav a[href="/dashboard/resources"]'))`), true);
     await screenshot('dashboard-mobile');
     await navigate('/dashboard/full-length-mocks'); await textContains('90-Minute Full Length Mocks'); await textContains('Full Length Mock 01');
     assert.ok(apiRequests.includes('/api/exams/live/full-length'));
     assert.ok(await evaluate('document.documentElement.scrollWidth <= window.innerWidth + 1'), 'Mobile Full Length Mocks overflows');
     await screenshot('full-length-mocks-mobile');
+    await navigate('/dashboard/resources'); await textContains('Curated PDF resource library');
+    await until(() => evaluate(`document.body.textContent.includes('Paid student resources')`), 'paid-student resource copy');
+    await textContains('Maths');
+    assert.ok(apiRequests.includes('/api/classes/catalog?kind=resources&program=general'));
+    assert.ok(await evaluate('document.documentElement.scrollWidth <= window.innerWidth + 1'), 'Mobile resources overflows');
+    await evaluate(`Array.from(document.querySelectorAll('button')).find(x=>x.textContent.includes('Browse Files')).click()`);
+    await textContains('Math Shortcuts');
+    assert.equal(await evaluate(`document.querySelector('a[href="https://drive.google.com/file/d/test-resource/view"]').textContent.includes('Open File')`), true);
+    await pause(400);
+    await screenshot('resources-mobile');
     await send('Emulation.setDeviceMetricsOverride', { width: 1365, height: 1000, deviceScaleFactor: 1, mobile: false });
     await navigate('/dashboard/full-length-mocks'); await textContains('Full Length Mock 01'); await textContains('GOLD III');
     assert.ok(await evaluate('document.documentElement.scrollWidth <= window.innerWidth + 1'), 'Desktop Full Length Mocks overflows');
     await screenshot('full-length-mocks-desktop');
+    await navigate('/dashboard/resources'); await textContains('Curated PDF resource library');
+    assert.ok(await evaluate('document.documentElement.scrollWidth <= window.innerWidth + 1'), 'Desktop resources overflows');
+    await pause(400);
+    await screenshot('resources-desktop');
     await send('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, deviceScaleFactor: 1, mobile: true });
     await navigate('/dashboard/math/archived-classes'); await textContains('Archive Class 12');
     assert.equal(await evaluate(`Array.from(document.querySelectorAll('div')).filter(x=>x.textContent.trim()==='Coming Soon').length`), 24);
@@ -146,7 +175,7 @@ async function main() {
     await navigate('/dashboard/math/leaderboard'); await textContains('Math Leaderboard');
     assert.ok(apiRequests.includes('/api/analytics/competition?program=math'));
     assert.ok(await evaluate('document.documentElement.scrollWidth <= window.innerWidth + 1'), 'Mobile leaderboard overflows');
-    console.log('PASS math-only navigation, Full Length Mocks desktop/mobile, recordings, exams and leaderboard');
+    console.log('PASS math-only navigation, shared resources, Full Length Mocks desktop/mobile, recordings, exams and leaderboard');
 
     await navigate('/payment/details?plan=slytherinUpgrade');
     await pause(1000);

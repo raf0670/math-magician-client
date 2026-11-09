@@ -29,6 +29,13 @@ const ACCESS_COPY = {
         lockedTitle: "Full Length Mocks unlock with any paid course",
         lockedMessage: "Enroll in any general or math course. Once payment is active, every scheduled Full Length Mock will open here.",
     },
+    resources: {
+        loadingEyebrow: "Resources",
+        loadingTitle: "Checking resource access",
+        loadingMessage: "Your active course access is being verified before the resource library opens.",
+        lockedTitle: "Resources unlock with any paid course",
+        lockedMessage: "Enroll in any house or math course. Once payment is active, the complete resource library will open here.",
+    },
     assignments: {
         loadingEyebrow: "Assignments",
         loadingTitle: "Checking assignment access",
@@ -67,7 +74,7 @@ export default function ClassAccessGate({ children, section = "classes", present
         getPaymentAccess()
             .then(async (payload) => {
                 const allowed = Boolean(
-                    section === 'fullLengthMocks'
+                    ['fullLengthMocks', 'resources'].includes(section)
                         ? payload?.data?.hasClassAccess || payload?.data?.hasMathAccess
                         : program === 'math'
                             ? payload?.data?.hasMathAccess

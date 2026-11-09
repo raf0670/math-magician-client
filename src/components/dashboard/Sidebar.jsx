@@ -108,7 +108,7 @@ export default function DashboardSidebar() {
         mathOnly ? { href: "/payment/details?plan=slytherinUpgrade", label: "Join Slytherin", icon: Sparkles } : null,
         currentUser?.role === "admin" ? { href: "/dashboard/admin/math/live-exams", label: "Math Exam Admin", icon: FileQuestion } : null,
         { href: "/dashboard/profile", label: "Profile", icon: User },
-    ].filter(Boolean).filter(item => !mathOnly || item.href.startsWith("/dashboard/math") || item.href === "/dashboard/full-length-mocks" || item.href === "/dashboard/profile" || item.href.startsWith("/payment/"));
+    ].filter(Boolean).filter(item => !mathOnly || item.href.startsWith("/dashboard/math") || item.href === "/dashboard/full-length-mocks" || item.href === "/dashboard/resources" || item.href === "/dashboard/profile" || item.href.startsWith("/payment/"));
 
     const firstName = currentUser?.name?.trim().split(" ")[0] || "Student";
     const rankTone = getRankTone(rankInfo);

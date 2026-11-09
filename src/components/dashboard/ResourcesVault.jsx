@@ -69,7 +69,7 @@ export default function ResourcesVault() {
                             <div className="inline-flex items-center gap-2 rounded-md border border-[#D4AF37]/15 bg-[#D4AF37]/10 px-2.5 py-1">
                                 <CheckCircle className="h-3.5 w-3.5 text-[#DFB15B]" />
                                 <span className="text-[10px] font-bold uppercase tracking-wider text-[#DFB15B]">
-                                    Approved student resources
+                                    Paid student resources
                                 </span>
                             </div>
 

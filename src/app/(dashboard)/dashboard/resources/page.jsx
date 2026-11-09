@@ -3,7 +3,7 @@ import ResourcesVault from "@/components/dashboard/ResourcesVault";
 
 export default function DashboardResourcesPage() {
     return (
-        <ClassAccessGate section="classes">
+        <ClassAccessGate section="resources">
             <div className="flex w-full flex-col gap-8">
                 <div className="flex flex-col items-start gap-1 text-left">
                     <h1 className="font-sans text-3xl font-medium tracking-wide text-white">
