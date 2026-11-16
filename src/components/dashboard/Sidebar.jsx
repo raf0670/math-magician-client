@@ -88,6 +88,7 @@ export default function DashboardSidebar() {
     const navItems = [
         { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
         { href: "/dashboard/full-length-mocks", label: "Full Length Mock", icon: Timer },
+        showMarathon ? { href: "/dashboard/marathon", label: "Marathon", icon: Languages } : { href: "/marathon", label: "Join Marathon", icon: Languages },
         { href: "/dashboard/classes", label: "Live Classes", icon: Video },
         { href: "/dashboard/archived-classes", label: "Recorded Classes", icon: Archive },
         { href: "/dashboard/resources", label: "Resources", icon: FolderOpen },
@@ -103,7 +104,6 @@ export default function DashboardSidebar() {
         currentUser?.role === "admin" ? { href: "/dashboard/admin/live-exams", label: "Live Exam Admin", icon: FileQuestion } : null,
         currentUser?.role === "admin" ? { href: "/dashboard/admin/assignments", label: "Assignment Admin", icon: ClipboardList } : null,
         currentUser?.role === "admin" ? { href: "/dashboard/admin/rp-adjustments", label: "RP Adjustments", icon: Gift } : null,
-        showMarathon ? { href: "/dashboard/marathon", label: "Marathon", icon: Languages } : { href: "/marathon", label: "Join Marathon", icon: Languages },
         showMath ? { href: "/dashboard/math", label: "Math Overview", icon: Brain } : null,
         showMath ? { href: "/dashboard/math/classes", label: "Math Live Classes", icon: Video } : null,
         showMath ? { href: "/dashboard/math/archived-classes", label: "Math Recordings", icon: Archive } : null,
