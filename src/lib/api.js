@@ -273,10 +273,10 @@ export async function getCourses() {
   return request("/api/courses");
 }
 
-export async function submitManualEnrollment(planId, formData, paymentChoice, expectedAmount) {
+export async function submitManualEnrollment(planId, formData, paymentChoice, expectedAmount, pricing = {}) {
   return request("/api/payments/manual-enrollment", {
     method: "POST",
-    body: { planId, formData, paymentChoice, expectedAmount },
+    body: { planId, formData, paymentChoice, expectedAmount, ...pricing },
   });
 }
 
@@ -562,8 +562,8 @@ export async function submitExam(examId, answers, metadata = {}) {
 export function getContentCatalog(kind = 'recordings', program = 'general') {
   return request(buildQueryPath('/api/classes/catalog', { kind, program }));
 }
-export function getPaymentQuote(planId) {
-  return request('/api/payments/quote', { method: 'POST', body: { planId } });
+export function getPaymentQuote(planId, pricing = {}) {
+  return request('/api/payments/quote', { method: 'POST', body: { planId, ...pricing } });
 }
 export function getMathEnrollmentContext() { return request('/api/payments/math-context'); }
 export function getMarathonEnrollmentContext() { return request('/api/payments/marathon-context'); }

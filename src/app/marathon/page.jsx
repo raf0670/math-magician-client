@@ -23,6 +23,7 @@ export default function MarathonLandingPage() {
           <div className="mx-auto mt-8 flex max-w-xl items-center justify-center gap-3 rounded-3xl border border-emerald-300/20 bg-emerald-300/8 px-5 py-4 text-left text-sm text-emerald-100">
             <Percent className="h-6 w-6 shrink-0 text-emerald-300" /> Students enrolled in any paid 2026 batch receive an automatic 25% discount when using the same account.
           </div>
+          <p className="mx-auto mt-3 max-w-xl text-sm font-semibold text-orange-200">Or use MAGNUS200 for BDT 200 off. Discounts cannot be combined.</p>
         </section>
 
         <section className="grid gap-5 lg:grid-cols-3">
