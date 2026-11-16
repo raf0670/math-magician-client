@@ -1,6 +1,7 @@
 "use client";
 
 import MathEnrollment from "@/components/math/MathEnrollment";
+import MarathonEnrollment from "@/components/marathon/MarathonEnrollment";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useMemo, useState } from "react";
@@ -163,6 +164,7 @@ function PaymentDetailsRouter() {
   const searchParams = useSearchParams();
   const planId = searchParams.get('plan');
   if (['math', 'mathSlytherin', 'slytherinUpgrade'].includes(planId)) return <MathEnrollment key={planId} initialPlan={planId} />;
+  if (['marathonEnglish', 'marathonMaths', 'marathonBoth', 'marathonAddEnglish', 'marathonAddMaths'].includes(planId)) return <MarathonEnrollment key={planId} initialPlan={planId} />;
   return <PaymentDetailsContent />;
 }
 

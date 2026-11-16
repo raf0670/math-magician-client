@@ -30,9 +30,10 @@ function PaymentFailedContent() {
   const isFinalInstallment = searchParams.get("paymentStage") === "final";
   const planId = searchParams.get("plan") || "";
   const isMathCheckout = ["math", "mathSlytherin", "slytherinUpgrade"].includes(planId);
+  const isMarathonCheckout = ["marathonEnglish", "marathonMaths", "marathonBoth", "marathonAddEnglish", "marathonAddMaths"].includes(planId);
   const retryHref = isFinalInstallment
     ? "/dashboard"
-    : isMathCheckout
+    : isMathCheckout || isMarathonCheckout
       ? `/payment/details?plan=${encodeURIComponent(planId)}`
       : "/#programs-section";
 
@@ -57,7 +58,7 @@ function PaymentFailedContent() {
           href={retryHref}
           className="mt-6 inline-flex rounded-2xl border border-[#DFB15B]/30 bg-[#DFB15B]/10 px-5 py-3 text-sm font-bold uppercase tracking-wider text-[#DFB15B] transition hover:bg-[#DFB15B] hover:text-black"
         >
-          {isFinalInstallment ? "Return to Dashboard" : isMathCheckout ? "Retry Math Checkout" : "Return to Pricing"}
+          {isFinalInstallment ? "Return to Dashboard" : isMarathonCheckout ? "Retry Marathon Checkout" : isMathCheckout ? "Retry Math Checkout" : "Return to Pricing"}
         </Link>
       </div>
     </div>

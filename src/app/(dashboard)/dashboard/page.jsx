@@ -15,6 +15,7 @@ export default function DashboardOverview() {
             if (!active) return;
             const user = payload.data;
             if (user.hasMathAccess && !user.hasClassAccess && user.role !== 'admin') router.replace('/dashboard/math');
+            else if (user.marathonSections?.length && !user.hasClassAccess && !user.hasMathAccess && user.role !== 'admin') router.replace('/dashboard/marathon');
             else setReady(true);
         }).catch(() => { if (active) setReady(true); });
         return () => { active = false; };

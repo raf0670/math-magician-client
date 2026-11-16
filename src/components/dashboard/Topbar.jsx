@@ -19,6 +19,7 @@ const SECTION_TITLES = {
     "/dashboard/quiz": "Quiz",
     "/dashboard/analytics": "Analytics",
     "/dashboard/leaderboard": "Leaderboard",
+    "/dashboard/marathon": "Marathon",
     "/dashboard/profile": "Profile",
     "/dashboard/admin/enrollments": "Enrollments",
     "/dashboard/admin/classes": "Class Admin",

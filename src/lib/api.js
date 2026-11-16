@@ -566,3 +566,9 @@ export function getPaymentQuote(planId) {
   return request('/api/payments/quote', { method: 'POST', body: { planId } });
 }
 export function getMathEnrollmentContext() { return request('/api/payments/math-context'); }
+export function getMarathonEnrollmentContext() { return request('/api/payments/marathon-context'); }
+export function getMarathonDashboard() { return request('/api/marathon'); }
+export function getAdminMarathonLinks() { return request('/api/marathon/admin/links'); }
+export function updateAdminMarathonLink(section, payload) {
+  return request(`/api/marathon/admin/links/${encodeURIComponent(section)}`, { method: 'PUT', body: payload });
+}

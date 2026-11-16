@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { LayoutDashboard, Video, ClipboardCheck, BarChart3, User, LogOut, ShieldCheck, Brain, Archive, Radio, FileQuestion, Trophy, Sparkles, ClipboardList, FolderOpen, Gift, Timer } from "lucide-react";
+import { LayoutDashboard, Video, ClipboardCheck, BarChart3, User, LogOut, ShieldCheck, Brain, Archive, Radio, FileQuestion, Trophy, Sparkles, ClipboardList, FolderOpen, Gift, Timer, Languages } from "lucide-react";
 import { clearAuthSession, getProfile, getStoredUser, saveAuthSession } from "@/lib/api";
 import BrandMark from "@/components/shared/BrandMark";
 import StudentAvatar from "@/components/shared/StudentAvatar";
@@ -29,6 +29,7 @@ const NAV_ACCENTS = {
     "/dashboard/math/archived-classes": "from-teal-300/22 via-[#DFB15B]/8 to-transparent",
     "/dashboard/math/live-exams": "from-emerald-300/24 via-red-400/8 to-transparent",
     "/dashboard/math/leaderboard": "from-emerald-300/24 via-[#DFB15B]/12 to-transparent",
+    "/dashboard/marathon": "from-cyan-300/24 via-orange-300/10 to-transparent",
     "/dashboard/admin/enrollments": "from-emerald-400/20 via-[#DFB15B]/8 to-transparent",
     "/dashboard/admin/classes": "from-cyan-300/18 via-[#7C3AED]/8 to-transparent",
     "/dashboard/admin/live-exams": "from-red-400/20 via-[#DFB15B]/8 to-transparent",
@@ -81,6 +82,9 @@ export default function DashboardSidebar() {
 
     const showMath = currentUser?.hasMathAccess || currentUser?.role === "admin";
     const mathOnly = currentUser?.hasMathAccess && !currentUser?.hasClassAccess && currentUser?.role !== "admin";
+    const marathonSections = Array.isArray(currentUser?.marathonSections) ? currentUser.marathonSections : [];
+    const showMarathon = marathonSections.length > 0 || currentUser?.role === "admin";
+    const marathonOnly = marathonSections.length > 0 && !currentUser?.hasClassAccess && !currentUser?.hasMathAccess && currentUser?.role !== "admin";
     const navItems = [
         { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
         { href: "/dashboard/full-length-mocks", label: "Full Length Mock", icon: Timer },
@@ -99,6 +103,7 @@ export default function DashboardSidebar() {
         currentUser?.role === "admin" ? { href: "/dashboard/admin/live-exams", label: "Live Exam Admin", icon: FileQuestion } : null,
         currentUser?.role === "admin" ? { href: "/dashboard/admin/assignments", label: "Assignment Admin", icon: ClipboardList } : null,
         currentUser?.role === "admin" ? { href: "/dashboard/admin/rp-adjustments", label: "RP Adjustments", icon: Gift } : null,
+        showMarathon ? { href: "/dashboard/marathon", label: "Marathon", icon: Languages } : { href: "/marathon", label: "Join Marathon", icon: Languages },
         showMath ? { href: "/dashboard/math", label: "Math Overview", icon: Brain } : null,
         showMath ? { href: "/dashboard/math/classes", label: "Math Live Classes", icon: Video } : null,
         showMath ? { href: "/dashboard/math/archived-classes", label: "Math Recordings", icon: Archive } : null,
@@ -108,7 +113,9 @@ export default function DashboardSidebar() {
         mathOnly ? { href: "/payment/details?plan=slytherinUpgrade", label: "Join Slytherin", icon: Sparkles } : null,
         currentUser?.role === "admin" ? { href: "/dashboard/admin/math/live-exams", label: "Math Exam Admin", icon: FileQuestion } : null,
         { href: "/dashboard/profile", label: "Profile", icon: User },
-    ].filter(Boolean).filter(item => !mathOnly || item.href.startsWith("/dashboard/math") || item.href === "/dashboard/full-length-mocks" || item.href === "/dashboard/resources" || item.href === "/dashboard/profile" || item.href.startsWith("/payment/"));
+    ].filter(Boolean)
+      .filter(item => !mathOnly || item.href.startsWith("/dashboard/math") || item.href === "/dashboard/marathon" || item.href === "/dashboard/full-length-mocks" || item.href === "/dashboard/resources" || item.href === "/dashboard/profile" || item.href.startsWith("/payment/"))
+      .filter(item => !marathonOnly || item.href === "/dashboard/marathon" || item.href === "/dashboard/profile");
 
     const firstName = currentUser?.name?.trim().split(" ")[0] || "Student";
     const rankTone = getRankTone(rankInfo);

@@ -22,6 +22,7 @@ import {
   updateAdminLiveClass,
 } from "@/lib/api";
 import FlashyLoader, { LoadingButtonLabel } from "@/components/shared/FlashyLoader";
+import MarathonLinkManager from "@/components/marathon/MarathonLinkManager";
 
 const EMPTY_FORM = {
   program: "general",
@@ -255,6 +256,8 @@ export default function AdminLiveClassesPage() {
           Refresh
         </button>
       </div>
+
+      <MarathonLinkManager />
 
       <section className="rounded-3xl border border-white/6 bg-[#121017] p-5 sm:p-6">
         <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">

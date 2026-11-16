@@ -5,19 +5,32 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ArrowRight, Sparkles, X } from "lucide-react";
 import Image from "next/image";
 
-const SESSION_KEY = "mathmagician_home_intro_seen";
+const SESSION_KEY = "mathmagician_marathon_intro_seen";
 
 const programs = [
   {
+    id: "marathon",
+    badge: "New Batch - Marathon",
+    title: "Marathon Classes",
+    detail: "Choose English, Maths, or both",
+    schedule: "Live class access from your dashboard",
+    price: "From BDT 1,200",
+    imageSrc: "/favicon.ico",
+    imageAlt: "Magician's School logo",
+    href: "/marathon",
+    featured: true,
+  },
+  {
     id: "math",
-    badge: "New Batch - Math Course",
+    badge: "Math Course",
     title: "Math Course",
     detail: "Dedicated online math preparation",
     schedule: "Recorded + Live Classes",
     price: "BDT 4,500",
     imageSrc: "/slytherin.jpg",
     imageAlt: "Slytherin house crest",
-    featured: true,
+    href: "/math-course",
+    featured: false,
   },
 ];
 
@@ -83,19 +96,9 @@ export default function HomeIntroPopup() {
     setIntroPhase("idle");
   };
 
-  const scrollToPrograms = () => {
+  const openProgram = (href) => {
     closePopup();
-
-    window.setTimeout(() => {
-      const programAnchor = document.getElementById("programs-section");
-
-      if (programAnchor) {
-        programAnchor.scrollIntoView({ behavior: "smooth", block: "start" });
-        return;
-      }
-
-      window.location.hash = "programs-section";
-    }, 120);
+    window.setTimeout(() => window.location.assign(href), 120);
   };
 
   return (
@@ -250,36 +253,36 @@ export default function HomeIntroPopup() {
                 transition={{ delay: 0.15, duration: 0.3 }}
               >
                 <Sparkles className="h-3.5 w-3.5" />
-                Your IBA journey starts here
+                New Marathon Batch
               </motion.div>
 
               <h2 id="home-intro-title" className="font-sans text-3xl font-medium leading-tight tracking-wide text-white sm:text-4xl lg:text-5xl">
-                Every serious result begins with one clear decision.
+                Your final sprint starts here.
               </h2>
 
               <p id="home-intro-description" className="mt-5 max-w-2xl text-sm font-medium leading-7 text-[#A9A3BA] sm:text-base">
-                Step into a focused preparation system built for discipline, confidence, and exam-day sharpness. Choose your path, then start moving with purpose.
+                Choose English, Maths, or both and join every live class from your dashboard. Students from any paid 2026 batch receive an automatic 25% discount.
               </p>
 
               <button
                 type="button"
-                onClick={scrollToPrograms}
+                onClick={() => openProgram("/marathon")}
                 className="mt-7 inline-flex items-center justify-center gap-2 rounded-full bg-linear-to-r from-[#E6C687] via-[#D4AF37] to-[#AA7C11] px-7 py-3.5 text-xs font-bold uppercase tracking-wider text-black shadow-[0_10px_35px_rgba(212,175,55,0.22)] transition hover:brightness-110 active:scale-[0.98]"
               >
-                Get Started Now
+                Explore Marathon
                 <ArrowRight className="h-4 w-4" />
               </button>
             </div>
 
-            <div className="relative z-10 mx-auto mt-8 grid max-w-3xl grid-cols-1 gap-3 sm:mt-9">
+            <div className="relative z-10 mx-auto mt-8 grid max-w-4xl grid-cols-1 gap-3 sm:mt-9 sm:grid-cols-2">
               {programs.map((program, index) => (
                 <motion.button
                   type="button"
                   key={program.id}
-                  onClick={scrollToPrograms}
+                  onClick={() => openProgram(program.href)}
                   className={`group flex min-h-40 flex-col rounded-2xl border p-5 text-left transition hover:-translate-y-1 hover:shadow-[0_16px_36px_rgba(0,0,0,0.35)] ${
                     program.featured
-                      ? "border-emerald-300/55 bg-linear-to-br from-emerald-400/18 via-[#DFB15B]/12 to-white/5 shadow-[0_0_48px_rgba(52,211,153,0.18)]"
+                      ? "border-cyan-300/55 bg-linear-to-br from-cyan-400/18 via-orange-300/12 to-white/5 shadow-[0_0_48px_rgba(34,211,238,0.18)]"
                       : "border-white/8 bg-white/4 hover:border-[#DFB15B]/20"
                   }`}
                   initial={{ opacity: 0, y: 18 }}
@@ -289,14 +292,14 @@ export default function HomeIntroPopup() {
                   <span className="flex items-start justify-between gap-3">
                     <span className={`rounded-md border px-2.5 py-1 text-[9px] font-bold uppercase tracking-wider ${
                       program.featured
-                        ? "border-emerald-300/35 bg-emerald-300/14 text-emerald-100"
+                        ? "border-cyan-300/35 bg-cyan-300/14 text-cyan-100"
                         : "border-white/10 bg-black/15 text-[#DFB15B]"
                     }`}>
                       {program.badge}
                     </span>
                     <span className={`flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-xl border ${
                       program.featured
-                        ? "border-emerald-300/45 bg-emerald-300/16 text-emerald-100 shadow-[0_0_24px_rgba(52,211,153,0.28)]"
+                        ? "border-cyan-300/45 bg-cyan-300/16 text-cyan-100 shadow-[0_0_24px_rgba(34,211,238,0.28)]"
                         : "border-[#DFB15B]/20 bg-[#DFB15B]/10 text-[#DFB15B]"
                     }`}>
                       <Image
@@ -315,19 +318,19 @@ export default function HomeIntroPopup() {
                     {program.title}
                   </span>
                   <span className={`mt-2 text-xs font-semibold leading-5 ${
-                    program.featured ? "text-emerald-50/75" : "text-[#8E8A9F]"
+                    program.featured ? "text-cyan-50/75" : "text-[#8E8A9F]"
                   }`}>
                     {program.detail} - {program.schedule}
                   </span>
 
                   <span className="mt-auto flex items-end justify-between gap-4 pt-5">
                     <span className={`font-sans font-bold text-white ${
-                      program.featured ? "text-3xl drop-shadow-[0_0_16px_rgba(52,211,153,0.26)]" : "text-2xl"
+                      program.featured ? "text-3xl drop-shadow-[0_0_16px_rgba(34,211,238,0.26)]" : "text-2xl"
                     }`}>
                       {program.price}
                     </span>
                     <span className={`inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider ${
-                      program.featured ? "text-emerald-100" : "text-[#DFB15B]"
+                      program.featured ? "text-cyan-100" : "text-[#DFB15B]"
                     }`}>
                       View Program
                       <ArrowRight className="h-3.5 w-3.5 transition group-hover:translate-x-0.5" />

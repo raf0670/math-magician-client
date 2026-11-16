@@ -45,6 +45,11 @@ const PAYMENT_METHOD_STYLES = {
 };
 
 const PLAN_DISPLAY_NAMES = {
+  marathonEnglish: "Marathon English",
+  marathonMaths: "Marathon Maths",
+  marathonBoth: "Marathon English + Maths",
+  marathonAddEnglish: "Add Marathon English",
+  marathonAddMaths: "Add Marathon Maths",
   math: "Math Course", mathSlytherin: "Math + Slytherin", slytherinUpgrade: "Slytherin Upgrade",
   offline: "Gryffindor",
   gryffindor2: "Gryffindor 2.0",
@@ -64,6 +69,7 @@ const PLAN_DISPLAY_NAMES = {
 };
 
 const BATCH_DISPLAY_NAMES = {
+  Marathon: "Marathon",
   Farmgate: "Gryffindor",
   "Farmgate - Gryffindor 2.0": "Gryffindor 2.0",
   "Bailey Road": "Hufflepuff",

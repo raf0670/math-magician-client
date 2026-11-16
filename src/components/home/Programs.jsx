@@ -49,6 +49,28 @@ export default function ProgramsAndTestimonials() {
     // --- Programs Data ---
     const cardsData = [
         {
+            id: "marathon",
+            badge: "New Batch - Marathon",
+            title: "Marathon Classes",
+            desc: "A focused final sprint in English, Maths, or both, with live links delivered through your dashboard.",
+            location: { text: "Online" },
+            schedule: { days: "Class links announced live", time: "English + Maths" },
+            features: ["English or Maths: BDT 1,200", "Both sections: BDT 2,000", "25% off for paid 2026 students", "Add the second section later"],
+            price: "From BDT 1,200",
+            period: "",
+            marathonCourse: true,
+            featured: true,
+            borderClass: "border-cyan-300/45 hover:border-orange-300/60 shadow-[0_0_60px_rgba(34,211,238,0.14)]",
+            bgClass: "bg-linear-to-br from-cyan-400/14 via-[#121821] to-orange-300/10",
+            badgeStyle: "bg-cyan-300/12 border-cyan-300/30 text-cyan-100",
+            iconStyle: "bg-cyan-300/12 text-cyan-100 border-cyan-300/30",
+            accentGlowClass: "bg-cyan-300/18",
+            accentLineClass: "from-transparent via-cyan-300/70 to-orange-300/60",
+            sparkleClass: "text-cyan-200/70",
+            crestFrameClass: "shadow-[0_0_42px_rgba(34,211,238,0.25)]",
+            buttonStyle: "bg-cyan-300 text-black border border-cyan-200/70 hover:bg-orange-300"
+        },
+        {
             id: "math",
             badge: "New Batch - Math Course",
             title: "Math Course",
@@ -239,7 +261,7 @@ export default function ProgramsAndTestimonials() {
 
                 {/* Programs Matrix Grid */}
                 <motion.div
-                    className="mx-auto grid max-w-4xl grid-cols-1 gap-8 items-stretch"
+                    className="mx-auto grid max-w-6xl grid-cols-1 gap-8 items-stretch lg:grid-cols-2"
                     variants={containerVariants}
                     initial="hidden"
                     whileInView="visible"
@@ -361,7 +383,7 @@ export default function ProgramsAndTestimonials() {
                                     </div>
 
                                     <div className="grid gap-2">
-                                        {card.mathCourse ? (<button type="button" onClick={() => router.push("/math-course")} className="w-full rounded-2xl bg-emerald-300 px-5 py-4 text-sm font-bold text-black shadow-[0_14px_36px_rgba(52,211,153,0.24)] transition hover:bg-[#DFB15B] hover:shadow-[0_14px_40px_rgba(223,177,91,0.2)] active:scale-[0.98]">Explore Math Course</button>) : card.comingSoon ? (
+                                        {card.marathonCourse ? (<button type="button" onClick={() => router.push("/marathon")} className="w-full rounded-2xl bg-cyan-300 px-5 py-4 text-sm font-bold text-black shadow-[0_14px_36px_rgba(34,211,238,0.2)] transition hover:bg-orange-300 active:scale-[0.98]">Explore Marathon</button>) : card.mathCourse ? (<button type="button" onClick={() => router.push("/math-course")} className="w-full rounded-2xl bg-emerald-300 px-5 py-4 text-sm font-bold text-black shadow-[0_14px_36px_rgba(52,211,153,0.24)] transition hover:bg-[#DFB15B] hover:shadow-[0_14px_40px_rgba(223,177,91,0.2)] active:scale-[0.98]">Explore Math Course</button>) : card.comingSoon ? (
                                             <button
                                                 type="button"
                                                 disabled
