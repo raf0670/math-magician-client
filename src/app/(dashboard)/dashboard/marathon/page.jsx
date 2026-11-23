@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { ExternalLink, Languages, LockKeyhole, RefreshCw, Sigma, Video, VideoOff } from "lucide-react";
+import { ExternalLink, Languages, LockKeyhole, MessageCircle, RefreshCw, Sigma, Video, VideoOff } from "lucide-react";
 import { getMarathonDashboard, getProfile, saveAuthSession } from "@/lib/api";
 import FlashyLoader from "@/components/shared/FlashyLoader";
 
@@ -80,7 +80,10 @@ function SectionCard({ section, entitledIds }) {
     <article className={`relative flex min-h-88 flex-col overflow-hidden rounded-3xl border p-6 ${section.entitled ? "border-cyan-300/22 bg-[#101620]" : "border-white/7 bg-[#0E1118]"}`}>
       <div className="flex items-start justify-between gap-4"><div className={`flex h-12 w-12 items-center justify-center rounded-2xl border ${section.entitled ? "border-cyan-300/20 bg-cyan-300/10 text-cyan-200" : "border-white/8 bg-white/4 text-[#778196]"}`}><Icon className="h-5 w-5" /></div><span className={`rounded-full border px-3 py-1 text-[10px] font-bold uppercase tracking-wider ${section.entitled ? "border-emerald-300/20 bg-emerald-300/10 text-emerald-200" : "border-white/8 bg-white/4 text-[#778196]"}`}>{section.entitled ? "Unlocked" : "Locked"}</span></div>
       <h2 className="mt-7 text-3xl font-semibold">{section.title}</h2><p className="mt-3 text-sm leading-7 text-[#AAB3C5]">{meta?.description}</p>
-      <div className="mt-auto pt-7">
+      <div className="mt-auto space-y-3 pt-7">
+        {section.entitled && section.messengerGroupUrl ? (
+          <a href={section.messengerGroupUrl} target="_blank" rel="noopener noreferrer" className="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-blue-300/25 bg-blue-300/10 px-5 py-4 text-sm font-black uppercase tracking-wider text-blue-200 transition hover:border-blue-300/45 hover:bg-blue-300/15"><MessageCircle className="h-4 w-4" /> Join Messenger group <ExternalLink className="h-4 w-4" /></a>
+        ) : null}
         {section.entitled && section.published && section.joinUrl ? (
           <a href={section.joinUrl} target="_blank" rel="noopener noreferrer" className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-linear-to-r from-cyan-300 to-emerald-300 px-5 py-4 text-sm font-black uppercase tracking-wider text-black"><Video className="h-4 w-4" /> Join live class <ExternalLink className="h-4 w-4" /></a>
         ) : section.entitled ? (
